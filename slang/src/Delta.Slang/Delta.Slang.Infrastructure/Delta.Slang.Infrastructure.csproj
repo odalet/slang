@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <!-- <SignAssembly>True</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\Common\AddUpKeyFile.snk</AssemblyOriginatorKeyFile>
+    <DelaySign>False</DelaySign> -->
+    <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
+    <RootNamespace>Delta.Slang</RootNamespace>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DebugType>Full</DebugType>
+    <DebugSymbols>True</DebugSymbols>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="SonarAnalyzer.CSharp" Version="7.7.0.7192">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="System.Collections.Immutable">
+      <HintPath>C:\Program Files\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.1.0\ref\netcoreapp2.1\System.Collections.Immutable.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>
