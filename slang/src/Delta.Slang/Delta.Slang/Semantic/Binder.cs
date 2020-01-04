@@ -317,7 +317,7 @@ namespace Delta.Slang.Semantic
 
         private VariableDeclaration BindVariableDeclaration(VariableDeclarationNode node)
         {
-            var isReadOnly = false;
+            const bool isReadOnly = false;
             var variableType = BindTypeClause(node.Type);
             var initializer = node.Initializer == null ? null : BindExpression(node.Initializer);
             if (variableType == null && initializer != null) // infer the variable type from its initializer

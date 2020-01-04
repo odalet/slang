@@ -3,7 +3,7 @@ using Delta.Slang.Symbols;
 
 namespace Delta.Slang.Semantic
 {
-    internal sealed class VariableDeclaration : Statement
+    public sealed class VariableDeclaration : Statement
     {
         public VariableDeclaration(VariableSymbol variable, Expression initializer)
         {

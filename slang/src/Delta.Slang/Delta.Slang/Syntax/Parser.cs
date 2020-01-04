@@ -18,9 +18,7 @@ namespace Delta.Slang.Syntax
             if (source == null) throw new ArgumentNullException(nameof(source));
             diagnostics = new DiagnosticCollection();
             tokens = source
-                .Where(t => t.Kind != TokenKind.Whitespace)
-                .Where(t => t.Kind != TokenKind.Invalid)
-                .Where(t => t.Kind != TokenKind.Comment)
+                .Where(t => t.Kind != TokenKind.Whitespace && t.Kind != TokenKind.Invalid && t.Kind != TokenKind.Comment)
                 .ToArray();
         }
 
@@ -122,9 +120,9 @@ namespace Delta.Slang.Syntax
 
             // If no type declared: this is void, and void is a type ;)
             var voidToken = new Token(
-                TokenKind.Identifier, 
-                new TextSpan(Current.Span.Start, 0), 
-                Current.Position, 
+                TokenKind.Identifier,
+                new TextSpan(Current.Span.Start, 0),
+                Current.Position,
                 BuiltinTypes.Void.Name);
             return new TypeClauseNode(voidToken);
         }
@@ -175,8 +173,8 @@ namespace Delta.Slang.Syntax
         private Token Peek(int offset)
         {
             var index = position + offset;
-            return index >= tokens.Length ? 
-                tokens[tokens.Length - 1] : 
+            return index >= tokens.Length ?
+                tokens[tokens.Length - 1] :
                 tokens[index];
         }
     }

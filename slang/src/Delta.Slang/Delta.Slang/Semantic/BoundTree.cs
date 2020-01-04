@@ -3,7 +3,7 @@ using Delta.Slang.Symbols;
 
 namespace Delta.Slang.Semantic
 {
-    internal sealed class BoundTree
+    public sealed class BoundTree
     {
         public BoundTree(IEnumerable<FunctionDefinition> functions, IEnumerable<VariableSymbol> variables, IEnumerable<Statement> statements, IEnumerable<IDiagnostic> diagnostics)
         {

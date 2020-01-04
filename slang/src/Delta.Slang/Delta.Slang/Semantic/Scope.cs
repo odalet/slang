@@ -4,7 +4,7 @@ using Delta.Slang.Symbols;
 
 namespace Delta.Slang.Semantic
 {
-    internal sealed class Scope
+    public sealed class Scope
     {
         private readonly SymbolTable symbols = new SymbolTable();
 

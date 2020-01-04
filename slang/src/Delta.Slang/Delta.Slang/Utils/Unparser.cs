@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using Delta.Slang.Symbols;
 using Delta.Slang.Syntax;
 
 namespace Delta.Slang.Utils
@@ -106,14 +107,14 @@ namespace Delta.Slang.Utils
                     break;
                 // Expressions
                 case InvokeExpressionNode ie:
-                    w($"{ie.FunctionName}(");
+                    w($"{ie.FunctionName.Text}(");
                     var isFirstParam = true;
                     foreach (var param in ie.Arguments)
                     {
                         if (isFirstParam) isFirstParam = false; else w(", ");
                         unparse(param);
                     }
-                    w(");");
+                    w(")");
                     break;
                 case UnaryExpressionNode ue:
                     w(ue.Operator.Text);
@@ -137,10 +138,14 @@ namespace Delta.Slang.Utils
                     unparse(ae.Expression);
                     break;
                 case LiteralExpressionNode le:
+                    if (le.Type == BuiltinTypes.String)
+                        w("\"");
                     if (le.Literal.Value != null)
                         w(le.Literal.Value.ToString());
                     else
                         w(le.Literal.Text);
+                    if (le.Type == BuiltinTypes.String)
+                        w("\"");
                     break;
                 default:
                     w("<?>");

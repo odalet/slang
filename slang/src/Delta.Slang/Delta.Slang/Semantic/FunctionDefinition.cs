@@ -3,7 +3,7 @@ using Delta.Slang.Symbols;
 
 namespace Delta.Slang.Semantic
 {
-    internal sealed class FunctionDefinition : Statement
+    public sealed class FunctionDefinition : Statement
     {
         public FunctionDefinition(FunctionSymbol declaration, Statement body)
         {

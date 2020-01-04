@@ -13,6 +13,8 @@ namespace Delta.Slang
 
         public ParseTree ParseTree { get; }
 
+        //public BoundTree 
+
         public void EmitTree(TextWriter writer)
         {
             var tree = Binder.BindCompilationUnit(ParseTree.Root);

@@ -4,7 +4,7 @@ using Delta.Slang.Syntax;
 
 namespace Delta.Slang.Semantic
 {
-    internal enum UnaryOperatorKind
+    public enum UnaryOperatorKind
     {
         Identity,
         Negation,
@@ -12,7 +12,7 @@ namespace Delta.Slang.Semantic
         OnesComplement
     }
 
-    internal sealed class UnaryOperator
+    public sealed class UnaryOperator
     {
         public UnaryOperator(TokenKind tokenKind, UnaryOperatorKind kind, TypeSymbol operandType) : this(tokenKind, kind, operandType, operandType) { }
         public UnaryOperator(TokenKind tokenKind, UnaryOperatorKind kind, TypeSymbol operandType, TypeSymbol resultType)

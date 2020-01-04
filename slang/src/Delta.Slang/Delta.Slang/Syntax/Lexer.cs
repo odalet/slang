@@ -17,6 +17,7 @@ namespace Delta.Slang.Syntax
 
         private readonly DiagnosticCollection diagnostics;
         private readonly SourceText source;
+
         private int previousLineIndex = 0;
         private int previousColumnIndex = 0;
         private int currentLineIndex = 0;
@@ -35,26 +36,31 @@ namespace Delta.Slang.Syntax
 
         public void Dispose() => TextWindow.Dispose();
 
-        public IEnumerable<(int, Token)> LexWithLineNumbers()
+        public IEnumerable<Token> Lex()
         {
-            Token token;
+            var end = false;
             do
             {
-                var info = new TokenInfo();
-                LexNext(ref info);
-
-                token = info.Kind == TokenKind.Eof ?
+                var tokens = LextNext().Select(info => info.Kind == TokenKind.Eof ?
                     Token.MakeEof(info.Span.Start, info.Position) : // Special case: we can't apply source.ToString(span) here
-                    new Token(info.Kind, info.Span, info.Position, source.ToString(info.Span), info.Value);
+                    new Token(info.Kind, info.Span, info.Position, source.ToString(info.Span), info.Value));
 
-                yield return (previousLineIndex, token);
-            } while (token.Kind != TokenKind.Eof);
+                foreach (var tok in tokens)
+                {
+                    yield return tok;
+                    if (tok.Kind == TokenKind.Eof)
+                    {
+                        end = true;
+                        break;
+                    }
+                }
+            } while (!end);
         }
 
-        public IEnumerable<Token> Lex() => LexWithLineNumbers().Select(((int l, Token t) x) => x.t);
-
-        private void LexNext(ref TokenInfo info)
+        private IEnumerable<TokenInfo> LextNext()
         {
+            var info = new TokenInfo();
+
             AdvanceLinePosition();
             TextWindow.Start();
 
@@ -117,8 +123,9 @@ namespace Delta.Slang.Syntax
                     LexOperatorEndingWithOptionalEqual(current, ref info);
                     break;
                 case '"':
-                    LexStringLiteral(ref info);
-                    break;
+                    return LexStringLiteral();
+                    ////LexStringLiteral(ref info);
+                    ////break;
                 case '0':
                 case '1':
                 case '2':
@@ -147,6 +154,8 @@ namespace Delta.Slang.Syntax
 
             info.Position = GetPreviousLinePosition();
             info.Span = GetCurrentSpan();
+
+            return new[] { info };
         }
 
         private void LexPotentialComment(ref TokenInfo info)
@@ -238,14 +247,30 @@ namespace Delta.Slang.Syntax
             }
         }
 
-        private void LexStringLiteral(ref TokenInfo info)
+        private IEnumerable<TokenInfo> LexStringLiteral()
         {
             Consume(); // This consumes the initial quote (")
+            yield return new TokenInfo
+            {
+                Kind = TokenKind.DoubleQuote,
+                Position = GetPreviousLinePosition(),
+                Span = GetCurrentSpan()
+            };
 
+            AdvanceLinePosition();
+            TextWindow.Start();
+
+            var info = new TokenInfo(); // This is the string content
             var isEscaping = false;
+            var buffer = new List<char>();
             while (true)
             {
                 var current = LookAhead();
+                if (current == '\"' && !isEscaping)
+                    break;
+
+                buffer.Add(current);
+
                 if (current == '\\' && !isEscaping)
                 {
                     isEscaping = true;
@@ -253,18 +278,55 @@ namespace Delta.Slang.Syntax
                     continue;
                 }
 
-                if (current == '\"' && !isEscaping)
-                {
-                    Consume();
-                    break;
-                }
-
                 Consume();
                 isEscaping = false; // Not escaping any more...
             }
 
             info.Kind = TokenKind.StringLiteral;
+            info.Position = GetPreviousLinePosition();
+            info.Span = GetCurrentSpan();
+            info.Value = new string(buffer.ToArray());
+            yield return info;
+
+            AdvanceLinePosition();
+            TextWindow.Start();
+
+            Consume(); // This consumes the ending quote (")
+            yield return new TokenInfo
+            {
+                Kind = TokenKind.DoubleQuote,
+                Position = GetPreviousLinePosition(),
+                Span = GetCurrentSpan()
+            };
         }
+
+        ////private void LexStringLiteral(ref TokenInfo info)
+        ////{
+        ////    Consume(); // This consumes the initial quote (")
+
+        ////    var isEscaping = false;
+        ////    while (true)
+        ////    {
+        ////        var current = LookAhead();
+        ////        if (current == '\\' && !isEscaping)
+        ////        {
+        ////            isEscaping = true;
+        ////            Consume();
+        ////            continue;
+        ////        }
+
+        ////        if (current == '\"' && !isEscaping)
+        ////        {
+        ////            Consume();
+        ////            break;
+        ////        }
+
+        ////        Consume();
+        ////        isEscaping = false; // Not escaping any more...
+        ////    }
+
+        ////    info.Kind = TokenKind.StringLiteral;
+        ////}
 
         private void LexNumberLiteral(ref TokenInfo info)
         {

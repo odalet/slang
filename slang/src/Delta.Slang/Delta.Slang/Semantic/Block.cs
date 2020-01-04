@@ -2,7 +2,7 @@
 
 namespace Delta.Slang.Semantic
 {
-    internal sealed class Block : Statement
+    public sealed class Block : Statement
     {
         public Block(IEnumerable<Statement> statements) =>
             Statements = statements ?? new Statement[0];

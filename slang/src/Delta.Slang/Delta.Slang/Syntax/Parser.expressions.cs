@@ -6,13 +6,10 @@ namespace Delta.Slang.Syntax
 {
     partial class Parser
     {
-        private ExpressionNode ParseExpression()
-        {
-            if (Peek(0).Kind == TokenKind.Identifier && Peek(1).Kind == TokenKind.Equal)
-                return ParseAssignmentExpression();
-
-            return ParseUnaryOrBinaryOrPrimaryExpression();
-        }
+        private ExpressionNode ParseExpression() =>
+            Peek(0).Kind == TokenKind.Identifier && Peek(1).Kind == TokenKind.Equal ?
+            ParseAssignmentExpression() :
+            ParseUnaryOrBinaryOrPrimaryExpression();
 
         private AssignmentExpressionNode ParseAssignmentExpression()
         {
@@ -25,8 +22,6 @@ namespace Delta.Slang.Syntax
 
         private ExpressionNode ParseUnaryOrBinaryOrPrimaryExpression(int parentPrecedence = 0)
         {
-            //return null;
-
             ExpressionNode lhs;
             var unaryOperatorPrecedence = Current.Kind.GetUnaryOperatorPrecedence();
             if (unaryOperatorPrecedence != 0 && unaryOperatorPrecedence >= parentPrecedence)
@@ -59,7 +54,7 @@ namespace Delta.Slang.Syntax
                 case TokenKind.FalseKeyword:
                 case TokenKind.TrueKeyword: return ParseBooleanLiteral();
                 case TokenKind.NumberLiteral: return ParseNumberLiteral();
-                case TokenKind.StringLiteral: return ParseStringLiteral();
+                case TokenKind.DoubleQuote: return ParseStringLiteral();
                 case TokenKind.Identifier:
                 default:
                     return ParseNameOrInvokeExpression();
@@ -89,13 +84,15 @@ namespace Delta.Slang.Syntax
 
         private LiteralExpressionNode ParseStringLiteral()
         {
+            _ = MatchToken(TokenKind.DoubleQuote);
             var token = MatchToken(TokenKind.StringLiteral);
+            _ = MatchToken(TokenKind.DoubleQuote);
             return LiteralExpressionNode.MakeStringLiteral(token);
         }
 
-        private ExpressionNode ParseNameOrInvokeExpression() => 
+        private ExpressionNode ParseNameOrInvokeExpression() =>
             Peek(0).Kind == TokenKind.Identifier && Peek(1).Kind == TokenKind.OpenParenthesis ?
-            ParseInvokeExpression() : 
+            ParseInvokeExpression() :
             ParseNameExpression();
 
         private ExpressionNode ParseInvokeExpression()

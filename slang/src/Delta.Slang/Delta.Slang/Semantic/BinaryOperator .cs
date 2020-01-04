@@ -4,7 +4,7 @@ using Delta.Slang.Syntax;
 
 namespace Delta.Slang.Semantic
 {
-    internal enum BinaryOperatorKind
+    public enum BinaryOperatorKind
     {
         Addition,
         Subtraction,
@@ -23,7 +23,7 @@ namespace Delta.Slang.Semantic
         GreaterOrEqual,
     }
 
-    internal sealed class BinaryOperator
+    public sealed class BinaryOperator
     {
         public BinaryOperator(TokenKind tokenKind, BinaryOperatorKind kind, TypeSymbol operandType) : this(tokenKind, kind, operandType, operandType) { }
         public BinaryOperator(TokenKind tokenKind, BinaryOperatorKind kind, TypeSymbol operandType, TypeSymbol resultType) : this(tokenKind, kind, operandType, operandType, resultType) { }

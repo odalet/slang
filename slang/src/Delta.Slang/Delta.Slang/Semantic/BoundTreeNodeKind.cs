@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Delta.Slang.Semantic
+﻿namespace Delta.Slang.Semantic
 {
-    internal enum BoundTreeNodeKind
+    public enum BoundTreeNodeKind
     {
         // Structure
 

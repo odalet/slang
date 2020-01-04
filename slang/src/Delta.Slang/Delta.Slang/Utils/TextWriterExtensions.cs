@@ -5,7 +5,7 @@ using Delta.Slang.Syntax;
 
 namespace Delta.Slang.Utils
 {
-    internal static class TextWriterExtensions
+    public static class TextWriterExtensions
     {
         private const ConsoleColor identifierColor = ConsoleColor.DarkYellow;
         private const ConsoleColor typeIdentifierColor = ConsoleColor.Yellow;
@@ -61,6 +61,13 @@ namespace Delta.Slang.Utils
         }
 
         public static void WriteSpace(this TextWriter writer) => writer.WritePunctuation(" ");
+
+        public static void WriteText(this TextWriter writer, string text, ConsoleColor color)
+        {
+            writer.SetForeground(color);
+            writer.Write(text);
+            writer.ResetColor();
+        }
 
         private static bool IsConsoleOut(this TextWriter writer) => writer == Console.Out || writer is IndentedTextWriter iw && iw.InnerWriter.IsConsoleOut();
 

@@ -89,7 +89,7 @@ namespace Delta.Slang.Syntax
 
         public static LiteralExpressionNode MakeBooleanLiteral(Token literal, bool value) => new LiteralExpressionNode(literal, value, BuiltinTypes.Boolean);
         public static LiteralExpressionNode MakeIntegerLiteral(Token literal) => new LiteralExpressionNode(literal, literal.Value, BuiltinTypes.Integer);
-        public static LiteralExpressionNode MakeStringLiteral(Token literal) => new LiteralExpressionNode(literal, literal.Text, BuiltinTypes.String);
+        public static LiteralExpressionNode MakeStringLiteral(Token literal) => new LiteralExpressionNode(literal, literal.Value, BuiltinTypes.String);
 
         public override SyntaxKind Kind => SyntaxKind.LiteralExpression;
         public override Token MainToken => Literal;

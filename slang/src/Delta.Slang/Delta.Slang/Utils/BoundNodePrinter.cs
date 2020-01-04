@@ -7,7 +7,7 @@ using Delta.Slang.Syntax;
 
 namespace Delta.Slang.Utils
 {
-    internal static class BoundNodePrinter
+    public static class BoundNodePrinter
     {
         public static void WriteTo(this BoundTreeNode node, TextWriter writer)
         {

@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Delta.Slang.Semantic;
 using Delta.Slang.Syntax;
 using Delta.Slang.Utils;
 
@@ -10,11 +12,7 @@ namespace Delta.Slang.Repl
 {
     internal class Program
     {
-        static Program()
-        {
-            Writer = new ConsoleOutputWriter();
-            NullWriter = new NullOutputWriter();
-        }
+        static Program() => Writer = Console.Out;
 
         private static int Main(string[] args)
         {
@@ -22,8 +20,9 @@ namespace Delta.Slang.Repl
             return rc;
         }
 
-        private static IOutputWriter Writer { get; }
-        private static IOutputWriter NullWriter { get; }
+        private static TextWriter Writer { get; }
+
+        private Interpreter.Result LastResult { get; set; }
 
         private int Run(string[] args)
         {
@@ -45,7 +44,7 @@ namespace Delta.Slang.Repl
             }
         }
 
-        private int RunFile(string filename, bool noOutput = false)
+        private int RunFile(string filename)
         {
             var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "samples", filename);
             Writer.WriteLine($"Loading {path}");
@@ -56,11 +55,11 @@ namespace Delta.Slang.Repl
             {
                 watch.Reset();
                 watch.Start();
-                ProcessInput(reader, noOutput);
+                ProcessInput(reader);
                 watch.Stop();
             }
 
-            Console.WriteLine($"Processing time: {TimeSpan.FromTicks(watch.ElapsedTicks)}");
+            Writer.WriteLine($"Processing time: {TimeSpan.FromTicks(watch.ElapsedTicks)}");
             return 0;
         }
 
@@ -71,7 +70,7 @@ namespace Delta.Slang.Repl
             var exit = false;
             while (!exit)
             {
-                Console.Write("> ");
+                Writer.Write("> ");
                 var input = Console.ReadLine();
                 switch (input.ToLowerInvariant().Trim())
                 {
@@ -92,98 +91,159 @@ namespace Delta.Slang.Repl
 
         private void ShowHelp()
         {
-            Console.WriteLine("Q - Quit");
-            Console.WriteLine("E - Enter a program (2 blank lines to end input)");
+            Writer.WriteLine("Q - Quit");
+            Writer.WriteLine("E - Enter a program (;; on its own line to end input)");
         }
 
         private void ProcessInteractiveProgram()
         {
-            var emptyLineCounter = 0;
             var buffer = new StringBuilder();
-
             while (true)
             {
-                Console.Write(": ");
+                Writer.Write(": ");
                 var line = Console.ReadLine();
-                if (string.IsNullOrEmpty(line))
-                    emptyLineCounter++;
-
-                _ = buffer.AppendLine(line);
-
-                if (emptyLineCounter == 2)
+                if (line.Trim() == ";;")
                 {
-                    ProcessInput(buffer.ToString(), false);
+                    ProcessInput(buffer.ToString());
                     _ = buffer.Clear();
                     break;
                 }
+                _ = buffer.AppendLine(line);
             }
         }
 
-        private void ProcessInput(TextReader reader, bool noOutput)
+        private void ProcessInput(TextReader reader) => ProcessInput(SourceText.From(reader, Encoding.UTF8));
+        private void ProcessInput(string source) => ProcessInput(SourceText.From(source, Encoding.UTF8));
+
+        private void ProcessInput(SourceText sourceText)
         {
-            using (var interpreter = new Interpreter(reader))
-                ProcessInput(interpreter, noOutput);
+            var interpreter = new Interpreter(sourceText);
+            LastResult = interpreter.Run();
+
+            Writer.WriteLine();
+            Writer.WriteLine("Diagnostics: ");
+            ShowDiagnostics(LastResult.Diagnostics);
+
+            Writer.WriteLine();
+            Writer.WriteLine("Highlighted tokens: ");
+            HighlightTokens(LastResult.Tokens);
+
+            Writer.WriteLine();
+            Writer.WriteLine("Parse Tree: ");
+            ShowParseTree(LastResult.ParseTree);
+
+            Writer.WriteLine();
+            Writer.WriteLine("Highlighted Unparsed Tree: ");
+            Unparse(LastResult.ParseTree);
+
+            Writer.WriteLine();
+            Writer.WriteLine("Bound Tree: ");
+            ShowBoundTree(LastResult.BoundTree);
         }
 
-        private void ProcessInput(string source, bool noOutput)
+        private void ShowDiagnostics(IEnumerable<IDiagnostic> diagnostics)
         {
-            using (var interpreter = new Interpreter(source))
-                ProcessInput(interpreter, noOutput);
-        }
-
-        private void ProcessInput(Interpreter interpreter, bool noOutput)
-        {
-            var writer = noOutput ? NullWriter : Writer;
-            Highlight(interpreter, writer);
-
-            writer.WriteLine();
-
-            // And now, parse
-            var (t, d) = interpreter.Parse();
-            writer.WriteLine("Parse Tree: ");
-            Walk(t.Root, writer);
-            writer.WriteLine();
-            if (d.Any())
+            if (diagnostics.Any())
             {
-                writer.WriteLine("Diagnostics: ");
-                foreach (var diagnostic in d)
-                    writer.WriteLine(diagnostic);
+                foreach (var diagnostic in diagnostics)
+                    Writer.WriteLine(diagnostic);
             }
-            else writer.WriteLine("Diagnostics: None");
-
-            writer.WriteLine();
-            writer.WriteLine("Unparse: ");
-            Unparse(t, writer);
-
-            writer.WriteLine();
-            writer.WriteLine("Compile: ");
-            Compile(t, writer);
+            else Writer.WriteLine("--> None");
         }
 
-        private void Highlight(Interpreter interpreter, IOutputWriter writer)
+        private void ShowParseTree(ParseTree tree)
         {
-            var previousLine = -1;
-
-            foreach (var (line, token) in interpreter.LexWithLineNumbers())
+            if (tree == null)
             {
-                if (line != previousLine)
+                Writer.WriteLine("No Parse Tree");
+                return;
+            }
+
+            void walk(SyntaxNode node, TextWriter writer, int tabCount = 0)
+            {
+                string f(Token token)
                 {
-                    previousLine = line;
-                    writer.Write($"\r\n{(line + 1).ToString().PadLeft(5, '0')}: ", ConsoleColor.Green);
+                    if (token == null) return "<NULL>";
+                    var text = token.Value == null ? token.Text ?? "" : token.Value.ToString();
+                    return text.Replace("\r", "\\r").Replace("\n", "\\n").Replace(" ", "·");
                 }
 
+                var tabs = new string(' ', tabCount * 3);
+                writer.WriteLine($"{tabs}{node.Kind} - {f(node.MainToken)}");
+                foreach (var child in node.Children)
+                    walk(child, writer, tabCount + 1);
+            }
+
+            walk(tree.Root, Writer);
+        }
+
+        ////private void ProcessInput(Interpreter interpreter, bool noOutput)
+        ////{
+        ////    var writer = noOutput ? NullWriter : Writer;
+        ////    Highlight(interpreter, writer);
+
+        ////    writer.WriteLine();
+
+        ////    // And now, parse
+        ////    var (t, d) = interpreter.Parse();
+        ////    writer.WriteLine("Parse Tree: ");
+        ////    Walk(t.Root, writer);
+        ////    writer.WriteLine();
+        ////    if (d.Any())
+        ////    {
+        ////        writer.WriteLine("Diagnostics: ");
+        ////        foreach (var diagnostic in d)
+        ////            writer.WriteLine(diagnostic);
+        ////    }
+        ////    else writer.WriteLine("Diagnostics: None");
+
+        ////    writer.WriteLine();
+        ////    writer.WriteLine("Unparse: ");
+        ////    Unparse(t, writer);
+
+        ////    writer.WriteLine();
+        ////    writer.WriteLine("Compile: ");
+        ////    Compile(t, writer);
+        ////}
+
+        private void HighlightTokens(IEnumerable<Token> tokens)
+        {
+            const int tabLength = 4;
+            var line = 0;
+            Writer.WriteText($"\r\n{(line + 1).ToString().PadLeft(5, '0')}: ", ConsoleColor.Green);
+
+            void processMultiLineToken(Token token, ConsoleColor color)
+            {
+                var lines = token.Text.Replace("\r", "\n").Replace("\n\n", "\n").Split('\n');
+                var first = true;
+                foreach (var l in lines)
+                {
+                    if (first) first = false;
+                    else
+                    {
+                        line++;
+                        Writer.WriteText($"\r\n{(line + 1).ToString().PadLeft(5, '0')}: ", ConsoleColor.Green);
+                    }
+
+                    var transformed = l.Replace(' ', '·').Replace("\t", new string('·', tabLength));
+                    Writer.Write(transformed, color);
+                }
+            }
+
+            foreach (var token in tokens)
+            {
                 // Let's highlight a bit...
                 switch (token.Kind)
                 {
                     case TokenKind.Invalid:
                         Console.BackgroundColor = ConsoleColor.Yellow;
-                        writer.Write($"{token.Text}", ConsoleColor.Red);
+                        Writer.WriteText($"{token.Text}", ConsoleColor.Red);
                         break;
                     case TokenKind.Eof:
                         // Always write Eof
                         Writer.WriteLine();
                         Console.BackgroundColor = ConsoleColor.DarkGray;
-                        Writer.Write("EOF", ConsoleColor.Cyan);
+                        Writer.WriteText("EOF", ConsoleColor.Cyan);
                         break;
                     // Operators
                     case TokenKind.Plus:
@@ -207,88 +267,80 @@ namespace Delta.Slang.Repl
                     case TokenKind.Colon:
                     case TokenKind.Comma:
                     case TokenKind.Semicolon:
-                        writer.Write($"{token.Text}", ConsoleColor.Gray);
+                        Writer.WriteText($"{token.Text}", ConsoleColor.Gray);
                         break;
                     case TokenKind.NumberLiteral:
                     case TokenKind.StringLiteral:
-                        writer.Write($"{token.Text}", ConsoleColor.DarkRed);
+                        Writer.WriteText($"{token.Text}", ConsoleColor.DarkRed);
                         break;
                     case TokenKind.Identifier:
-                        writer.Write($"{token.Text}", ConsoleColor.DarkMagenta);
+                        Writer.WriteText($"{token.Text}", ConsoleColor.DarkMagenta);
                         break;
                     case TokenKind.Whitespace:
-                        writer.Write($"{new string('·', token.Text.Replace("\r", "").Replace("\n", "").Length)}", ConsoleColor.DarkGray);
+                        processMultiLineToken(token, ConsoleColor.Green);
                         break;
                     case TokenKind.Comment:
-                        writer.Write($"{token.Text}", ConsoleColor.DarkGray);
+                        processMultiLineToken(token, ConsoleColor.DarkGray);
                         break;
                     default:
                         if (token.IsKeyword())
-                            writer.Write($"{token.Text}", ConsoleColor.Cyan);
+                            Writer.WriteText($"{token.Text}", ConsoleColor.Cyan);
                         else
-                            writer.Write(token);
+                            Writer.Write(token);
                         break;
                 }
             }
 
-            writer.WriteLine();
+            Writer.WriteLine();
         }
 
-        private void Unparse(ParseTree t, IOutputWriter writer)
+        private void Unparse(ParseTree tree)
         {
+            if (tree == null)
+            {
+                Writer.WriteLine("No Parse Tree");
+                return;
+            }
+
             var unparsed = "";
             using (var tempWriter = new StringWriter())
             {
-                new Unparser(t).Unparse(tempWriter);
+                new Unparser(tree).Unparse(tempWriter);
                 unparsed = tempWriter.ToString();
             }
 
-            using (var interpreter = new Interpreter(unparsed))
-                Highlight(interpreter, writer);
-        }
-
-        private void Compile(ParseTree t, IOutputWriter writer)
-        {
-            var compilation = new Compilation(t);
-            compilation.EmitTree(writer.TextWriter);
-        }
-
-        private void Walk(SyntaxNode node, IOutputWriter writer, int tabCount = 0)
-        {
-            string f(Token token)
+            var localInterpreter = new Interpreter(SourceText.From(unparsed, Encoding.UTF8));
+            var localResults = localInterpreter.Run();
+            if (localResults.Diagnostics.Any())
             {
-                if (token == null) return "<NULL>";
-                var text = token.Value == null ? token.Text ?? "" : token.Value.ToString();
-                return text.Replace("\r", "\\r").Replace("\n", "\\n").Replace(" ", "·");
+                foreach (var diagnostic in localResults.Diagnostics)
+                    Writer.WriteLine(diagnostic);
             }
 
-            var tabs = new string(' ', tabCount * 3);
-            writer.WriteLine($"{tabs}{node.Kind} - {f(node.MainToken)}");
-            foreach (var child in node.Children)
-                Walk(child, writer, tabCount + 1);
+            HighlightTokens(localResults.Tokens);
         }
 
-        private static void LogError(object text) => Writer.WriteLine($"ERROR - {text ?? "<NULL>"}", ConsoleColor.Red);
-
-        #region Write*
-
-        public void Write(object text) => Console.Write(text);
-        public void WriteLine(object text) => Console.WriteLine(text);
-        public void WriteLine() => Console.WriteLine();
-        public void Write(object text, ConsoleColor color)
+        private void ShowBoundTree(BoundTree tree)
         {
-            Console.ForegroundColor = color;
-            Console.Write(text);
-            Console.ResetColor();
+            if (tree == null)
+            {
+                Writer.WriteLine("No Bound Tree");
+                return;
+            }
+
+            if (tree.Statements.Any())
+            {
+                foreach (var statement in tree.Statements)
+                    statement.WriteTo(Writer);
+            }
+
+            if (tree.Functions.Any())
+            {
+                foreach (var function in tree.Functions)
+                    function.WriteTo(Writer);
+            }
         }
 
-        public void WriteLine(object text, ConsoleColor color)
-        {
-            Console.ForegroundColor = color;
-            Console.WriteLine(text);
-            Console.ResetColor();
-        }
-
-        #endregion
+        private static void LogError(object text) => Writer.WriteText($"ERROR - {text ?? "<NULL>"}\r\n", ConsoleColor.Red);
     }
 }

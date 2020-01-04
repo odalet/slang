@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using Delta.Slang.Symbols;
 using Delta.Slang.Syntax;
@@ -87,16 +88,19 @@ namespace Delta.Slang
             return this;
         }
 
+        public void ReportLexerException(Exception ex) => ReportLexerError(LinePosition.Zero, TextSpan.Zero, $"Unexpected Error: {ex.Message}.\r\n{ex}");
         public void ReportInvalidCharacter(LinePosition position, TextSpan span, char character) =>
             ReportLexerError(position, span, $"Encountered invalid character: '{character}'.");
         public void ReportInvalidNumber(LinePosition position, TextSpan span, string text) =>
             ReportLexerError(position, span, $"'{text}' is not a valid number.");
 
+        public void ReportParserException(Exception ex) => ReportParserError(LinePosition.Zero, TextSpan.Zero, $"Unexpected Error: {ex.Message}.\r\n{ex}");
         public void ReportUnexpectedToken(LinePosition position, TextSpan span, TokenKind expected, TokenKind actual) =>
             ReportParserError(position, span, $"Unexpected token <{actual}>; expected <{expected}>.");
         public void ReportInvalidVariableDeclaration(LinePosition position, TextSpan span, Token variable, string reason) =>
             ReportParserError(position, span, $"Variable '{variable.Text}' is incorrectly declared: {reason ?? "?"}.");
 
+        public void ReportBinderException(Exception ex) => ReportBinderError(LinePosition.Zero, TextSpan.Zero, $"Unexpected Error: {ex.Message}.\r\n{ex}");
         public void ReportExpressionMustHaveValue(Token where) =>
             ReportBinderError(where, "Expression must have a value.");
         public void ReportParameterAlreadyDeclared(Token where, string name) =>
@@ -126,6 +130,7 @@ namespace Delta.Slang
 
         private void ReportLexerError(LinePosition position, TextSpan span, string message) => diagnostics.Add(new LexerError(position, span, message ?? ""));
         private void ReportParserError(LinePosition position, TextSpan span, string message) => diagnostics.Add(new ParserError(position, span, message ?? ""));
-        private void ReportBinderError(Token where, string message) => diagnostics.Add(new ParserError(where.Position, where.Span, message ?? ""));
+        private void ReportBinderError(Token where, string message) => ReportBinderError(where.Position, where.Span, message);
+        private void ReportBinderError(LinePosition position, TextSpan span, string message) => diagnostics.Add(new BinderError(position, span, message ?? ""));
     }
 }

@@ -4,12 +4,12 @@ using Delta.Slang.Symbols;
 
 namespace Delta.Slang.Semantic
 {
-    internal abstract class Expression : BoundTreeNode
+    public abstract class Expression : BoundTreeNode
     {
         public abstract TypeSymbol Type { get; }
     }
 
-    internal sealed class LiteralExpression : Expression
+    public sealed class LiteralExpression : Expression
     {
         public LiteralExpression(TypeSymbol type, object value)
         {
@@ -35,7 +35,7 @@ namespace Delta.Slang.Semantic
         }
     }
 
-    internal sealed class VariableExpression : Expression
+    public sealed class VariableExpression : Expression
     {
         public VariableExpression(VariableSymbol variable) =>
             Variable = variable ?? throw new ArgumentNullException(nameof(variable));
@@ -46,7 +46,7 @@ namespace Delta.Slang.Semantic
         public override BoundTreeNodeKind Kind => BoundTreeNodeKind.VariableExpression;
     }
 
-    internal sealed class AssignmentExpression : Expression
+    public sealed class AssignmentExpression : Expression
     {
         public AssignmentExpression(VariableSymbol variable, Expression expression)
         {
@@ -61,7 +61,7 @@ namespace Delta.Slang.Semantic
         public override BoundTreeNodeKind Kind => BoundTreeNodeKind.AssignmentExpression;
     }
 
-    internal sealed class ConversionExpression : Expression
+    public sealed class ConversionExpression : Expression
     {
         public ConversionExpression(TypeSymbol type, Expression expression)
         {
@@ -75,7 +75,7 @@ namespace Delta.Slang.Semantic
         public override BoundTreeNodeKind Kind => BoundTreeNodeKind.ConversionExpression;
     }
 
-    internal sealed class UnaryExpression : Expression
+    public sealed class UnaryExpression : Expression
     {
         public UnaryExpression(UnaryOperator op, Expression operand)
         {
@@ -90,7 +90,7 @@ namespace Delta.Slang.Semantic
         public override BoundTreeNodeKind Kind => BoundTreeNodeKind.UnaryExpression;
     }
 
-    internal sealed class BinaryExpression : Expression
+    public sealed class BinaryExpression : Expression
     {
         public BinaryExpression(Expression lhs, BinaryOperator op, Expression rhs)
         {
@@ -107,7 +107,7 @@ namespace Delta.Slang.Semantic
         public override BoundTreeNodeKind Kind => BoundTreeNodeKind.UnaryExpression;
     }
 
-    internal sealed class InvokeExpression : Expression
+    public sealed class InvokeExpression : Expression
     {
         public InvokeExpression(FunctionSymbol function, IEnumerable<Expression> arguments)
         {

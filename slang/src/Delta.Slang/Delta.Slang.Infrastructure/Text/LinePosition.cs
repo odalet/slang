@@ -31,7 +31,7 @@ namespace Delta.Slang.Text
             Line = line;
             Column = column;
         }
-        
+
         /// <summary>
         /// The line number. The first line in a file is defined as line 0 (zero based line numbering).
         /// </summary>
@@ -47,7 +47,7 @@ namespace Delta.Slang.Text
         public bool Equals(LinePosition other) => other.Line == Line && other.Column == Column;
         public override bool Equals(object obj) => obj is LinePosition position && Equals(position);
         public override int GetHashCode() => HashUtils.Combine(Line, Column);
-        
+
         public int CompareTo(LinePosition other)
         {
             var result = Line.CompareTo(other.Line);

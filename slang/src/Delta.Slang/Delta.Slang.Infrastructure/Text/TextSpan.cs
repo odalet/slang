@@ -6,6 +6,8 @@ namespace Delta.Slang.Text
     // Heavily inspired by (well... copied from) Roslyn's TextSpan
     public readonly struct TextSpan : IEquatable<TextSpan>, IComparable<TextSpan>
     {
+        public static TextSpan Zero => default;
+
         /// <summary>
         /// Creates a TextSpan instance beginning with the position Start and having the Length
         /// specified with <paramref name="length" />.

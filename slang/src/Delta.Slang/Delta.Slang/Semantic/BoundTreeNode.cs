@@ -3,7 +3,7 @@ using Delta.Slang.Utils;
 
 namespace Delta.Slang.Semantic
 {
-    internal abstract class BoundTreeNode
+    public abstract class BoundTreeNode
     {
         public abstract BoundTreeNodeKind Kind { get; }
 
