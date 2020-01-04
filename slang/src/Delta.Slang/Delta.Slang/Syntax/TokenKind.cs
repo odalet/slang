@@ -38,13 +38,30 @@
         ReturnKeyword,
         TrueKeyword,
         FalseKeyword,
+        IfKeyword,
+        ElseKeyword,
 
         Identifier
     }
 
-    internal static class TokenKindExtensions
+    internal static class TokenKindConversions
     {
-        public static string GetText(this TokenKind kind)
+        public static TokenKind GetIdentifierOrKeyword(string text)
+        {
+            switch (text)
+            {
+                case "fun": return TokenKind.FunKeyword;
+                case "var": return TokenKind.VarKeyword;
+                case "if": return TokenKind.IfKeyword;
+                case "else": return TokenKind.ElseKeyword;
+                case "return": return TokenKind.ReturnKeyword;
+                case "true": return TokenKind.TrueKeyword;
+                case "false": return TokenKind.FalseKeyword;
+                default: return TokenKind.Identifier;
+            }
+        }
+
+        public static string GetText(TokenKind kind)
         {
             switch (kind)
             {
@@ -78,12 +95,12 @@
                 case TokenKind.VarKeyword: return "var";
                 case TokenKind.ReturnKeyword: return "return";
                 //case TokenKind.BreakKeyword: return "break";
-                //case TokenKind.ContinueKeyword: return "continue";
-                //case TokenKind.ElseKeyword: return "else";
+                //case TokenKind.ContinueKeyword: return "continue";                
                 //case TokenKind.ForKeyword: return "for";
                 case TokenKind.FunKeyword: return "fun";
                 //case TokenKind.FunctionKeyword: return "function";
-                //case TokenKind.IfKeyword: return "if";
+                case TokenKind.IfKeyword: return "if";
+                case TokenKind.ElseKeyword: return "else";
                 //case TokenKind.LetKeyword: return "let";
                 //case TokenKind.ToKeyword: return "to";
                 //case TokenKind.WhileKeyword: return "while";
@@ -92,5 +109,10 @@
                     return "<?>";
             }
         }
+    }
+
+    internal static class TokenKindExtensions
+    {
+        public static string GetText(this TokenKind kind) => TokenKindConversions.GetText(kind);
     }
 }

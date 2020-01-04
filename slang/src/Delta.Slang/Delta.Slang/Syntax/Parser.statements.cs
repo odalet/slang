@@ -8,7 +8,7 @@
             {
                 case TokenKind.OpenBrace: return ParseBlock();
                 case TokenKind.VarKeyword: return ParseVariableDeclaration();
-                //case TokenKind.IfKeyword: return ParseIfStatement();
+                case TokenKind.IfKeyword: return ParseIfStatement();
                 //case TokenKind.WhileKeyword: return ParseWhileStatement();
                 //case TokenKind.DoKeyword: return ParseDoWhileStatement();
                 //case TokenKind.ForKeyword: return ParseForStatement();
@@ -18,7 +18,7 @@
                 default: return ParseExpressionStatement();
             }
         }
-        
+
         private VariableDeclarationNode ParseVariableDeclaration()
         {
             _ = MatchToken(TokenKind.VarKeyword);
@@ -27,7 +27,7 @@
             var type = Current.Kind == TokenKind.Colon ? ParseTypeClause() : null;
 
             ExpressionNode initializer = null;
-            
+
             if (Current.Kind == TokenKind.Equal)
             {
                 Advance();
@@ -37,10 +37,31 @@
             _ = MatchToken(TokenKind.Semicolon);
 
             if (type == null && initializer == null) diagnostics.ReportInvalidVariableDeclaration(
-                identifier.Position, identifier.Span, identifier, 
+                identifier.Position, identifier.Span, identifier,
                 "Either the variable type or its initializer can be missing, but not both");
 
             return new VariableDeclarationNode(identifier, type, initializer);
+        }
+
+        private IfStatementNode ParseIfStatement()
+        {
+            _ = MatchToken(TokenKind.IfKeyword);
+            _ = MatchToken(TokenKind.OpenParenthesis);
+            var condition = ParseExpression();
+            _ = MatchToken(TokenKind.CloseParenthesis);
+            var statement = ParseStatement();
+            var elseClause = ParseElseClause();
+            return new IfStatementNode(condition, statement, elseClause);
+        }
+
+        private ElseClauseNode ParseElseClause()
+        {
+            if (Current.Kind != TokenKind.ElseKeyword)
+                return null;
+
+            _ = MatchToken(TokenKind.ElseKeyword);
+            var statement = ParseStatement();
+            return new ElseClauseNode(statement);
         }
 
         private ReturnStatementNode ParseReturnStatement()

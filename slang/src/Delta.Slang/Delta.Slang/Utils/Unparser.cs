@@ -95,6 +95,43 @@ namespace Delta.Slang.Utils
                     unparse(es.Expression);
                     w(";");
                     break;
+                case IfStatementNode ifs:
+                {
+                    ltabs();
+                    w("if (");
+                    unparse(ifs.Condition);
+                    w(")");
+
+                    var isBlock = ifs.Statement is BlockNode;
+                    if (!isBlock)
+                    {
+                        Indent();
+                        unparse(ifs.Statement);
+                        Dedent();
+                    }
+                    else unparse(ifs.Statement);
+
+                    if (ifs.Else != null)
+                    {
+                        if (!isBlock)
+                            ltabs();
+                        unparse(ifs.Else);
+                    }
+                }
+                break;
+                case ElseClauseNode ec:
+                {
+                    w("else");
+                    var isBlock = ec.Statement is BlockNode;
+                    if (!isBlock)
+                    {
+                        Indent();
+                        unparse(ec.Statement);
+                        Dedent();
+                    }
+                    else unparse(ec.Statement);
+                }
+                break;
                 case ReturnStatementNode rs:
                     ltabs();
                     w("return");

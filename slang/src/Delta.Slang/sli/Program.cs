@@ -339,6 +339,8 @@ namespace Delta.Slang.Repl
                 foreach (var function in tree.Functions)
                     function.WriteTo(Writer);
             }
+
+            Writer.WriteLine();
         }
 
         private static void LogError(object text) => Writer.WriteText($"ERROR - {text ?? "<NULL>"}\r\n", ConsoleColor.Red);

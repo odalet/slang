@@ -29,5 +29,6 @@
         InvalidStatement,
         InvalidExpression,
         FunctionDefinition,
+        IfStatement,
     }
 }

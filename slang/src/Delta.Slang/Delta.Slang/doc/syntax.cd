@@ -1,27 +1,27 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1">
   <Class Name="Delta.Slang.Syntax.MemberNode" Collapsed="true">
-    <Position X="15" Y="3.5" Width="1.5" />
+    <Position X="15.5" Y="3.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Syntax\nodes\abstractNodes.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Delta.Slang.Syntax.StatementNode" Collapsed="true">
-    <Position X="18.5" Y="6.5" Width="1.5" />
+    <Position X="18.5" Y="6" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Syntax\nodes\abstractNodes.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Delta.Slang.Syntax.ExpressionNode" Collapsed="true">
-    <Position X="22.75" Y="6.5" Width="1.75" />
+    <Position X="25.25" Y="3.5" Width="1.75" />
     <InheritanceLine Type="Delta.Slang.Syntax.SyntaxNode" ManuallyRouted="true">
       <Path>
         <Point X="19.25" Y="2.312" />
         <Point X="19.25" Y="3.139" />
-        <Point X="23.625" Y="3.139" />
-        <Point X="23.625" Y="6.5" />
+        <Point X="26.125" Y="3.139" />
+        <Point X="26.125" Y="3.5" />
       </Path>
     </InheritanceLine>
     <TypeIdentifier>
@@ -29,87 +29,73 @@
       <FileName>Syntax\nodes\abstractNodes.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Delta.Slang.Syntax.BlockNode" Collapsed="true">
-    <Position X="18.5" Y="8" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAABAAAAAAAAEAAAAAAAABAAAAAAAAAABAAA=</HashCode>
-      <FileName>Syntax\nodes\BlockNode.cs</FileName>
-    </TypeIdentifier>
-  </Class>
   <Class Name="Delta.Slang.Syntax.CompilationUnitNode" Collapsed="true">
-    <Position X="12" Y="3.5" Width="2" />
+    <Position X="13.25" Y="3.5" Width="2" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAABAAAAAAAAEAAAAAAAAAAAAAAAEAAABAAA=</HashCode>
+      <HashCode>AAAAAAAAAABAAEAAAAAEAAAAAAAAAAAAAAAEAAAAAAA=</HashCode>
       <FileName>Syntax\nodes\CompilationUnitNode.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Delta.Slang.Syntax.AssignmentExpressionNode" Collapsed="true">
-    <Position X="27" Y="9.75" Width="2.25" />
+    <Position X="23.25" Y="10.5" Width="2.25" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAABAAAAAAAAEAAAAAAAAAAAQAAAAQAABAAA=</HashCode>
-      <FileName>Syntax\nodes\expressionNodes.cs</FileName>
+      <HashCode>AAAAAAAAAABAAEAAgAAEAAAAAAAAAAAQAAAAQAAAAAA=</HashCode>
+      <FileName>Syntax\nodes\expressions.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Delta.Slang.Syntax.UnaryExpressionNode" Collapsed="true">
-    <Position X="16.25" Y="9.75" Width="1.75" />
+    <Position X="19.5" Y="11.75" Width="1.75" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAABAAAAAAAAEAAAAAAAAAAAAAAAAAAEBIAA=</HashCode>
-      <FileName>Syntax\nodes\expressionNodes.cs</FileName>
+      <HashCode>AAAAAAAAAABAAEAAAAAEAAAAAAAAAAAAAAAAAAEAIAA=</HashCode>
+      <FileName>Syntax\nodes\expressions.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Delta.Slang.Syntax.BinaryExpressionNode" Collapsed="true">
-    <Position X="20.25" Y="9.75" Width="2" />
+    <Position X="21.5" Y="11.75" Width="2" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAABAAAAAAAAEAAAAAAAAAAAACACAAAABIAA=</HashCode>
-      <FileName>Syntax\nodes\expressionNodes.cs</FileName>
+      <HashCode>AAAAAAAAAABAAEAAAAAEAAAAAAAAAAAACACAAAAAIAA=</HashCode>
+      <FileName>Syntax\nodes\expressions.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Delta.Slang.Syntax.ParenthesizedExpressionNode" Collapsed="true">
-    <Position X="22.5" Y="9.75" Width="2.25" />
+    <Position X="20.75" Y="10.5" Width="2.25" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAABAAAAAAAAEAAAAAAAAAAAQAAAAAAABAAA=</HashCode>
-      <FileName>Syntax\nodes\expressionNodes.cs</FileName>
+      <HashCode>AAAAAAAAAABAAEAAAAAEAAAAAAAAAAAQAAAAAAAAAAA=</HashCode>
+      <FileName>Syntax\nodes\expressions.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Delta.Slang.Syntax.LiteralExpressionNode" Collapsed="true">
-    <Position X="25" Y="9.75" Width="1.75" />
+    <Position X="23.75" Y="11.75" Width="1.75" />
     <TypeIdentifier>
-      <HashCode>AAQAAAAAAABAABAAAAAEAABAAAAAAAAAASAgAAABAAA=</HashCode>
-      <FileName>Syntax\nodes\expressionNodes.cs</FileName>
+      <HashCode>AAQAAAAAAABAAFAAAAAEAABAAAAAAAAAASAgAAAAAAA=</HashCode>
+      <FileName>Syntax\nodes\expressions.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Delta.Slang.Syntax.InvokeExpressionNode" Collapsed="true">
-    <Position X="14" Y="9.75" Width="2" />
+    <Position X="16.5" Y="10.5" Width="2" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAABAAAAAAAAGAAAAAAAAAAAAAIAAAAABAAA=</HashCode>
-      <FileName>Syntax\nodes\expressionNodes.cs</FileName>
+      <HashCode>AAAAAAAAAABAAEAAAACGAAAAAAAAAEAAIAAAAAAAAAA=</HashCode>
+      <FileName>Syntax\nodes\expressions.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Delta.Slang.Syntax.NameExpressionNode" Collapsed="true">
-    <Position X="18.25" Y="9.75" Width="1.75" />
+    <Position X="18.75" Y="10.5" Width="1.75" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAABAAAAAAAAEAAAAAAAAAAAAAAAAQAABAAA=</HashCode>
-      <FileName>Syntax\nodes\expressionNodes.cs</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="Delta.Slang.Syntax.ExpressionStatementNode" Collapsed="true">
-    <Position X="16.25" Y="8" Width="2" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAABAAAAAAAAEAAAAAAAAAAAQAAAAAAABAAA=</HashCode>
-      <FileName>Syntax\nodes\ExpressionStatementNode.cs</FileName>
+      <HashCode>AAAAAAAAAABAAEAAAAAEAAAAAAAAAAAAAAAAQAAAAAA=</HashCode>
+      <FileName>Syntax\nodes\expressions.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Delta.Slang.Syntax.FunctionDeclarationNode" Collapsed="true">
-    <Position X="14.75" Y="5" Width="2" />
+    <Position X="15.25" Y="5" Width="2" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAACBAAAAAAAAHAAAAAAAAAAAAAAAAAAAFAAA=</HashCode>
+      <HashCode>AAAAAAAAACBAAEAAAAAHAAAAAAAAAAAAAAAAAAAEAAA=</HashCode>
       <FileName>Syntax\nodes\FunctionDeclarationNode.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Delta.Slang.Syntax.GlobalStatementNode" Collapsed="true">
-    <Position X="12.5" Y="5" Width="1.75" />
+    <Position X="13" Y="5" Width="1.75" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAABAAAAAAAAEAAACAAAAAAAAAAAAAAABAAA=</HashCode>
+      <HashCode>AAAAAAAAAABAAEAAAAAEAAACAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Syntax\nodes\GlobalStatementNode.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
@@ -117,36 +103,24 @@
     </ShowAsAssociation>
   </Class>
   <Class Name="Delta.Slang.Syntax.ParametersDeclarationNode" Collapsed="true">
-    <Position X="20" Y="3.5" Width="2.5" />
+    <Position X="19.5" Y="3.5" Width="2.25" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAABAAAAAAAAEAAAAAAAAAAAAAIAAAAABAAA=</HashCode>
+      <HashCode>AAAAAAAAAABAAEAAAAAEAAAAAAAAAAAAAIAAAAAAAAA=</HashCode>
       <FileName>Syntax\nodes\ParameterDeclarationNode.cs</FileName>
     </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Property Name="Parameters" />
+    </ShowAsCollectionAssociation>
   </Class>
   <Class Name="Delta.Slang.Syntax.ParameterDeclarationNode" Collapsed="true">
-    <Position X="24" Y="3.5" Width="2.25" />
+    <Position X="21" Y="4.75" Width="2.25" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAABAAAAAAAAEAAAAAAAAABAAAQAAAAABAAA=</HashCode>
+      <HashCode>AAAAAAAAAABAAEAAAAAEAAAAAAAAABAAAQAAAAAAAAA=</HashCode>
       <FileName>Syntax\nodes\ParameterDeclarationNode.cs</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="Delta.Slang.Syntax.ReturnStatementNode" Collapsed="true">
-    <Position X="20.25" Y="8" Width="2" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAABAAAAAAAAEAAAAAAAAAAAQAAAAAAABAAA=</HashCode>
-      <FileName>Syntax\nodes\ReturnStatementNode.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Delta.Slang.Syntax.SyntaxNode" Collapsed="true">
     <Position X="18.5" Y="1.75" Width="1.5" />
-    <AssociationLine Name="Token" Type="Delta.Slang.Syntax.Token" FixedFromPoint="true" FixedToPoint="true">
-      <Path>
-        <Point X="20" Y="1.937" />
-        <Point X="20.375" Y="1.937" />
-        <Point X="20.375" Y="1.5" />
-        <Point X="24.25" Y="1.5" />
-      </Path>
-    </AssociationLine>
     <AssociationLine Name="Children" Type="Delta.Slang.Syntax.SyntaxNode" FixedFromPoint="true" FixedToPoint="true">
       <Path>
         <Point X="18.5" Y="2.125" />
@@ -157,11 +131,10 @@
       </Path>
     </AssociationLine>
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAABAAAAAAAAEAAAAAAAAAAAAAAAAAAABAAA=</HashCode>
+      <HashCode>AAAAAAAAAABAAEAAAAAEAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Syntax\nodes\SyntaxNode.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
-      <Property Name="Token" />
       <Property Name="Kind" />
     </ShowAsAssociation>
     <ShowAsCollectionAssociation>
@@ -169,29 +142,14 @@
     </ShowAsCollectionAssociation>
   </Class>
   <Class Name="Delta.Slang.Syntax.TypeClauseNode" Collapsed="true">
-    <Position X="17" Y="3.5" Width="1.5" />
+    <Position X="17.25" Y="3.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAABAAAAAAAAEAAAAAAAAABAAAAAAAAABAAA=</HashCode>
+      <HashCode>AAAAAAAAAABAAEAAAAAEAAAAAAAAABAAAAAAAAAAAAA=</HashCode>
       <FileName>Syntax\nodes\TypeClauseNode.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Delta.Slang.Syntax.VariableDeclarationNode" Collapsed="true">
-    <Position X="14" Y="8" Width="2" />
-    <InheritanceLine Type="Delta.Slang.Syntax.StatementNode" FixedToPoint="true">
-      <Path>
-        <Point X="19.25" Y="7.191" />
-        <Point X="19.25" Y="7.625" />
-        <Point X="15" Y="7.625" />
-        <Point X="15" Y="8" />
-      </Path>
-    </InheritanceLine>
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAABAAAAAAAEEAAAAAAAAAAAAAQAAAAABBAA=</HashCode>
-      <FileName>Syntax\nodes\VariableDeclarationNode.cs</FileName>
-    </TypeIdentifier>
-  </Class>
   <Class Name="Delta.Slang.Syntax.ParseTree" Collapsed="true">
-    <Position X="11.75" Y="1" Width="1.5" />
+    <Position X="13" Y="1" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Syntax\ParseTree.cs</FileName>
@@ -203,24 +161,69 @@
   <Class Name="Delta.Slang.Syntax.Token" Collapsed="true">
     <Position X="24.25" Y="1.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAABAAAEkAAAAAAAAAAAAAAAAAAAgCAIAAAA=</HashCode>
+      <HashCode>AAAAAAAAAABAAAEkAAAAAAAAAAAAAAAAAAAgCAIAAAQ=</HashCode>
       <FileName>Syntax\Token.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
       <Property Name="Kind" />
     </ShowAsAssociation>
   </Class>
-  <Enum Name="Delta.Slang.Syntax.SyntaxKind">
-    <Position X="26.5" Y="1.75" Width="1.5" />
+  <Class Name="Delta.Slang.Syntax.BlockNode" Collapsed="true">
+    <Position X="14" Y="7.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAEQAAIFGAAACEAAQAIAAAAAAACAAABAAAAAAAUAAQ=</HashCode>
+      <HashCode>AAAAAAAAAABAAEAAAAAEAAAAAAAABAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Syntax\nodes\statements.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Delta.Slang.Syntax.ExpressionStatementNode" Collapsed="true">
+    <Position X="17.25" Y="8.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAABAAEAAAAAEAAAAAAAAAAAQAAAAAAAAAAA=</HashCode>
+      <FileName>Syntax\nodes\statements.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Delta.Slang.Syntax.VariableDeclarationNode" Collapsed="true">
+    <Position X="15.75" Y="7.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAABAAEAAAAEEAAAAAAAAAAAAAQAAAAAABAA=</HashCode>
+      <FileName>Syntax\nodes\statements.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Delta.Slang.Syntax.IfStatementNode" Collapsed="true">
+    <Position X="20.25" Y="8.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAADAAEAQAAAEAAACAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Syntax\nodes\statements.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="ElseClause" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="Delta.Slang.Syntax.ReturnStatementNode" Collapsed="true">
+    <Position X="18.75" Y="7.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAABAAEAAAAAEAAAAAAAAAAAQAAAAAAAAAAA=</HashCode>
+      <FileName>Syntax\nodes\statements.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Delta.Slang.Syntax.ElseClauseNode" Collapsed="true">
+    <Position X="23" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAABAAEAAAAAEAAACAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Syntax\nodes\statements.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Enum Name="Delta.Slang.Syntax.SyntaxKind">
+    <Position X="27.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAEQAAIFGQAACEQAQAIAAAAAAACAAABAAAAAAAUAAQ=</HashCode>
       <FileName>Syntax\SyntaxKind.cs</FileName>
     </TypeIdentifier>
   </Enum>
   <Enum Name="Delta.Slang.Syntax.TokenKind">
-    <Position X="28.25" Y="1" Width="1.5" />
+    <Position X="29.25" Y="1" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AEAQAAAEEDAAAEIAgMKAAgxBBAAAAEQAgSAASAgAAEA=</HashCode>
+      <HashCode>AEAQAAAEEDAAAEIggMKAAgxBBAAAAEQAgWAASAgAAEA=</HashCode>
       <FileName>Syntax\TokenKind.cs</FileName>
     </TypeIdentifier>
   </Enum>

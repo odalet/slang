@@ -104,9 +104,17 @@ namespace Delta.Slang.Semantic
             {
                 case BlockNode b: return BindBlock(b);
                 case VariableDeclarationNode vd: return BindVariableDeclaration(vd);
+                case ExpressionStatementNode es: return BindExpressionStatement(es);
+                case IfStatementNode ifs: return BindIfStatement(ifs);
             }
 
             return new InvalidStatement();
+        }
+
+        private Statement BindExpressionStatement(ExpressionStatementNode node)
+        {
+            var expression = BindExpression(node.Expression, allowVoid: true);
+            return new ExpressionStatement(expression);
         }
 
         private Block BindBlock(BlockNode node)
@@ -128,6 +136,30 @@ namespace Delta.Slang.Semantic
 
             return new Block(statements);
         }
+
+        private VariableDeclaration BindVariableDeclaration(VariableDeclarationNode node)
+        {
+            const bool isReadOnly = false;
+            var variableType = BindTypeClause(node.Type);
+            var initializer = node.Initializer == null ? null : BindExpression(node.Initializer);
+            if (variableType == null && initializer != null) // infer the variable type from its initializer
+                variableType = initializer.Type;
+
+            var variable = BindVariable(node.VariableName, isReadOnly, variableType);
+
+            var realInitializer = initializer == null ? BindDefaultInitializer(variableType) : BindConversion(node.Initializer, initializer, variableType);
+            return new VariableDeclaration(variable, realInitializer);
+        }
+
+        private IfStatement BindIfStatement(IfStatementNode syntax)
+        {
+            var condition = BindExpression(syntax.Condition, BuiltinTypes.Boolean);
+            var thenStatement = BindStatement(syntax.Statement);
+            var elseStatement = syntax.Else == null ? null : BindStatement(syntax.Else.Statement);
+            return new IfStatement(condition, thenStatement, elseStatement);
+        }
+
+        private Expression BindExpression(ExpressionNode node, TypeSymbol expectedType) => BindConversion(node, expectedType);
 
         private Expression BindExpression(ExpressionNode node, bool allowVoid = false)
         {
@@ -314,20 +346,6 @@ namespace Delta.Slang.Semantic
         }
 
         private Expression BindDefaultInitializer(TypeSymbol type) => new LiteralExpression(type, type.DefaultValue);
-
-        private VariableDeclaration BindVariableDeclaration(VariableDeclarationNode node)
-        {
-            const bool isReadOnly = false;
-            var variableType = BindTypeClause(node.Type);
-            var initializer = node.Initializer == null ? null : BindExpression(node.Initializer);
-            if (variableType == null && initializer != null) // infer the variable type from its initializer
-                variableType = initializer.Type;
-
-            var variable = BindVariable(node.VariableName, isReadOnly, variableType);
-
-            var realInitializer = initializer == null ? BindDefaultInitializer(variableType) : BindConversion(node.Initializer, initializer, variableType);
-            return new VariableDeclaration(variable, realInitializer);
-        }
 
         private VariableSymbol BindVariable(Token identifier, bool isReadOnly, TypeSymbol type)
         {

@@ -4,15 +4,20 @@
     {
         Invalid,
         CompilationUnit,
-        GlobalStatement,
+
         FunctionDeclaration,
         ParametersDeclaration,
         ParameterDeclaration,
         TypeClause,
+
         Block,
-        AssignmentExpression,
+        GlobalStatement,   
+        IfStatement,
+        ElseClause,
         ReturnStatement,
         ExpressionStatement,
+
+        AssignmentExpression,
         UnaryExpression,
         BinaryExpression,
         ParenthesizedExpression,

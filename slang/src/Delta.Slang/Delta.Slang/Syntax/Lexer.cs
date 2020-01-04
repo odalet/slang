@@ -396,7 +396,7 @@ namespace Delta.Slang.Syntax
                 Consume();
 
             var text = source.ToString(GetCurrentSpan());
-            info.Kind = GetIdentifierOrKeyword(text);
+            info.Kind = TokenKindConversions.GetIdentifierOrKeyword(text);
         }
 
         private bool IsIdentifierFirstCharacter(char c) => c == '_' || char.IsLetter(c);
@@ -418,17 +418,5 @@ namespace Delta.Slang.Syntax
         private TextSpan GetCurrentSpan() => new TextSpan(TextWindow.LexemeStartPosition, TextWindow.Width);
         private LinePosition GetPreviousLinePosition() => new LinePosition(previousLineIndex, previousColumnIndex);
         private LinePosition GetCurrentLinePosition() => new LinePosition(currentLineIndex, currentColumnIndex);
-        private TokenKind GetIdentifierOrKeyword(string text)
-        {
-            switch (text)
-            {
-                case "fun": return TokenKind.FunKeyword;
-                case "var": return TokenKind.VarKeyword;
-                case "return": return TokenKind.ReturnKeyword;
-                case "true": return TokenKind.TrueKeyword;
-                case "false": return TokenKind.FalseKeyword;
-                default: return TokenKind.Identifier;
-            }
-        }
     }
 }

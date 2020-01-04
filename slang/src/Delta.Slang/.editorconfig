@@ -14,3 +14,6 @@ dotnet_diagnostic.RCS1057.severity = none
 
 # RCS1123: Add parentheses according to operator precedence.
 dotnet_diagnostic.RCS1123.severity = none
+
+# RCS1001: Add braces (when expression spans over multiple lines).
+dotnet_diagnostic.RCS1001.severity = none

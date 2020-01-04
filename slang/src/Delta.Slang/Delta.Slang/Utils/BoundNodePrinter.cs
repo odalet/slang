@@ -24,11 +24,17 @@ namespace Delta.Slang.Utils
                 case Block b:
                     WriteBlock(b, writer);
                     break;
+                case VariableDeclaration vd:
+                    WriteVariableDeclaration(vd, writer);
+                    break;
                 case FunctionDefinition fd:
                     WriteFunctionDefinition(fd, writer);
                     break;
-                case VariableDeclaration vd:
-                    WriteVariableDeclaration(vd, writer);
+                case ExpressionStatement es:
+                    WriteExpressionStatement(es, writer);
+                    break;
+                case IfStatement ifs:
+                    WriteIfStatement(ifs, writer);
                     break;
                 case AssignmentExpression ae:
                     WriteAssignmentExpression(ae, writer);
@@ -48,13 +54,132 @@ namespace Delta.Slang.Utils
                 case BinaryExpression be:
                     WriteBinaryExpression(be, writer);
                     break;
-                ////case InvalidStatement invalid:
-                ////    WriteInvalidStatement(invalid, writer);
-                ////    break;
+                case InvalidStatement _:
+                    writer.Write("<INV>");
+                    break;
                 default:
                     writer.Write("<?>");
                     break;
             }
+        }
+
+        private static void WriteExpressionStatement(ExpressionStatement node, IndentedTextWriter writer)
+        {
+            node.Expression.WriteTo(writer);
+            writer.WritePunctuation(TokenKind.Semicolon);
+            writer.WriteLine();
+        }
+
+        private static void WriteBlock(Block node, IndentedTextWriter writer)
+        {
+            writer.WritePunctuation(TokenKind.OpenBrace);
+            writer.WriteLine();
+            writer.Indent++;
+
+            foreach (var s in node.Statements)
+                s.WriteTo(writer);
+
+            writer.Indent--;
+            writer.WritePunctuation(TokenKind.CloseBrace);
+        }
+
+        private static void WriteVariableDeclaration(VariableDeclaration node, IndentedTextWriter writer)
+        {
+            writer.WriteKeyword(TokenKind.VarKeyword);
+            writer.WriteSpace();
+            writer.WriteIdentifier(node.Variable.Name);
+            writer.WritePunctuation(TokenKind.Colon);
+            writer.WriteSpace();
+            writer.WriteTypeIdentifier(node.Variable.Type.Name);
+            writer.WriteSpace();
+            writer.WritePunctuation(TokenKind.Equal);
+            writer.WriteSpace();
+            node.Initializer.WriteTo(writer);
+            writer.WritePunctuation(TokenKind.Semicolon);
+            writer.WriteLine();
+        }
+
+        private static void WriteFunctionDefinition(FunctionDefinition node, IndentedTextWriter writer)
+        {
+            writer.WriteLine();
+            writer.WriteKeyword(TokenKind.FunKeyword);
+            writer.WriteSpace();
+            writer.WriteIdentifier(node.Declaration.Name);
+            writer.WritePunctuation(TokenKind.OpenParenthesis);
+            // parameters
+            var first = true;
+            foreach (var p in node.Declaration.Parameters)
+            {
+                if (first) first = false;
+                else
+                {
+                    writer.WritePunctuation(TokenKind.Comma);
+                    writer.WriteSpace();
+                }
+
+                writer.WriteIdentifier(p.Name);
+                writer.WritePunctuation(TokenKind.Colon);
+                writer.WriteTypeIdentifier(p.Type.Name);
+            }
+
+            writer.WritePunctuation(TokenKind.CloseParenthesis);
+            writer.WritePunctuation(TokenKind.Colon);
+            writer.WriteSpace();
+            writer.WriteTypeIdentifier(node.Declaration.Type.Name);
+            writer.WriteSpace();
+            node.Body.WriteTo(writer);
+            writer.WriteLine();
+        }
+
+        private static void WriteIfStatement(IfStatement node, IndentedTextWriter writer)
+        {
+            writer.WriteKeyword(TokenKind.IfKeyword);
+            writer.WriteSpace();
+            writer.WritePunctuation(TokenKind.OpenParenthesis);
+            node.Condition.WriteTo(writer);
+            writer.WritePunctuation(TokenKind.CloseParenthesis);
+            
+            var isThenBlock = node.Then is Block;
+            if (isThenBlock)
+                writer.WriteSpace();
+            else
+            {
+                writer.WriteLine();
+                writer.Indent++;
+            }
+
+            node.Then.WriteTo(writer);
+
+            if (!isThenBlock)
+                writer.Indent--;
+
+            if (node.Else == null)
+            {
+                writer.WriteLine();
+                return;
+            }
+
+            if (isThenBlock) writer.WriteSpace();
+            writer.WriteKeyword(TokenKind.ElseKeyword);
+
+            var isElseBlock = node.Else is Block;
+            if (isElseBlock)
+                writer.WriteSpace();
+            else
+            {
+                writer.WriteLine();
+                writer.WriteLine();
+                writer.Indent++;
+            }
+
+            node.Else.WriteTo(writer);
+
+            if (!isThenBlock)
+                writer.Indent--;
+            
+            // This leaves a blank line between the end of the if/else statement and the next instructions
+            writer.WriteLine();
+            writer.WriteLine();
         }
 
         private static void WriteUnaryExpression(UnaryExpression node, IndentedTextWriter writer)
@@ -111,67 +236,6 @@ namespace Delta.Slang.Utils
             writer.WritePunctuation(TokenKind.Equal);
             writer.WriteSpace();
             node.Expression.WriteTo(writer);
-        }
-
-        private static void WriteBlock(Block node, IndentedTextWriter writer)
-        {
-            writer.WritePunctuation(TokenKind.OpenBrace);
-            writer.WriteLine();
-            writer.Indent++;
-
-            foreach (var s in node.Statements)
-                s.WriteTo(writer);
-
-            writer.Indent--;
-            writer.WritePunctuation(TokenKind.CloseBrace);
-            writer.WriteLine();
-        }
-
-        private static void WriteFunctionDefinition(FunctionDefinition node, IndentedTextWriter writer)
-        {
-            writer.WriteLine();
-            writer.WriteKeyword(TokenKind.FunKeyword);
-            writer.WriteSpace();
-            writer.WriteIdentifier(node.Declaration.Name);
-            writer.WritePunctuation(TokenKind.OpenParenthesis);
-            // parameters
-            var first = true;
-            foreach (var p in node.Declaration.Parameters)
-            {
-                if (first) first = false;
-                else
-                {
-                    writer.WritePunctuation(TokenKind.Comma);
-                    writer.WriteSpace();
-                }
-
-                writer.WriteIdentifier(p.Name);
-                writer.WritePunctuation(TokenKind.Colon);
-                writer.WriteTypeIdentifier(p.Type.Name);
-            }
-
-            writer.WritePunctuation(TokenKind.CloseParenthesis);
-            writer.WritePunctuation(TokenKind.Colon);
-            writer.WriteSpace();
-            writer.WriteTypeIdentifier(node.Declaration.Type.Name);
-            writer.WriteSpace();
-            node.Body.WriteTo(writer);
-        }
-
-        private static void WriteVariableDeclaration(VariableDeclaration node, IndentedTextWriter writer)
-        {
-            writer.WriteKeyword(TokenKind.VarKeyword);
-            writer.WriteSpace();
-            writer.WriteIdentifier(node.Variable.Name);
-            writer.WritePunctuation(TokenKind.Colon);
-            writer.WriteSpace();
-            writer.WriteTypeIdentifier(node.Variable.Type.Name);
-            writer.WriteSpace();
-            writer.WritePunctuation(TokenKind.Equal);
-            writer.WriteSpace();
-            node.Initializer.WriteTo(writer);
-            writer.WritePunctuation(TokenKind.Semicolon);
-            writer.WriteLine();
         }
 
         private static void WriteNestedExpression(this IndentedTextWriter writer, int parentPrecedence, Expression expression)
