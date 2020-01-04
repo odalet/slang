@@ -7,7 +7,9 @@ namespace TestApp
     {
         private static int Main(string[] args)
         {
-            var rc = new Program().Run(args);
+            //var rc = new Program().Run(args);
+            var rc = 0;
+            Foo1.Test();
 
 #if DEBUG
             Console.ReadKey();

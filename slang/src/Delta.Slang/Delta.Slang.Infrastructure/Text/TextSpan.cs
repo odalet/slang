@@ -42,10 +42,11 @@ namespace Delta.Slang.Text
         /// <summary>
         /// Creates a new <see cref="TextSpan"/> from <paramref name="start" /> and <paramref
         /// name="end"/> positions as opposed to a position and length.
-        /// 
+        /// </summary>
+        /// <remarks>
         /// The returned TextSpan contains the range with <paramref name="start"/> inclusive, 
         /// and <paramref name="end"/> exclusive.
-        /// </summary>
+        /// </remarks>
         public static TextSpan FromBounds(int start, int end)
         {
             if (start < 0) throw new ArgumentOutOfRangeException(nameof(start));
@@ -107,7 +108,7 @@ namespace Delta.Slang.Text
             var overlap = GetOverlap(span);
             return overlap.start < overlap.end ? TextSpan.FromBounds(overlap.start, overlap.end) : (TextSpan?)null;
         }
-        
+
         /// <summary>
         /// Compares current instance of <see cref="TextSpan"/> with another.
         /// </summary>
@@ -134,7 +135,7 @@ namespace Delta.Slang.Text
         public static bool operator >(TextSpan left, TextSpan right) => left.CompareTo(right) > 0;
         public static bool operator <=(TextSpan left, TextSpan right) => left.CompareTo(right) <= 0;
         public static bool operator >=(TextSpan left, TextSpan right) => left.CompareTo(right) >= 0;
-        
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private (int start, int end) GetOverlap(TextSpan span) => (Math.Max(Start, span.Start), Math.Min(End, span.End));
     }

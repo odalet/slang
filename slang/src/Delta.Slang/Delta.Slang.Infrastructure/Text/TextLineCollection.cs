@@ -25,9 +25,7 @@ namespace Delta.Slang.Text
                 get
                 {
                     var localIndex = index;
-                    if (localIndex >= 0 && localIndex < lines.Count)
-                        return lines[localIndex];
-                    return default;
+                    return localIndex >= 0 && localIndex < lines.Count ? lines[localIndex] : (default);
                 }
             }
 
@@ -71,10 +69,7 @@ namespace Delta.Slang.Text
         /// </summary>
         /// <param name="position"></param>
         /// <returns></returns>
-        public virtual TextLine GetLineFromPosition(int position)
-        {
-            return this[this.IndexOf(position)];
-        }
+        public virtual TextLine GetLineFromPosition(int position) => this[IndexOf(position)];
 
         /// <summary>
         /// Gets a <see cref="LinePosition"/> corresponding to a character position.
@@ -94,7 +89,7 @@ namespace Delta.Slang.Text
         /// <summary>
         /// Convert a <see cref="LinePosition"/> to a position.
         /// </summary>
-        public int GetPosition(LinePosition position) => this[position.Line].Start + position.Character;
+        public int GetPosition(LinePosition position) => this[position.Line].Start + position.Column;
 
         /// <summary>
         /// Convert a <see cref="LinePositionSpan"/> to <see cref="TextSpan"/>.

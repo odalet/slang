@@ -52,7 +52,7 @@ namespace Delta.Slang
         /// Copy a range of characters from this SourceText to a destination array.
         /// </summary>
         public abstract void CopyTo(int sourceIndex, char[] destination, int destinationIndex, int count);
-        
+
         /// <summary>
         /// Gets a string containing the characters in specified span.
         /// </summary>

@@ -8,4 +8,4 @@
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S1121:Assignments should not be made from within sub-expressions", Justification = "<Pending>", Scope = "member", Target = "~P:Delta.Slang.SourceText.Lines")]
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S125:Sections of code should not be commented out", Justification = "<Pending>", Scope = "member", Target = "~M:Delta.Slang.SourceText.ParseLineStarts~System.Int32[]")]
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S1066:Collapsible \"if\" statements should be merged", Justification = "<Pending>", Scope = "member", Target = "~M:Delta.Slang.Pooling.ObjectPool`1.AllocateSlow~`0")]
-
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0046:Convert to conditional expression", Justification = "<Pending>", Scope = "member", Target = "~M:Delta.Slang.StringText.ToString(Delta.Slang.Text.TextSpan)~System.String")]

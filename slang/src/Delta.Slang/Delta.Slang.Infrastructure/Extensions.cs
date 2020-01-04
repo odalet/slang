@@ -16,7 +16,7 @@
 
                 if (midValue == value)
                     return middle;
-                
+
                 if (midValue > value)
                     high = middle - 1;
                 else

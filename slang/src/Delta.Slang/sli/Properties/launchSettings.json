@@ -1,5 +1,8 @@
 {
   "profiles": {
+    "sli": {
+      "commandName": "Project"
+    },
     "sli hello.sl": {
       "commandName": "Project",
       "commandLineArgs": "hello.sl"

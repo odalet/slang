@@ -29,7 +29,7 @@ namespace Delta.Slang.Text
             if (column < 0) throw new ArgumentOutOfRangeException(nameof(column));
 
             Line = line;
-            Character = column;
+            Column = column;
         }
         
         /// <summary>
@@ -40,18 +40,18 @@ namespace Delta.Slang.Text
         /// <summary>
         /// The character position within the line (the column).
         /// </summary>
-        public int Character { get; } // TODO: rename this 'column'
+        public int Column { get; }
 
-        public override string ToString() => $"{Line},{Character}";
+        public override string ToString() => $"{Line},{Column}";
 
-        public bool Equals(LinePosition other) => other.Line == Line && other.Character == Character;
+        public bool Equals(LinePosition other) => other.Line == Line && other.Column == Column;
         public override bool Equals(object obj) => obj is LinePosition position && Equals(position);
-        public override int GetHashCode() => HashUtils.Combine(Line, Character);
+        public override int GetHashCode() => HashUtils.Combine(Line, Column);
         
         public int CompareTo(LinePosition other)
         {
             var result = Line.CompareTo(other.Line);
-            return result != 0 ? result : Character.CompareTo(other.Character);
+            return result != 0 ? result : Column.CompareTo(other.Column);
         }
 
         public static bool operator ==(LinePosition left, LinePosition right) => left.Equals(right);

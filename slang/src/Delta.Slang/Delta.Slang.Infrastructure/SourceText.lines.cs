@@ -33,7 +33,6 @@ namespace Delta.Slang
 
                     var end = starts[index + 1];
                     return TextLine.FromSpan(text, TextSpan.FromBounds(start, end));
-
                 }
             }
 
@@ -64,7 +63,7 @@ namespace Delta.Slang
                 // round to the left. EOF position will map to the last line.
                 currentLineNumber = starts.BinarySearch(position);
                 if (currentLineNumber < 0)
-                    currentLineNumber = (~currentLineNumber) - 1;
+                    currentLineNumber = ~currentLineNumber - 1;
 
                 lastLineNumber = currentLineNumber;
                 return currentLineNumber;
@@ -134,7 +133,7 @@ namespace Delta.Slang
                     // if (c > '\r' && c <= 127)
                     // if (c >= ('\r'+1) && c <= 127)
                     const uint bias = '\r' + 1;
-                    if (unchecked(current - bias) <= (127 - bias))
+                    if (unchecked(current - bias) <= 127 - bias)
                         continue;
 
                     // Assumes that the only 2-char line break sequence is CR+LF

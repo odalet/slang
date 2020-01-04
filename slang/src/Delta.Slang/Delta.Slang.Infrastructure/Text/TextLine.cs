@@ -89,23 +89,10 @@ namespace Delta.Slang.Text
         /// </summary>
         public TextSpan SpanIncludingLineBreak => TextSpan.FromBounds(Start, EndIncludingLineBreak);
 
-        private int LineBreakLength
-        {
-            get
-            {
-                if (Text == null || Text.Length == 0 || EndIncludingLineBreak == Start)
-                    return 0;
+        private int LineBreakLength => Text == null || Text.Length == 0 || EndIncludingLineBreak == Start ?
+            0 : TextUtils.GetStartAndLengthOfLineBreakEndingAt(Text, EndIncludingLineBreak - 1).length;
 
-                return TextUtils.GetStartAndLengthOfLineBreakEndingAt(Text, EndIncludingLineBreak - 1).length;
-            }
-        }
-
-        public override string ToString()
-        {
-            if (Text == null || Text.Length == 0)
-                return string.Empty;
-            return Text.ToString(Span);
-        }
+        public override string ToString() => Text == null || Text.Length == 0 ? string.Empty : Text.ToString(Span);
 
         public bool Equals(TextLine other) => other.Text == Text && other.Start == Start && other.EndIncludingLineBreak == EndIncludingLineBreak;
         public override bool Equals(object obj) => obj is TextLine line && Equals(line);

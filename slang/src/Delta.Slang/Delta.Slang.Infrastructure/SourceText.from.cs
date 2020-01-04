@@ -125,7 +125,7 @@ namespace Delta.Slang
             Debug.Assert(stream != null);
             Debug.Assert(encoding != null);
 
-            stream.Seek(0, SeekOrigin.Begin);
+            _ = stream.Seek(0, SeekOrigin.Begin);
 
             var length = (int)stream.Length;
             if (length == 0)
@@ -161,7 +161,7 @@ namespace Delta.Slang
             Debug.Assert(buffer != null);
             Debug.Assert(encoding != null);
 
-            actualEncoding = TextUtils.TryReadByteOrderMark(buffer, length, out int preambleLength) ?? encoding;
+            actualEncoding = TextUtils.TryReadByteOrderMark(buffer, length, out var preambleLength) ?? encoding;
             return actualEncoding.GetString(buffer, preambleLength, length - preambleLength);
         }
     }

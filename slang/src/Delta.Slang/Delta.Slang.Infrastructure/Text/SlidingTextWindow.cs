@@ -8,18 +8,16 @@ namespace Delta.Slang.Text
     {
         private const int defaultWindowLength = 2048;
 
-        /// <summary>
-        /// In many cases, e.g. PeekChar, we need the ability to indicate that there are
-        /// no characters left and we have reached the end of the stream, or some other
-        /// invalid or not present character was asked for. Due to perf concerns, things
-        /// like nullable or out variables are not viable. Instead we need to choose a
-        /// char value which can never be legal.
-        /// 
-        /// In .NET, all characters are represented in 16 bits using the UTF-16 encoding.
-        /// Fortunately for us, there are a variety of different bit patterns which
-        /// are *not* legal UTF-16 characters. 0xffff (char.MaxValue) is one of these
-        /// characters -- a legal Unicode code point, but not a legal UTF-16 bit pattern.
-        /// </summary>
+        // In many cases, e.g. PeekChar, we need the ability to indicate that there are
+        // no characters left and we have reached the end of the stream, or some other
+        // invalid or not present character was asked for. Due to perf concerns, things
+        // like nullable or out variables are not viable. Instead we need to choose a
+        // char value which can never be legal.
+        // 
+        // In .NET, all characters are represented in 16 bits using the UTF-16 encoding.
+        // Fortunately for us, there are a variety of different bit patterns which
+        // are *not* legal UTF-16 characters. 0xffff (char.MaxValue) is one of these
+        // characters -- a legal Unicode code point, but not a legal UTF-16 bit pattern.
         public const char InvalidCharacter = char.MaxValue; // NB: we must have a const here...
 
         // Example for the above variables:
@@ -109,13 +107,9 @@ namespace Delta.Slang.Text
             }
         }
 
-        /// <summary>
-        /// After reading <see cref=" InvalidCharacter"/>, a consumer can determine
-        /// if the InvalidCharacter was in the user's source or a sentinel.
-        /// 
-        /// Comments and string literals are allowed to contain any Unicode character.
-        /// </summary>
-        /// <returns></returns>
+        // After reading <see cref=" InvalidCharacter"/>, a consumer can determine
+        // if the InvalidCharacter was in the user's source or a sentinel.
+        // Comments and string literals are allowed to contain any Unicode character.
         public bool IsReallyAtEnd() => Offset >= CharacterWindowCount && Position >= TextEnd;
 
         /// <summary>
@@ -139,7 +133,7 @@ namespace Delta.Slang.Text
         /// </returns>
         public char NextChar()
         {
-            char c = PeekChar();
+            var c = PeekChar();
             if (c != InvalidCharacter)
                 AdvanceChar();
             return c;
@@ -173,11 +167,9 @@ namespace Delta.Slang.Text
             var position = Position;
             AdvanceChar(delta);
 
-            char ch;
-            if (Offset >= CharacterWindowCount && !MoreChars())
-                ch = InvalidCharacter;
-            else // N.B. MoreChars may update the offset.
-                ch = CharacterWindow[Offset];
+            var ch = Offset >= CharacterWindowCount && !MoreChars() ?
+                InvalidCharacter :
+                CharacterWindow[Offset];
 
             Reset(position);
             return ch;
@@ -202,7 +194,7 @@ namespace Delta.Slang.Text
 
             // if lexeme scanning is sufficiently into the char buffer, 
             // then refocus the window onto the lexeme
-            if (LexemeRelativeStart > (CharacterWindowCount / 4))
+            if (LexemeRelativeStart > CharacterWindowCount / 4)
             {
                 Array.Copy(CharacterWindow, LexemeRelativeStart, CharacterWindow, 0, CharacterWindowCount - LexemeRelativeStart);
                 CharacterWindowCount -= LexemeRelativeStart;

@@ -9,19 +9,17 @@
     <AssemblyOriginatorKeyFile>..\Common\AddUpKeyFile.snk</AssemblyOriginatorKeyFile>
     <DelaySign>False</DelaySign> -->
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
+    <!-- See https://stackoverflow.com/questions/36461174/how-do-i-disable-all-roslyn-code-analyzers -->
+    <RunAnalyzersDuringBuild>false</RunAnalyzersDuringBuild>
+    <RunAnalyzersDuringLiveAnalysis>false</RunAnalyzersDuringLiveAnalysis>
+    <RunAnalyzers>false</RunAnalyzers>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DebugType>Full</DebugType>
     <DebugSymbols>True</DebugSymbols>
+    <CheckForOverflowUnderflow>false</CheckForOverflowUnderflow>
   </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="SonarAnalyzer.CSharp" Version="7.7.0.7192">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
-    </PackageReference>
-  </ItemGroup>
 
   <ItemGroup>
     <None Update="data\hello.sl">

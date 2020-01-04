@@ -1,9 +1,12 @@
 ﻿using System;
+using System.IO;
+using System.Text;
 
 namespace Delta.Slang.Repl
 {
     internal interface IOutputWriter
     {
+        TextWriter TextWriter { get; }
         void Write(object text);
         void WriteLine(object text);
         void WriteLine();
@@ -13,6 +16,13 @@ namespace Delta.Slang.Repl
 
     internal class NullOutputWriter : IOutputWriter
     {
+        private class NullTextWriter : TextWriter
+        {
+            public override Encoding Encoding => Encoding.UTF8;
+        }
+
+        public TextWriter TextWriter { get; } = new NullTextWriter();
+
         public void Write(object text) { /* Empty by design */ }
         public void Write(object text, ConsoleColor color) { /* Empty by design */ }
         public void WriteLine(object text) { /* Empty by design */ }
@@ -22,20 +32,22 @@ namespace Delta.Slang.Repl
 
     internal class ConsoleOutputWriter : IOutputWriter
     {
-        public void Write(object text) => Console.Write(text);
-        public void WriteLine(object text) => Console.WriteLine(text);
-        public void WriteLine() => Console.WriteLine();
+        public TextWriter TextWriter => Console.Out;
+
+        public void Write(object text) => TextWriter.Write(text);
+        public void WriteLine(object text) => TextWriter.WriteLine(text);
+        public void WriteLine() => TextWriter.WriteLine();
         public void Write(object text, ConsoleColor color)
         {
             Console.ForegroundColor = color;
-            Console.Write(text);
+            TextWriter.Write(text);
             Console.ResetColor();
         }
 
         public void WriteLine(object text, ConsoleColor color)
         {
             Console.ForegroundColor = color;
-            Console.WriteLine(text);
+            TextWriter.WriteLine(text);
             Console.ResetColor();
         }
     }

@@ -1,0 +1,115 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Delta.Slang.Symbols.FunctionSymbol" Collapsed="true">
+    <Position X="5.25" Y="4.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAQABAAAAAAAAAAAAAAAAAAAAAAYAAAAAAAAA=</HashCode>
+      <FileName>Symbols\FunctionSymbol.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Declaration" />
+      <Property Name="Type" />
+    </ShowAsAssociation>
+    <ShowAsCollectionAssociation>
+      <Property Name="Parameters" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="Delta.Slang.Symbols.ParameterSymbol" Collapsed="true">
+    <Position X="11.75" Y="7.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Symbols\ParameterSymbol.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Delta.Slang.Symbols.Symbol">
+    <Position X="8.5" Y="2" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Methods" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAABAAAAEAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Symbols\Symbol.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Kind" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="Delta.Slang.Symbols.TypeSymbol" Collapsed="true">
+    <Position X="7.5" Y="4.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAABAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Symbols\TypeSymbol.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Delta.Slang.Symbols.VariableSymbol">
+    <Position X="10.75" Y="4.25" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Methods" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAQAAAAAAAAA=</HashCode>
+      <FileName>Symbols\variables.cs</FileName>
+      <NewMemberFileName>Symbols\VariableSymbol.cs</NewMemberFileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Type" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="Delta.Slang.Symbols.GlobalVariableSymbol" Collapsed="true">
+    <Position X="9.5" Y="6.25" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Symbols\variables.cs</FileName>
+      <NewMemberFileName>Symbols\GlobalVariableSymbol.cs</NewMemberFileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Delta.Slang.Symbols.LocalVariableSymbol" Collapsed="true">
+    <Position X="11.75" Y="6.25" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Symbols\variables.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Delta.Slang.Syntax.FunctionDeclarationNode" Collapsed="true">
+    <Position X="2" Y="4.25" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACBAAEAAAAAHAAAAAAAAAAAAAAAAAAAEAAA=</HashCode>
+      <FileName>Syntax\nodes\FunctionDeclarationNode.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Delta.Slang.Symbols.BuiltinTypes">
+    <Position X="2" Y="1" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAEQAAAAAAQAAAAAAAAAAAAgAAAIAAAAACAAA=</HashCode>
+      <FileName>Symbols\builtins.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Delta.Slang.Symbols.BuiltinFunctions">
+    <Position X="3.75" Y="1" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAIAAAAAEBAA=</HashCode>
+      <FileName>Symbols\builtins.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Delta.Slang.Symbols.SymbolTable">
+    <Position X="5.75" Y="1" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>AAIAAEAAAAAAAAAAAAAAAACAAAAAAAAAAIABAAAQAAA=</HashCode>
+      <FileName>Symbols\SymbolTable.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Property Name="All" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Enum Name="Delta.Slang.Symbols.SymbolKind">
+    <Position X="14.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IAAQAAAAAAAAAAAAAAAAAAIAAAAQAAAAAQAAAAAAAAA=</HashCode>
+      <FileName>Symbols\SymbolKind.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
