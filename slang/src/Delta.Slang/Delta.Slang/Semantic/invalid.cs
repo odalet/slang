@@ -2,6 +2,11 @@
 
 namespace Delta.Slang.Semantic
 {
+
+#pragma warning disable S1481 // Unused local variables should be removed
+#pragma warning disable CS0219 // Variable is assigned but its value is never used
+#pragma warning disable IDE0059 // Unnecessary assignment of a value
+
     public sealed class InvalidStatement : Statement
     {
         public InvalidStatement()
@@ -22,4 +27,8 @@ namespace Delta.Slang.Semantic
         public override BoundTreeNodeKind Kind => BoundTreeNodeKind.InvalidExpression;
         public override TypeSymbol Type => BuiltinTypes.Invalid;
     }
+
+#pragma warning restore IDE0059 // Unnecessary assignment of a value
+#pragma warning restore CS0219 // Variable is assigned but its value is never used
+#pragma warning restore S1481 // Unused local variables should be removed
 }

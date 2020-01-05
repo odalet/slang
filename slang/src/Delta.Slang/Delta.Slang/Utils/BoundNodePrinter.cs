@@ -138,7 +138,7 @@ namespace Delta.Slang.Utils
             writer.WritePunctuation(TokenKind.OpenParenthesis);
             node.Condition.WriteTo(writer);
             writer.WritePunctuation(TokenKind.CloseParenthesis);
-            
+
             var isThenBlock = node.Then is Block;
             if (isThenBlock)
                 writer.WriteSpace();
@@ -176,7 +176,7 @@ namespace Delta.Slang.Utils
 
             if (!isThenBlock)
                 writer.Indent--;
-            
+
             // This leaves a blank line between the end of the if/else statement and the next instructions
             writer.WriteLine();
             writer.WriteLine();

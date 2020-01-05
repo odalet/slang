@@ -17,3 +17,6 @@ dotnet_diagnostic.RCS1123.severity = none
 
 # RCS1001: Add braces (when expression spans over multiple lines).
 dotnet_diagnostic.RCS1001.severity = none
+
+# RCS1036: Remove redundant empty line.
+dotnet_diagnostic.RCS1036.severity = none

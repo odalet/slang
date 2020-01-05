@@ -11,7 +11,7 @@
         TypeClause,
 
         Block,
-        GlobalStatement,   
+        GlobalStatement,
         IfStatement,
         ElseClause,
         ReturnStatement,
