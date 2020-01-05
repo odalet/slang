@@ -71,7 +71,7 @@ namespace Delta.Slang.Repl
             while (!exit)
             {
                 Writer.Write("> ");
-                var input = Console.ReadLine();
+                var input = Console.ReadLine().Replace("\t", "    ");
                 switch (input.ToLowerInvariant().Trim())
                 {
                     case "q":
@@ -176,36 +176,7 @@ namespace Delta.Slang.Repl
 
             walk(tree.Root, Writer);
         }
-
-        ////private void ProcessInput(Interpreter interpreter, bool noOutput)
-        ////{
-        ////    var writer = noOutput ? NullWriter : Writer;
-        ////    Highlight(interpreter, writer);
-
-        ////    writer.WriteLine();
-
-        ////    // And now, parse
-        ////    var (t, d) = interpreter.Parse();
-        ////    writer.WriteLine("Parse Tree: ");
-        ////    Walk(t.Root, writer);
-        ////    writer.WriteLine();
-        ////    if (d.Any())
-        ////    {
-        ////        writer.WriteLine("Diagnostics: ");
-        ////        foreach (var diagnostic in d)
-        ////            writer.WriteLine(diagnostic);
-        ////    }
-        ////    else writer.WriteLine("Diagnostics: None");
-
-        ////    writer.WriteLine();
-        ////    writer.WriteLine("Unparse: ");
-        ////    Unparse(t, writer);
-
-        ////    writer.WriteLine();
-        ////    writer.WriteLine("Compile: ");
-        ////    Compile(t, writer);
-        ////}
-
+        
         private void HighlightTokens(IEnumerable<Token> tokens)
         {
             const int tabLength = 4;
@@ -310,7 +281,7 @@ namespace Delta.Slang.Repl
             }
 
             var localInterpreter = new Interpreter(SourceText.From(unparsed, Encoding.UTF8));
-            var localResults = localInterpreter.Run();
+            var localResults = localInterpreter.Run(InterpreterRunOptions.Parse);
             if (localResults.Diagnostics.Any())
             {
                 foreach (var diagnostic in localResults.Diagnostics)

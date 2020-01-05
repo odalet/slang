@@ -2,7 +2,9 @@
 {
     public enum BoundTreeNodeKind
     {
-        // Structure
+        Root,
+        InvalidStatement,
+        InvalidExpression,
 
         // Statements
         BlockStatement,
@@ -12,10 +14,12 @@
         //DoWhileStatement,
         //ForStatement,
         //LabelStatement,
-        //GotoStatement,
         //ConditionalGotoStatement,
         ReturnStatement,
         ExpressionStatement,
+        IfStatement,
+        GotoStatement,
+        LabelStatement,
 
         // Expressions
         ErrorExpression,
@@ -26,9 +30,6 @@
         BinaryExpression,
         InvokeExpression,
         ConversionExpression,
-        InvalidStatement,
-        InvalidExpression,
-        FunctionDefinition,
-        IfStatement,
+        FunctionDefinition       
     }
 }

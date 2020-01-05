@@ -9,7 +9,7 @@ namespace Delta.Slang.Semantic
 
     public sealed class InvalidStatement : Statement
     {
-        public InvalidStatement()
+        public InvalidStatement() : base(new Scope(ScopeKind.Invalid))
         {
             var foo = 42; // For debugging only
         }
@@ -17,18 +17,17 @@ namespace Delta.Slang.Semantic
         public override BoundTreeNodeKind Kind => BoundTreeNodeKind.InvalidStatement;
     }
 
-    public sealed class InvalidExpression : Expression
-    {
-        public InvalidExpression()
-        {
-            var foo = 42; // For debugging only
-        }
-
-        public override BoundTreeNodeKind Kind => BoundTreeNodeKind.InvalidExpression;
-        public override TypeSymbol Type => BuiltinTypes.Invalid;
-    }
-
 #pragma warning restore IDE0059 // Unnecessary assignment of a value
 #pragma warning restore CS0219 // Variable is assigned but its value is never used
 #pragma warning restore S1481 // Unused local variables should be removed
+
+    public sealed class InvalidExpression : Expression
+    {
+        public InvalidExpression(Expression nested) =>
+            Expression = nested;
+
+        public override BoundTreeNodeKind Kind => BoundTreeNodeKind.InvalidExpression;
+        public override TypeSymbol Type => Expression?.Type ?? BuiltinTypes.Invalid;
+        public Expression Expression { get; }
+    }
 }

@@ -105,8 +105,8 @@ namespace Delta.Slang
             ReportBinderError(where, "Expression must have a value.");
         public void ReportParameterAlreadyDeclared(Token where, string name) =>
             ReportBinderError(where, $"A parameter named '{name}' already exists.");
-        public void ReportSymbolAlreadyDeclared(Token where, string name) =>
-            ReportBinderError(where, $"'{name}' is already declared.");
+        public void ReportSymbolAlreadyDeclared(Token where, string name, string kind) =>
+            ReportBinderError(where, $"{kind} '{name}' is already declared.");
         public void ReportUndefinedType(Token where, string name) =>
             ReportBinderError(where, $"Type '{name}' could not be found.");
         public void ReportUndefinedFunction(Token where, string name) =>
@@ -117,6 +117,8 @@ namespace Delta.Slang
             ReportBinderError(where, $"Parameter '{name}' in function '{functionName}' requires a value of type '{expectedType}' but was given a value of type '{actualType}'.");
         public void ReportUndefinedVariable(Token where, string name) =>
             ReportBinderError(where, $"Variable '{name}' could not be found.");
+        public void ReportUndefinedLabel(Token where, string name) =>
+            ReportBinderError(where, $"Label '{name}' could not be found.");
         public void ReportInvalidAssignmentToReadOnlyVariable(Token where, string name) =>
             ReportBinderError(where, $"Cannot assign a value to read-only variable '{name}'.");
         public void ReportImpossibleConversion(Token where, TypeSymbol from, TypeSymbol to) =>
@@ -127,7 +129,13 @@ namespace Delta.Slang
             ReportBinderError(where, $"Operator '{op}' is not defined for type '{operandType}'.");
         public void ReportUndefinedBinaryOperator(Token where, string op, TypeSymbol lhsType, TypeSymbol rhsType) =>
             ReportBinderError(where, $"Operator '{op}' is not defined for types '{lhsType}' and '{rhsType}'.");
-
+        public void ReportInvalidLabelDeclaration(Token where, string label) =>
+            ReportBinderError(where, $"Label '{label}' is invalid. Labels cannot be defined outside a function.");
+        public void ReportInvalidReturn(Token where) =>
+            ReportBinderError(where, "The 'return' keyword can only be used inside of functions.");
+        public void ReportInconsistentReturnType(Token where, FunctionSymbol function, TypeSymbol expectedType, TypeSymbol actualType) =>
+            ReportBinderError(where, $"Return expression type '{actualType}' is inconsistent with Function '{function}' return type '{expectedType}'.");
+        
         private void ReportLexerError(LinePosition position, TextSpan span, string message) => diagnostics.Add(new LexerError(position, span, message ?? ""));
         private void ReportParserError(LinePosition position, TextSpan span, string message) => diagnostics.Add(new ParserError(position, span, message ?? ""));
         private void ReportBinderError(Token where, string message) => ReportBinderError(where.Position, where.Span, message);

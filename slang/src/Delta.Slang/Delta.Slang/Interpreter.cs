@@ -1,13 +1,31 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Text;
 using Delta.Slang.Semantic;
 using Delta.Slang.Syntax;
 
 namespace Delta.Slang
 {
+    [Flags]
+    [SuppressMessage("Design", "RCS1157:Composite enum value contains undefined flag.", Justification = "Cannot Parse without lexing or Bind without parsing")]
+    [SuppressMessage("Major Code Smell", "S4070:Non-flags enums should not be marked with \"FlagsAttribute\"", Justification = "This is a flags enum!")]
+    public enum InterpreterRunOptions : byte
+    {
+        None = 0,
+        Lex = 1,
+        Parse = 3,
+        Bind = 7,
+        All = 0xFF
+    }
+
+    public static class RunOptionsExtensions
+    {
+        public static bool ShouldLex(this InterpreterRunOptions options) => (options & InterpreterRunOptions.Lex) == InterpreterRunOptions.Lex;
+        public static bool ShouldParse(this InterpreterRunOptions options) => (options & InterpreterRunOptions.Parse) == InterpreterRunOptions.Parse;
+        public static bool ShouldBind(this InterpreterRunOptions options) => (options & InterpreterRunOptions.Bind) == InterpreterRunOptions.Bind;
+    }
+
     public sealed class Interpreter
     {
         public sealed class Result
@@ -22,13 +40,13 @@ namespace Delta.Slang
 
         private SourceText SourceText { get; }
 
-        public Result Run()
+        public Result Run(InterpreterRunOptions options = InterpreterRunOptions.All)
         {
             var diagnostics = new DiagnosticCollection();
 
-            var tokens = Lex(diagnostics);
-            var parseTree = Parse(tokens, diagnostics);
-            var boundTree = parseTree != null ? Bind(parseTree, diagnostics) : null;
+            var tokens = options.ShouldLex() ? Lex(diagnostics) : null;
+            var parseTree = options.ShouldParse() ? Parse(tokens, diagnostics) : null;
+            var boundTree = options.ShouldBind() && parseTree != null ? Bind(parseTree, diagnostics) : null;
 
             return new Result
             {

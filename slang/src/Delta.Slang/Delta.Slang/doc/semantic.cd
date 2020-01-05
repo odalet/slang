@@ -21,18 +21,22 @@
     </ShowAsCollectionAssociation>
   </Class>
   <Class Name="Delta.Slang.Semantic.Binder" Collapsed="true">
-    <Position X="12.5" Y="9.25" Width="1.5" />
+    <Position X="3" Y="0.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAhAAAggAAQCoiIAAAAAJAAACQAIgAAQACAEgAAAg=</HashCode>
+      <HashCode>AAAAhAAAggAAQDoiYAAACAJAAACQAIgAAQACAEgAAAg=</HashCode>
       <FileName>Semantic\Binder.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Delta.Slang.Semantic.BoundTree">
-    <Position X="19.5" Y="0.75" Width="1.5" />
+    <Position X="19.25" Y="2" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Methods" Collapsed="true" />
+    </Compartments>
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAIAAAAAAAIAAAAABAAAAAQAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAABAACIAAAAAAAIAAAAABAAAAAQAAAAAAAA=</HashCode>
       <FileName>Semantic\BoundTree.cs</FileName>
     </TypeIdentifier>
+    <Lollipop Position="0.885" />
   </Class>
   <Class Name="Delta.Slang.Semantic.BoundTreeNode" Collapsed="true">
     <Position X="17.5" Y="0.75" Width="1.5" />
@@ -120,8 +124,8 @@
       <FileName>Semantic\expressions.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Delta.Slang.Semantic.InvalidStatement">
-    <Position X="11" Y="3.5" Width="1.5" />
+  <Class Name="Delta.Slang.Semantic.InvalidStatement" Collapsed="true">
+    <Position X="1.75" Y="3.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Semantic\invalid.cs</FileName>
@@ -134,39 +138,40 @@
       <FileName>Semantic\invalid.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Delta.Slang.Semantic.Scope" Collapsed="true">
-    <Position X="16.5" Y="9.25" Width="1.5" />
+  <Class Name="Delta.Slang.Semantic.Scope">
+    <Position X="16.5" Y="9.25" Width="2" />
     <AssociationLine Name="symbols" Type="Delta.Slang.Symbols.SymbolTable" FixedToPoint="true">
       <Path>
-        <Point X="18" Y="9.562" />
+        <Point X="18.5" Y="9.562" />
         <Point X="20" Y="9.562" />
       </Path>
     </AssociationLine>
-    <AssociationLine Name="Parent" Type="Delta.Slang.Semantic.Scope" FixedFromPoint="true" FixedToPoint="true">
+    <AssociationLine Name="Parent" Type="Delta.Slang.Semantic.Scope" ManuallyRouted="true" FixedFromPoint="true" FixedToPoint="true">
       <Path>
-        <Point X="16.5" Y="9.625" />
-        <Point X="16.125" Y="9.625" />
-        <Point X="16.125" Y="8.875" />
-        <Point X="17.5" Y="8.875" />
-        <Point X="17.5" Y="9.25" />
+        <Point X="16.917" Y="12.661" />
+        <Point X="16.917" Y="12.911" />
+        <Point X="18.25" Y="12.911" />
+        <Point X="18.25" Y="12.661" />
       </Path>
     </AssociationLine>
     <TypeIdentifier>
-      <HashCode>AAAAQEBAAAAAAAAEAAAAUAAAAAAAGAAAAAAAAYAACAA=</HashCode>
+      <HashCode>AgAAQEBAAABAAAAEAAAAUAEAAAAAGAAAAAIAAYAACAA=</HashCode>
       <FileName>Semantic\Scope.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
       <Field Name="symbols" />
       <Property Name="Parent" />
+      <Property Name="Kind" />
     </ShowAsAssociation>
   </Class>
   <Class Name="Delta.Slang.Semantic.Statement" Collapsed="true">
     <Position X="11" Y="2" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Semantic\statements.cs</FileName>
       <NewMemberFileName>Semantic\Statement.cs</NewMemberFileName>
     </TypeIdentifier>
+    <Lollipop Position="0.2" />
   </Class>
   <Class Name="Delta.Slang.Semantic.UnaryOperator" Collapsed="true">
     <Position X="25" Y="1.5" Width="1.5" />
@@ -189,15 +194,16 @@
     </ShowAsCollectionAssociation>
   </Class>
   <Class Name="Delta.Slang.Semantic.FunctionDefinition">
-    <Position X="12.75" Y="3.5" Width="1.75" />
+    <Position X="5.25" Y="3.5" Width="1.75" />
     <Compartments>
       <Compartment Name="Methods" Collapsed="true" />
     </Compartments>
     <TypeIdentifier>
-      <HashCode>AAAAAAAAQABAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAQABAAAAAAAABAAAAAAAABAAAAAAAAAAAAAA=</HashCode>
       <FileName>Semantic\statements.cs</FileName>
       <NewMemberFileName>Semantic\FunctionDefinition.cs</NewMemberFileName>
     </TypeIdentifier>
+    <Lollipop Position="0.2" />
   </Class>
   <Class Name="Delta.Slang.Symbols.SymbolTable" Collapsed="true">
     <Position X="20" Y="9.25" Width="1.5" />
@@ -207,14 +213,15 @@
     </TypeIdentifier>
   </Class>
   <Class Name="Delta.Slang.Semantic.Block">
-    <Position X="9.25" Y="3.5" Width="1.5" />
+    <Position X="12.75" Y="3.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAABAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAA=</HashCode>
       <FileName>Semantic\statements.cs</FileName>
     </TypeIdentifier>
+    <Lollipop Position="0.2" />
   </Class>
   <Class Name="Delta.Slang.Semantic.VariableDeclaration">
-    <Position X="14.75" Y="3.5" Width="1.75" />
+    <Position X="7.25" Y="3.5" Width="1.75" />
     <Compartments>
       <Compartment Name="Methods" Collapsed="true" />
     </Compartments>
@@ -223,6 +230,58 @@
       <FileName>Semantic\statements.cs</FileName>
     </TypeIdentifier>
   </Class>
+  <Class Name="Delta.Slang.Semantic.ExpressionStatement" Collapsed="true">
+    <Position X="14.5" Y="3.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAABAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAA=</HashCode>
+      <FileName>Semantic\statements.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Expression" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="Delta.Slang.Semantic.IfStatement" Collapsed="true">
+    <Position X="3.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAABAAADAAAAAAQAAAAAAAAAABAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Semantic\statements.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Delta.Slang.Semantic.GotoStatement" Collapsed="true">
+    <Position X="9.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAEABBAACAAAgAAAAAAAAAAAAAAAAAAAAAAAQ=</HashCode>
+      <FileName>Semantic\statements.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Delta.Slang.Semantic.LabelStatement" Collapsed="true">
+    <Position X="11" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAEABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQ=</HashCode>
+      <FileName>Semantic\statements.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Interface Name="Delta.Slang.Semantic.IHasScope" Collapsed="true">
+    <Position X="12" Y="9.25" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Semantic\interfaces.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Scope" />
+    </ShowAsAssociation>
+  </Interface>
+  <Interface Name="Delta.Slang.Semantic.IHasChildStatements" Collapsed="true">
+    <Position X="7.25" Y="2" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Semantic\interfaces.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Property Name="Statements" />
+    </ShowAsCollectionAssociation>
+  </Interface>
   <Enum Name="Delta.Slang.Semantic.BinaryOperatorKind">
     <Position X="29.75" Y="0.75" Width="1.75" />
     <TypeIdentifier>
@@ -230,10 +289,10 @@
       <FileName>Semantic\BinaryOperator .cs</FileName>
     </TypeIdentifier>
   </Enum>
-  <Enum Name="Delta.Slang.Semantic.BoundTreeNodeKind">
+  <Enum Name="Delta.Slang.Semantic.BoundTreeNodeKind" Collapsed="true">
     <Position X="7.25" Y="0.5" Width="1.75" />
     <TypeIdentifier>
-      <HashCode>AAAAQAAABCACAAEAQQAIAAAAAEACAUAACAAAAAAUAAA=</HashCode>
+      <HashCode>AAAAQAgABCQCACEAQQAIAAAAAEAKAUAACAAAAAAUAAA=</HashCode>
       <FileName>Semantic\BoundTreeNodeKind.cs</FileName>
     </TypeIdentifier>
   </Enum>
@@ -242,6 +301,13 @@
     <TypeIdentifier>
       <HashCode>AAAAAAAAABAAAAAAAAAAAIAAAAAAAAAAAEAAAAAAAgA=</HashCode>
       <FileName>Semantic\UnaryOperator.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="Delta.Slang.Semantic.ScopeKind">
+    <Position X="20" Y="10.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAEAAAAEAAAAAAAAAAAAAIAAAAAAAAAAAAAAAABAAA=</HashCode>
+      <FileName>Semantic\Scope.cs</FileName>
     </TypeIdentifier>
   </Enum>
   <Font Name="Segoe UI" Size="9" />

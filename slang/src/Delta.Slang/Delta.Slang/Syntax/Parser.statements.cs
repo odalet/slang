@@ -1,4 +1,6 @@
-﻿namespace Delta.Slang.Syntax
+﻿using System;
+
+namespace Delta.Slang.Syntax
 {
     partial class Parser
     {
@@ -9,12 +11,14 @@
                 case TokenKind.OpenBrace: return ParseBlock();
                 case TokenKind.VarKeyword: return ParseVariableDeclaration();
                 case TokenKind.IfKeyword: return ParseIfStatement();
+                case TokenKind.GotoKeyword: return ParseGotoStatement();
                 //case TokenKind.WhileKeyword: return ParseWhileStatement();
                 //case TokenKind.DoKeyword: return ParseDoWhileStatement();
                 //case TokenKind.ForKeyword: return ParseForStatement();
                 //case TokenKind.BreakKeyword: return ParseBreakStatement();
                 //case TokenKind.ContinueKeyword: return ParseContinueStatement();
                 case TokenKind.ReturnKeyword: return ParseReturnStatement();
+                case TokenKind.Identifier: return ParseIdentifierStatement();
                 default: return ParseExpressionStatement();
             }
         }
@@ -54,6 +58,26 @@
             return new IfStatementNode(condition, statement, elseClause);
         }
 
+        private GotoStatementNode ParseGotoStatement()
+        {
+            var gotoKeyword = MatchToken(TokenKind.GotoKeyword);
+            var label = ParseNameExpression();
+            _ = MatchToken(TokenKind.Semicolon);
+            return new GotoStatementNode(gotoKeyword, label);
+        }
+
+        private StatementNode ParseIdentifierStatement() => 
+            Peek(1).Kind == TokenKind.Colon ? 
+            ParseLabelStatement() : 
+            (StatementNode)ParseExpressionStatement();
+
+        private LabelStatementNode ParseLabelStatement()
+        {
+            var label = ParseNameExpression();
+            _ = MatchToken(TokenKind.Colon);
+            return new LabelStatementNode(label);
+        }
+
         private ElseClauseNode ParseElseClause()
         {
             if (Current.Kind != TokenKind.ElseKeyword)
@@ -66,13 +90,13 @@
 
         private ReturnStatementNode ParseReturnStatement()
         {
-            _ = MatchToken(TokenKind.ReturnKeyword);
+            var returnToken = MatchToken(TokenKind.ReturnKeyword);
             var expression = Current.Kind == TokenKind.Semicolon ? null : ParseExpression();
             _ = MatchToken(TokenKind.Semicolon);
 
-            return new ReturnStatementNode(expression);
+            return new ReturnStatementNode(returnToken, expression);
         }
-
+        
         private ExpressionStatementNode ParseExpressionStatement()
         {
             var expression = ParseExpression();

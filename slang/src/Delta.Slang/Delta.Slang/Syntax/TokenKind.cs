@@ -33,6 +33,7 @@
 
         Comment,
 
+        GotoKeyword,
         FunKeyword,
         VarKeyword,
         ReturnKeyword,
@@ -50,6 +51,7 @@
         {
             switch (text)
             {
+                case "goto": return TokenKind.GotoKeyword;
                 case "fun": return TokenKind.FunKeyword;
                 case "var": return TokenKind.VarKeyword;
                 case "if": return TokenKind.IfKeyword;
@@ -97,6 +99,7 @@
                 //case TokenKind.BreakKeyword: return "break";
                 //case TokenKind.ContinueKeyword: return "continue";                
                 //case TokenKind.ForKeyword: return "for";
+                case TokenKind.GotoKeyword: return "goto";
                 case TokenKind.FunKeyword: return "fun";
                 //case TokenKind.FunctionKeyword: return "function";
                 case TokenKind.IfKeyword: return "if";

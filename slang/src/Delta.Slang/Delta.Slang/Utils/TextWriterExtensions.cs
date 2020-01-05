@@ -62,6 +62,16 @@ namespace Delta.Slang.Utils
 
         public static void WriteSpace(this TextWriter writer) => writer.WritePunctuation(" ");
 
+        public static void WriteInvalid(this TextWriter writer, string text) => WriteInvalid(writer, text, ConsoleColor.Red);
+        public static void WriteInvalid(this TextWriter writer, string text, ConsoleColor color)
+        {
+            const ConsoleColor bg = ConsoleColor.DarkYellow;
+            writer.SetBackground(bg);
+            writer.SetForeground(color == bg ? ConsoleColor.Red : color);
+            writer.Write(text);
+            writer.ResetColor();
+        }
+
         public static void WriteText(this TextWriter writer, string text, ConsoleColor color)
         {
             writer.SetForeground(color);
@@ -70,6 +80,11 @@ namespace Delta.Slang.Utils
         }
 
         private static bool IsConsoleOut(this TextWriter writer) => writer == Console.Out || writer is IndentedTextWriter iw && iw.InnerWriter.IsConsoleOut();
+
+        private static void SetBackground(this TextWriter writer, ConsoleColor color)
+        {
+            if (writer.IsConsoleOut()) Console.BackgroundColor = color;
+        }
 
         private static void SetForeground(this TextWriter writer, ConsoleColor color)
         {

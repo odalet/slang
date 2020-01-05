@@ -95,6 +95,17 @@ namespace Delta.Slang.Utils
                     unparse(es.Expression);
                     w(";");
                     break;
+                case GotoStatementNode gs:
+                    ltabs();
+                    w("goto ");
+                    unparse(gs.Label);
+                    w(";");
+                    break;
+                case LabelStatementNode ls:
+                    wl();
+                    unparse(ls.Label);
+                    w(":");
+                    break;
                 case IfStatementNode ifs:
                 {
                     ltabs();

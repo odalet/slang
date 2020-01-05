@@ -23,6 +23,9 @@
         ParenthesizedExpression,
         LiteralExpression,
         InvokeExpression,
-        NameExpression
+        NameExpression,
+        GotoStatement,
+        LabelStatement,
+        VariableDeclaration
     }
 }

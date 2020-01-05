@@ -36,7 +36,7 @@ namespace Delta.Slang.Syntax
             Initializer = initializer; // may be null.
         }
 
-        public override SyntaxKind Kind => SyntaxKind.AssignmentExpression;
+        public override SyntaxKind Kind => SyntaxKind.VariableDeclaration;
         public override Token MainToken => VariableName;
         public override IEnumerable<SyntaxNode> Children
         {
@@ -54,10 +54,14 @@ namespace Delta.Slang.Syntax
 
     public sealed class ReturnStatementNode : StatementNode
     {
-        internal ReturnStatementNode(ExpressionNode expression) => Expression = expression; // may be null
+        internal ReturnStatementNode(Token returnToken, ExpressionNode expression)
+        {
+            ReturnToken = returnToken ?? throw new ArgumentNullException(nameof(returnToken));
+            Expression = expression; // may be null
+        }
 
         public override SyntaxKind Kind => SyntaxKind.ReturnStatement;
-        public override Token MainToken => null;
+        public override Token MainToken => ReturnToken;
         public override IEnumerable<SyntaxNode> Children
         {
             get
@@ -66,6 +70,7 @@ namespace Delta.Slang.Syntax
             }
         }
 
+        public Token ReturnToken { get; }
         public ExpressionNode Expression { get; }
     }
 
@@ -104,5 +109,32 @@ namespace Delta.Slang.Syntax
         public override IEnumerable<SyntaxNode> Children { get { yield return Statement; } }
 
         public StatementNode Statement { get; }
+    }
+
+    public sealed class GotoStatementNode : StatementNode
+    {
+        internal GotoStatementNode(Token gotoToken, NameExpressionNode label)
+        {
+            GotoToken = gotoToken ?? throw new ArgumentNullException(nameof(gotoToken));
+            Label = label ?? throw new ArgumentNullException(nameof(label));
+        }
+
+        public override SyntaxKind Kind => SyntaxKind.GotoStatement;
+        public override Token MainToken => GotoToken;
+        public override IEnumerable<SyntaxNode> Children { get { yield return Label; } }
+
+        public Token GotoToken { get; }
+        public NameExpressionNode Label { get; }
+    }
+
+    public sealed class LabelStatementNode : StatementNode
+    {
+        internal LabelStatementNode(NameExpressionNode label) => Label = label ?? throw new ArgumentNullException(nameof(label));
+
+        public override SyntaxKind Kind => SyntaxKind.LabelStatement;
+        public override Token MainToken => Label.MainToken;
+        public override IEnumerable<SyntaxNode> Children { get { yield return Label; } }
+
+        public NameExpressionNode Label { get; }
     }
 }

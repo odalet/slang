@@ -33,8 +33,17 @@ namespace Delta.Slang.Utils
                 case ExpressionStatement es:
                     WriteExpressionStatement(es, writer);
                     break;
+                case GotoStatement gs:
+                    WriteGotoStatement(gs, writer);
+                    break;
+                case LabelStatement ls:
+                    WriteLabelStatement(ls, writer);
+                    break;
                 case IfStatement ifs:
                     WriteIfStatement(ifs, writer);
+                    break;
+                case ReturnStatement rs:
+                    WriteReturnStatement(rs, writer);
                     break;
                 case AssignmentExpression ae:
                     WriteAssignmentExpression(ae, writer);
@@ -45,6 +54,9 @@ namespace Delta.Slang.Utils
                 case ConversionExpression ce:
                     WriteConversionExpression(ce, writer);
                     break;
+                case InvokeExpression ie:
+                    WriteInvokeExpression(ie, writer);
+                    break;
                 case LiteralExpression le:
                     WriteLiteralExpression(le, writer);
                     break;
@@ -54,8 +66,12 @@ namespace Delta.Slang.Utils
                 case BinaryExpression be:
                     WriteBinaryExpression(be, writer);
                     break;
+                case InvalidExpression inve:
+                    WriteInvalidExpression(inve, writer);
+                    break;
                 case InvalidStatement _:
                     writer.Write("<INV>");
+                    writer.WriteLine();
                     break;
                 default:
                     writer.Write("<?>");
@@ -63,6 +79,52 @@ namespace Delta.Slang.Utils
             }
         }
 
+        private static void WriteInvalidExpression(InvalidExpression node, IndentedTextWriter writer)
+        {
+            if (node.Expression == null)
+                writer.WriteInvalid("!!");
+            else
+            {
+                writer.WriteInvalid("!");
+                node.Expression.WriteTo(writer);
+                writer.WriteInvalid("!");
+            }
+        }
+
+        private static void WriteReturnStatement(ReturnStatement node, IndentedTextWriter writer)
+        {
+            writer.WriteKeyword(TokenKind.ReturnKeyword);
+            if (node.Expression != null)
+            {
+                writer.WriteSpace();
+                node.Expression.WriteTo(writer);
+            }
+            writer.WritePunctuation(TokenKind.Semicolon);
+            writer.WriteLine();
+        }
+
+        private static void WriteGotoStatement(GotoStatement node, IndentedTextWriter writer)
+        {
+            writer.WriteKeyword(TokenKind.GotoKeyword);
+            writer.WriteSpace();
+            writer.WriteIdentifier(node.Label?.Name ?? "<UNDEFINED>");
+            writer.WritePunctuation(TokenKind.Semicolon);
+            writer.WriteLine();
+        }
+
+        private static void WriteLabelStatement(LabelStatement node, IndentedTextWriter writer)
+        {
+            var indent = writer.Indent;
+            writer.Indent = 0;
+            try
+            {
+                writer.WriteIdentifier(node.Label.Name);
+                writer.WritePunctuation(TokenKind.Colon);
+            }
+            finally { writer.Indent = indent; }
+            writer.WriteLine();
+        }
+        
         private static void WriteExpressionStatement(ExpressionStatement node, IndentedTextWriter writer)
         {
             node.Expression.WriteTo(writer);
@@ -174,7 +236,7 @@ namespace Delta.Slang.Utils
 
             node.Else.WriteTo(writer);
 
-            if (!isThenBlock)
+            if (!isElseBlock)
                 writer.Indent--;
 
             // This leaves a blank line between the end of the if/else statement and the next instructions
@@ -224,6 +286,26 @@ namespace Delta.Slang.Utils
             writer.WriteTypeIdentifier(node.Type.Name);
             writer.WritePunctuation(TokenKind.OpenParenthesis);
             node.Expression.WriteTo(writer);
+            writer.WritePunctuation(TokenKind.CloseParenthesis);
+        }
+
+        private static void WriteInvokeExpression(InvokeExpression node, IndentedTextWriter writer)
+        {
+            writer.WriteTypeIdentifier(node.Function.Name);
+            writer.WritePunctuation(TokenKind.OpenParenthesis);
+            var isFirst = true;
+            foreach (var argument in node.Arguments)
+            {
+                if (isFirst) isFirst = false;
+                else
+                {
+                    writer.WritePunctuation(TokenKind.Comma);
+                    writer.WriteSpace();
+                }
+
+                argument.WriteTo(writer);
+            }
+
             writer.WritePunctuation(TokenKind.CloseParenthesis);
         }
 
