@@ -5,8 +5,9 @@ namespace Delta.Slang.Symbols
     internal static class BuiltinTypes
     {
         public static TypeSymbol Invalid { get; } = new TypeSymbol("?", null);
-        public static TypeSymbol Integer { get; } = new TypeSymbol("int", 0);
-        public static TypeSymbol Boolean { get; } = new TypeSymbol("bool", false);
+        public static TypeSymbol Int { get; } = new TypeSymbol("int", 0);
+        public static TypeSymbol Double { get; } = new TypeSymbol("double", 0.0);
+        public static TypeSymbol Bool { get; } = new TypeSymbol("bool", false);
         public static TypeSymbol String { get; } = new TypeSymbol("string", string.Empty);
         public static TypeSymbol Void { get; } = new TypeSymbol("void", 0);
 
@@ -14,8 +15,9 @@ namespace Delta.Slang.Symbols
         {
             get
             {
-                yield return Integer;
-                yield return Boolean;
+                yield return Int;
+                yield return Double;
+                yield return Bool;
                 yield return String;
                 yield return Void;
             }
@@ -34,10 +36,15 @@ namespace Delta.Slang.Symbols
             new ParameterSymbol[0],
             BuiltinTypes.String);
 
+        public static FunctionSymbol Rndi { get; } = new FunctionSymbol(
+            "rndi",
+            new[] { new ParameterSymbol("max", BuiltinTypes.Int) },
+            BuiltinTypes.Int);
+
         public static FunctionSymbol Rnd { get; } = new FunctionSymbol(
             "rnd",
-            new[] { new ParameterSymbol("max", BuiltinTypes.Integer) },
-            BuiltinTypes.Integer);
+            new[] { new ParameterSymbol("max", BuiltinTypes.Double) },
+            BuiltinTypes.Double);
 
         public static IEnumerable<FunctionSymbol> All
         {
@@ -45,7 +52,7 @@ namespace Delta.Slang.Symbols
             {
                 yield return Print;
                 yield return Input;
-                yield return Rnd;
+                yield return Rndi;
             }
         }
     }

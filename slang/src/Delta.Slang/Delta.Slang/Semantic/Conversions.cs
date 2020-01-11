@@ -28,11 +28,17 @@ namespace Delta.Slang.Semantic
         {
             if (from == to) return Identity;
 
-            if (to == BuiltinTypes.String && (from == BuiltinTypes.Boolean || from == BuiltinTypes.Integer))
+            if (to == BuiltinTypes.String)
                 return Explicit;
 
-            if (from == BuiltinTypes.String && (to == BuiltinTypes.Boolean || to == BuiltinTypes.Integer))
+            if (from == BuiltinTypes.String && (to == BuiltinTypes.Bool || to == BuiltinTypes.Int || to == BuiltinTypes.Double))
                 return Explicit;
+
+            if (from == BuiltinTypes.Double && to == BuiltinTypes.Int)
+                return Explicit;
+
+            if (from == BuiltinTypes.Int && to == BuiltinTypes.Double)
+                return Implicit;
 
             return None;
         }

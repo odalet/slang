@@ -33,9 +33,9 @@ namespace Delta.Slang.Semantic
     {
         private static readonly UnaryOperator[] operators =
         {
-            new UnaryOperator(TokenKind.Exclamation, UnaryOperatorKind.LogicalNegation, BuiltinTypes.Boolean),
-            new UnaryOperator(TokenKind.Plus, UnaryOperatorKind.Identity, BuiltinTypes.Integer),
-            new UnaryOperator(TokenKind.Minus, UnaryOperatorKind.Negation, BuiltinTypes.Integer),
+            new UnaryOperator(TokenKind.Exclamation, UnaryOperatorKind.LogicalNegation, BuiltinTypes.Bool),
+            new UnaryOperator(TokenKind.Plus, UnaryOperatorKind.Identity, BuiltinTypes.Int),
+            new UnaryOperator(TokenKind.Minus, UnaryOperatorKind.Negation, BuiltinTypes.Int),
             //new UnaryOperator(TokenKind.Tilde, BoundUnaryOperatorKind.OnesComplement, TypeSymbol.Int),
         };
 

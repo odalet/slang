@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Delta.Slang.Symbols;
+using Delta.Slang.Utils;
 
 namespace Delta.Slang.Semantic
 {
@@ -26,12 +27,14 @@ namespace Delta.Slang.Semantic
 
         private static void EnsureTypeConsistency(TypeSymbol type, object value)
         {
-            if (type == BuiltinTypes.Boolean && value is bool) return;
-            if (type == BuiltinTypes.Integer && value is int) return;
+            if (type == BuiltinTypes.Bool && value is bool) return;
+            if (type == BuiltinTypes.Int && value is int) return;
+            if (type == BuiltinTypes.Double && value is double) return;
             if (type == BuiltinTypes.String && value is string) return;
             if (type == BuiltinTypes.Void && value is int i && i == 0) return;
 
-            throw new InvalidOperationException($"Unexpected literal '{value ?? ""}' for type {type.Name}");
+            using (CultureUtils.InvariantCulture())
+                throw new InvalidOperationException($"Unexpected literal '{value ?? ""}' for type {type.Name}");
         }
     }
 

@@ -14,6 +14,29 @@ namespace Delta.Slang.Utils
         private ParseTree Tree { get; }
 
         private string Tabs => indentLevel > 0 ? new string(' ', 3 * indentLevel) : "";
+        
+        public void DumpTree(TextWriter writer)
+        {
+            void walk(SyntaxNode node, int tabCount = 0)
+            {
+                string f(Token token)
+                {
+                    using (CultureUtils.InvariantCulture())
+                    {
+                        if (token == null) return "<NULL>";
+                        var text = token.Value == null ? token.Text ?? "" : token.Value.ToString();
+                        return text.Replace("\r", "\\r").Replace("\n", "\\n").Replace(" ", "·");
+                    }
+                }
+
+                var tabs = new string(' ', tabCount * 3);
+                writer.WriteLine($"{tabs}{node.Kind} - {f(node.MainToken)}");
+                foreach (var child in node.Children)
+                    walk(child, tabCount + 1);
+            }
+
+            walk(Tree.Root);
+        }
 
         public void Unparse(TextWriter writer) => Unparse(writer, Tree.Root);
 
@@ -189,7 +212,10 @@ namespace Delta.Slang.Utils
                     if (le.Type == BuiltinTypes.String)
                         w("\"");
                     if (le.Literal.Value != null)
-                        w(le.Literal.Value.ToString());
+                    {
+                        using (CultureUtils.InvariantCulture())
+                            w(le.Literal.Value.ToString());
+                    }
                     else
                         w(le.Literal.Text);
                     if (le.Type == BuiltinTypes.String)

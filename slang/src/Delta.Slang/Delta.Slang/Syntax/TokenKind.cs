@@ -29,7 +29,8 @@
 
         Whitespace,
         StringLiteral,
-        NumberLiteral,
+        IntLiteral,
+        DoubleLiteral,
 
         Comment,
 

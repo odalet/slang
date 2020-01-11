@@ -87,8 +87,9 @@ namespace Delta.Slang.Syntax
             Type = type ?? throw new ArgumentNullException(nameof(type));
         }
 
-        public static LiteralExpressionNode MakeBooleanLiteral(Token literal, bool value) => new LiteralExpressionNode(literal, value, BuiltinTypes.Boolean);
-        public static LiteralExpressionNode MakeIntegerLiteral(Token literal) => new LiteralExpressionNode(literal, literal.Value, BuiltinTypes.Integer);
+        public static LiteralExpressionNode MakeBoolLiteral(Token literal, bool value) => new LiteralExpressionNode(literal, value, BuiltinTypes.Bool);
+        public static LiteralExpressionNode MakeIntLiteral(Token literal) => new LiteralExpressionNode(literal, literal.Value, BuiltinTypes.Int);
+        public static LiteralExpressionNode MakeDoubleLiteral(Token literal) => new LiteralExpressionNode(literal, literal.Value, BuiltinTypes.Double);
         public static LiteralExpressionNode MakeStringLiteral(Token literal) => new LiteralExpressionNode(literal, literal.Value, BuiltinTypes.String);
 
         public override SyntaxKind Kind => SyntaxKind.LiteralExpression;

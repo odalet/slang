@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using Delta.Slang.Text;
 
@@ -300,43 +301,36 @@ namespace Delta.Slang.Syntax
             };
         }
 
-        ////private void LexStringLiteral(ref TokenInfo info)
-        ////{
-        ////    Consume(); // This consumes the initial quote (")
-
-        ////    var isEscaping = false;
-        ////    while (true)
-        ////    {
-        ////        var current = LookAhead();
-        ////        if (current == '\\' && !isEscaping)
-        ////        {
-        ////            isEscaping = true;
-        ////            Consume();
-        ////            continue;
-        ////        }
-
-        ////        if (current == '\"' && !isEscaping)
-        ////        {
-        ////            Consume();
-        ////            break;
-        ////        }
-
-        ////        Consume();
-        ////        isEscaping = false; // Not escaping any more...
-        ////    }
-
-        ////    info.Kind = TokenKind.StringLiteral;
-        ////}
-
         private void LexNumberLiteral(ref TokenInfo info)
         {
             while (char.IsDigit(LookAhead()))
                 Consume();
 
-            info.Kind = TokenKind.NumberLiteral;
+            if (LookAhead() == '.')
+                LexFloatingPointLiteral(ref info);
+            else
+            {
+                info.Kind = TokenKind.IntLiteral;
+                var span = GetCurrentSpan();
+                var text = source.ToString(span);
+                if (int.TryParse(text, out var value))
+                    info.Value = value;
+                else
+                    diagnostics.ReportInvalidNumber(GetCurrentLinePosition(), GetCurrentSpan(), text);
+            }
+        }
+
+        private void LexFloatingPointLiteral(ref TokenInfo info)
+        {
+            Consume(); // This consumes the '.' character
+
+            while (char.IsDigit(LookAhead()))
+                Consume();
+
+            info.Kind = TokenKind.DoubleLiteral;
             var span = GetCurrentSpan();
             var text = source.ToString(span);
-            if (int.TryParse(text, out var value))
+            if (double.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out var value))
                 info.Value = value;
             else
                 diagnostics.ReportInvalidNumber(GetCurrentLinePosition(), GetCurrentSpan(), text);

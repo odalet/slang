@@ -47,31 +47,31 @@ namespace Delta.Slang.Semantic
     {
         private static readonly BinaryOperator[] operators =
         {
-            new BinaryOperator(TokenKind.Plus, BinaryOperatorKind.Addition, BuiltinTypes.Integer),
-            new BinaryOperator(TokenKind.Minus, BinaryOperatorKind.Subtraction, BuiltinTypes.Integer),
-            new BinaryOperator(TokenKind.Star, BinaryOperatorKind.Multiplication, BuiltinTypes.Integer),
-            new BinaryOperator(TokenKind.Slash, BinaryOperatorKind.Division, BuiltinTypes.Integer),
+            new BinaryOperator(TokenKind.Plus, BinaryOperatorKind.Addition, BuiltinTypes.Int),
+            new BinaryOperator(TokenKind.Minus, BinaryOperatorKind.Subtraction, BuiltinTypes.Int),
+            new BinaryOperator(TokenKind.Star, BinaryOperatorKind.Multiplication, BuiltinTypes.Int),
+            new BinaryOperator(TokenKind.Slash, BinaryOperatorKind.Division, BuiltinTypes.Int),
             //new BinaryOperator(TokenKind.Ampersand, BinaryOperatorKind.BitwiseAnd, BuiltinTypes.Integer),
             //new BinaryOperator(TokenKind.Pipe, BinaryOperatorKind.BitwiseOr, BuiltinTypes.Integer),
             //new BinaryOperator(TokenKind.Hat, BinaryOperatorKind.BitwiseXor, BuiltinTypes.Integer),
-            new BinaryOperator(TokenKind.EqualEqual, BinaryOperatorKind.Equality, BuiltinTypes.Integer, BuiltinTypes.Boolean),
-            new BinaryOperator(TokenKind.ExclamationEqual, BinaryOperatorKind.NonEquality, BuiltinTypes.Integer, BuiltinTypes.Boolean),
-            new BinaryOperator(TokenKind.Lower, BinaryOperatorKind.Lower, BuiltinTypes.Integer, BuiltinTypes.Boolean),
-            new BinaryOperator(TokenKind.LowerEqual, BinaryOperatorKind.LowerOrEqual, BuiltinTypes.Integer, BuiltinTypes.Boolean),
-            new BinaryOperator(TokenKind.Greater, BinaryOperatorKind.Greater, BuiltinTypes.Integer, BuiltinTypes.Boolean),
-            new BinaryOperator(TokenKind.GreaterEqual, BinaryOperatorKind.GreaterOrEqual, BuiltinTypes.Integer, BuiltinTypes.Boolean),
+            new BinaryOperator(TokenKind.EqualEqual, BinaryOperatorKind.Equality, BuiltinTypes.Int, BuiltinTypes.Bool),
+            new BinaryOperator(TokenKind.ExclamationEqual, BinaryOperatorKind.NonEquality, BuiltinTypes.Int, BuiltinTypes.Bool),
+            new BinaryOperator(TokenKind.Lower, BinaryOperatorKind.Lower, BuiltinTypes.Int, BuiltinTypes.Bool),
+            new BinaryOperator(TokenKind.LowerEqual, BinaryOperatorKind.LowerOrEqual, BuiltinTypes.Int, BuiltinTypes.Bool),
+            new BinaryOperator(TokenKind.Greater, BinaryOperatorKind.Greater, BuiltinTypes.Int, BuiltinTypes.Bool),
+            new BinaryOperator(TokenKind.GreaterEqual, BinaryOperatorKind.GreaterOrEqual, BuiltinTypes.Int, BuiltinTypes.Bool),
 
             //new BinaryOperator(TokenKind.Ampersand, BinaryOperatorKind.BitwiseAnd, BuiltinTypes.Boolean),
             //new BinaryOperator(TokenKind.AmpersandAmpersand, BinaryOperatorKind.LogicalAnd, BuiltinTypes.Boolean),
             //new BinaryOperator(TokenKind.Pipe, BinaryOperatorKind.BitwiseOr, BuiltinTypes.Boolean),
             //new BinaryOperator(TokenKind.PipePipe, BinaryOperatorKind.LogicalOr, BuiltinTypes.Boolean),
             //new BinaryOperator(TokenKind.Hat, BinaryOperatorKind.BitwiseXor, BuiltinTypes.Boolean),
-            new BinaryOperator(TokenKind.EqualEqual, BinaryOperatorKind.Equality, BuiltinTypes.Boolean),
-            new BinaryOperator(TokenKind.ExclamationEqual, BinaryOperatorKind.NonEquality, BuiltinTypes.Boolean),
+            new BinaryOperator(TokenKind.EqualEqual, BinaryOperatorKind.Equality, BuiltinTypes.Bool),
+            new BinaryOperator(TokenKind.ExclamationEqual, BinaryOperatorKind.NonEquality, BuiltinTypes.Bool),
 
             new BinaryOperator(TokenKind.Plus, BinaryOperatorKind.Addition, BuiltinTypes.String),
-            new BinaryOperator(TokenKind.EqualEqual, BinaryOperatorKind.Equality, BuiltinTypes.String, BuiltinTypes.Boolean),
-            new BinaryOperator(TokenKind.ExclamationEqual, BinaryOperatorKind.NonEquality, BuiltinTypes.String, BuiltinTypes.Boolean),
+            new BinaryOperator(TokenKind.EqualEqual, BinaryOperatorKind.Equality, BuiltinTypes.String, BuiltinTypes.Bool),
+            new BinaryOperator(TokenKind.ExclamationEqual, BinaryOperatorKind.NonEquality, BuiltinTypes.String, BuiltinTypes.Bool),
         };
 
         public static BinaryOperator Bind(TokenKind tokenKind, TypeSymbol leftType, TypeSymbol rightType)

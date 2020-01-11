@@ -232,7 +232,7 @@ namespace Delta.Slang.Semantic
 
         private IfStatement BindIfStatement(IfStatementNode node)
         {
-            var condition = BindExpression(node.Condition, BuiltinTypes.Boolean);
+            var condition = BindExpression(node.Condition, BuiltinTypes.Bool);
             var thenStatement = BindStatement(node.Statement);
             var elseStatement = node.Else == null ? null : BindStatement(node.Else.Statement);
             return new IfStatement(Scope, condition, thenStatement, elseStatement);
@@ -406,7 +406,7 @@ namespace Delta.Slang.Semantic
                 }
             }
 
-            return hasErrors ? (Expression)invokeExpression : new InvalidExpression(invokeExpression);
+            return hasErrors ? new InvalidExpression(invokeExpression) : (Expression)invokeExpression;
         }
 
         private Expression BindConversion(ExpressionNode node, TypeSymbol type, bool allowExplicit = false)

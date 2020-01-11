@@ -1,5 +1,6 @@
 ﻿using System;
 using System.CodeDom.Compiler;
+using System.Globalization;
 using System.IO;
 using Delta.Slang.Semantic;
 using Delta.Slang.Symbols;
@@ -269,6 +270,8 @@ namespace Delta.Slang.Utils
                 writer.WriteKeyword(b ? TokenKind.TrueKeyword : TokenKind.FalseKeyword);
             else if (node.Value is int i)
                 writer.WriteNumber(i.ToString());
+            else if (node.Value is double d)
+                writer.WriteNumber(d.ToString(CultureInfo.InvariantCulture));
             else if (node.Value is string s)
                 writer.WriteNumber($"\"{s ?? ""}\"");
             else if (node.Type == BuiltinTypes.Void)

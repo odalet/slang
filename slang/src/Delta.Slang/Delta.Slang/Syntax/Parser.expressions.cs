@@ -52,8 +52,9 @@ namespace Delta.Slang.Syntax
             {
                 case TokenKind.OpenParenthesis: return ParseParenthesizedExpression();
                 case TokenKind.FalseKeyword:
-                case TokenKind.TrueKeyword: return ParseBooleanLiteral();
-                case TokenKind.NumberLiteral: return ParseNumberLiteral();
+                case TokenKind.TrueKeyword: return ParseBoolLiteral();
+                case TokenKind.IntLiteral: return ParseIntLiteral();
+                case TokenKind.DoubleLiteral: return ParseDoubleLiteral();
                 case TokenKind.DoubleQuote: return ParseStringLiteral();
                 case TokenKind.Identifier:
                 default:
@@ -69,17 +70,23 @@ namespace Delta.Slang.Syntax
             return new ParenthesizedExpressionNode(openParen, expression);
         }
 
-        private LiteralExpressionNode ParseBooleanLiteral()
+        private LiteralExpressionNode ParseBoolLiteral()
         {
             var isTrue = Current.Kind == TokenKind.TrueKeyword;
             var keywordToken = isTrue ? MatchToken(TokenKind.TrueKeyword) : MatchToken(TokenKind.FalseKeyword);
-            return LiteralExpressionNode.MakeBooleanLiteral(keywordToken, isTrue);
+            return LiteralExpressionNode.MakeBoolLiteral(keywordToken, isTrue);
         }
 
-        private LiteralExpressionNode ParseNumberLiteral()
+        private LiteralExpressionNode ParseIntLiteral()
         {
-            var token = MatchToken(TokenKind.NumberLiteral);
-            return LiteralExpressionNode.MakeIntegerLiteral(token);
+            var token = MatchToken(TokenKind.IntLiteral);
+            return LiteralExpressionNode.MakeIntLiteral(token);
+        }
+
+        private LiteralExpressionNode ParseDoubleLiteral()
+        {
+            var token = MatchToken(TokenKind.DoubleLiteral);
+            return LiteralExpressionNode.MakeDoubleLiteral(token);
         }
 
         private LiteralExpressionNode ParseStringLiteral()
