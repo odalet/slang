@@ -36,7 +36,9 @@ namespace Delta.Slang.Semantic
             new UnaryOperator(TokenKind.Exclamation, UnaryOperatorKind.LogicalNegation, BuiltinTypes.Bool),
             new UnaryOperator(TokenKind.Plus, UnaryOperatorKind.Identity, BuiltinTypes.Int),
             new UnaryOperator(TokenKind.Minus, UnaryOperatorKind.Negation, BuiltinTypes.Int),
-            //new UnaryOperator(TokenKind.Tilde, BoundUnaryOperatorKind.OnesComplement, TypeSymbol.Int),
+            //new UnaryOperator(TokenKind.Tilde, BoundUnaryOperatorKind.OnesComplement, TypeSymbol.Int),          
+            new UnaryOperator(TokenKind.Plus, UnaryOperatorKind.Identity, BuiltinTypes.Double),
+            new UnaryOperator(TokenKind.Minus, UnaryOperatorKind.Negation, BuiltinTypes.Double),
         };
 
         public static UnaryOperator Bind(TokenKind tokenKind, TypeSymbol operandType)

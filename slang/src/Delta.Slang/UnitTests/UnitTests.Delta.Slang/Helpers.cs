@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using Delta.Slang.Semantic;
 using Delta.Slang.Syntax;
 
 namespace Delta.Slang
 {
+    [ExcludeFromCodeCoverage]
     internal static class Helpers
     {
         public static (IEnumerable<Token> tokens, IEnumerable<IDiagnostic> diagnostics) Lex(string text) => Lex(SourceText.From(text));

@@ -47,13 +47,14 @@ namespace Delta.Slang.Semantic
     {
         private static readonly BinaryOperator[] operators =
         {
+            // Int
             new BinaryOperator(TokenKind.Plus, BinaryOperatorKind.Addition, BuiltinTypes.Int),
             new BinaryOperator(TokenKind.Minus, BinaryOperatorKind.Subtraction, BuiltinTypes.Int),
             new BinaryOperator(TokenKind.Star, BinaryOperatorKind.Multiplication, BuiltinTypes.Int),
             new BinaryOperator(TokenKind.Slash, BinaryOperatorKind.Division, BuiltinTypes.Int),
-            //new BinaryOperator(TokenKind.Ampersand, BinaryOperatorKind.BitwiseAnd, BuiltinTypes.Integer),
-            //new BinaryOperator(TokenKind.Pipe, BinaryOperatorKind.BitwiseOr, BuiltinTypes.Integer),
-            //new BinaryOperator(TokenKind.Hat, BinaryOperatorKind.BitwiseXor, BuiltinTypes.Integer),
+            //new BinaryOperator(TokenKind.Ampersand, BinaryOperatorKind.BitwiseAnd, BuiltinTypes.Int),
+            //new BinaryOperator(TokenKind.Pipe, BinaryOperatorKind.BitwiseOr, BuiltinTypes.Int),
+            //new BinaryOperator(TokenKind.Hat, BinaryOperatorKind.BitwiseXor, BuiltinTypes.Int),
             new BinaryOperator(TokenKind.EqualEqual, BinaryOperatorKind.Equality, BuiltinTypes.Int, BuiltinTypes.Bool),
             new BinaryOperator(TokenKind.ExclamationEqual, BinaryOperatorKind.NonEquality, BuiltinTypes.Int, BuiltinTypes.Bool),
             new BinaryOperator(TokenKind.Lower, BinaryOperatorKind.Lower, BuiltinTypes.Int, BuiltinTypes.Bool),
@@ -61,6 +62,19 @@ namespace Delta.Slang.Semantic
             new BinaryOperator(TokenKind.Greater, BinaryOperatorKind.Greater, BuiltinTypes.Int, BuiltinTypes.Bool),
             new BinaryOperator(TokenKind.GreaterEqual, BinaryOperatorKind.GreaterOrEqual, BuiltinTypes.Int, BuiltinTypes.Bool),
 
+            // Double
+            new BinaryOperator(TokenKind.Plus, BinaryOperatorKind.Addition, BuiltinTypes.Double),
+            new BinaryOperator(TokenKind.Minus, BinaryOperatorKind.Subtraction, BuiltinTypes.Double),
+            new BinaryOperator(TokenKind.Star, BinaryOperatorKind.Multiplication, BuiltinTypes.Double),
+            new BinaryOperator(TokenKind.Slash, BinaryOperatorKind.Division, BuiltinTypes.Double),
+            new BinaryOperator(TokenKind.EqualEqual, BinaryOperatorKind.Equality, BuiltinTypes.Double, BuiltinTypes.Bool),
+            new BinaryOperator(TokenKind.ExclamationEqual, BinaryOperatorKind.NonEquality, BuiltinTypes.Double, BuiltinTypes.Bool),
+            new BinaryOperator(TokenKind.Lower, BinaryOperatorKind.Lower, BuiltinTypes.Double, BuiltinTypes.Bool),
+            new BinaryOperator(TokenKind.LowerEqual, BinaryOperatorKind.LowerOrEqual, BuiltinTypes.Double, BuiltinTypes.Bool),
+            new BinaryOperator(TokenKind.Greater, BinaryOperatorKind.Greater, BuiltinTypes.Double, BuiltinTypes.Bool),
+            new BinaryOperator(TokenKind.GreaterEqual, BinaryOperatorKind.GreaterOrEqual, BuiltinTypes.Double, BuiltinTypes.Bool),
+
+            // Bool
             //new BinaryOperator(TokenKind.Ampersand, BinaryOperatorKind.BitwiseAnd, BuiltinTypes.Boolean),
             //new BinaryOperator(TokenKind.AmpersandAmpersand, BinaryOperatorKind.LogicalAnd, BuiltinTypes.Boolean),
             //new BinaryOperator(TokenKind.Pipe, BinaryOperatorKind.BitwiseOr, BuiltinTypes.Boolean),
@@ -69,6 +83,7 @@ namespace Delta.Slang.Semantic
             new BinaryOperator(TokenKind.EqualEqual, BinaryOperatorKind.Equality, BuiltinTypes.Bool),
             new BinaryOperator(TokenKind.ExclamationEqual, BinaryOperatorKind.NonEquality, BuiltinTypes.Bool),
 
+            // String
             new BinaryOperator(TokenKind.Plus, BinaryOperatorKind.Addition, BuiltinTypes.String),
             new BinaryOperator(TokenKind.EqualEqual, BinaryOperatorKind.Equality, BuiltinTypes.String, BuiltinTypes.Bool),
             new BinaryOperator(TokenKind.ExclamationEqual, BinaryOperatorKind.NonEquality, BuiltinTypes.String, BuiltinTypes.Bool),
@@ -76,6 +91,7 @@ namespace Delta.Slang.Semantic
 
         public static BinaryOperator Bind(TokenKind tokenKind, TypeSymbol leftType, TypeSymbol rightType)
         {
+            // TODO: apply automatic conversions
             foreach (var op in operators)
             {
                 if (op.TokenKind == tokenKind && op.LeftType == leftType && op.RightType == rightType)

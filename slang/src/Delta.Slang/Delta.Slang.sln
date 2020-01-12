@@ -14,12 +14,11 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{40F8D273-F105-4831-A410-2A638479A189}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
-		.runsettings = .runsettings
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UnitTests", "UnitTests", "{F495D735-1C94-4008-8A39-E8E4F94A9C5C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests.Delta.Slang", "UnitTests\UnitTests.Delta.Slang\UnitTests.Delta.Slang.csproj", "{13223A93-F1A4-4CDA-B853-2150D208A7B9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTests.Delta.Slang", "UnitTests\UnitTests.Delta.Slang\UnitTests.Delta.Slang.csproj", "{13223A93-F1A4-4CDA-B853-2150D208A7B9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
