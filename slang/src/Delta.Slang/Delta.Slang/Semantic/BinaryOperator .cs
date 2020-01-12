@@ -91,12 +91,13 @@ namespace Delta.Slang.Semantic
 
         public static BinaryOperator Bind(TokenKind tokenKind, TypeSymbol leftType, TypeSymbol rightType)
         {
-            // TODO: apply automatic conversions
             foreach (var op in operators)
             {
                 if (op.TokenKind == tokenKind && op.LeftType == leftType && op.RightType == rightType)
                     return op;
             }
+
+            // TODO: apply automatic conversions
 
             return null;
         }
