@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 using Delta.Slang.Symbols;
 using Delta.Slang.Text;
@@ -39,7 +38,7 @@ namespace Delta.Slang.Syntax
 
         private IEnumerable<MemberNode> ParseCompilationUnitContent()
         {
-            var members = ImmutableArray.CreateBuilder<MemberNode>();
+            var members = new List<MemberNode>();
             while (Current.Kind != TokenKind.Eof)
             {
                 var startToken = Current;
@@ -58,7 +57,7 @@ namespace Delta.Slang.Syntax
                     Advance();
             }
 
-            return members.ToImmutable();
+            return members.ToArray();
         }
 
         private MemberNode ParseMember() => Current.Kind == TokenKind.FunKeyword ? (MemberNode)ParseFunctionDeclaration() : ParseGlobalStatement();
@@ -83,7 +82,7 @@ namespace Delta.Slang.Syntax
 
         private ParametersDeclarationNode ParseParametersDeclaration()
         {
-            var parameters = ImmutableArray.CreateBuilder<ParameterDeclarationNode>();
+            var parameters = new List<ParameterDeclarationNode>();
 
             var shouldParseNextParameter = true;
             while (shouldParseNextParameter && Current.Kind != TokenKind.CloseParenthesis && Current.Kind != TokenKind.Eof)
@@ -96,7 +95,7 @@ namespace Delta.Slang.Syntax
                 else shouldParseNextParameter = false;
             }
 
-            return new ParametersDeclarationNode(parameters.ToImmutable());
+            return new ParametersDeclarationNode(parameters.ToArray());
         }
 
         private ParameterDeclarationNode ParseParameterDeclaration()
@@ -129,7 +128,7 @@ namespace Delta.Slang.Syntax
 
         private BlockNode ParseBlock()
         {
-            var statements = ImmutableArray.CreateBuilder<StatementNode>();
+            var statements = new List<StatementNode>();
 
             _ = MatchToken(TokenKind.OpenBrace);
             while (Current.Kind != TokenKind.CloseBrace && Current.Kind != TokenKind.Eof)
@@ -147,7 +146,7 @@ namespace Delta.Slang.Syntax
             }
 
             _ = MatchToken(TokenKind.CloseBrace);
-            return new BlockNode(statements.ToImmutable());
+            return new BlockNode(statements.ToArray());
         }
 
         private Token MatchToken(TokenKind expected)

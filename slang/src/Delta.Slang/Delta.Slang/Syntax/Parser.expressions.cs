@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Collections.Immutable;
 using Delta.Slang.Utils;
 
 namespace Delta.Slang.Syntax
@@ -114,7 +113,7 @@ namespace Delta.Slang.Syntax
 
         private IEnumerable<ExpressionNode> ParseArguments()
         {
-            var parameters = ImmutableArray.CreateBuilder<ExpressionNode>();
+            var parameters = new List<ExpressionNode>();
 
             var shouldParseNextParameter = true;
             while (shouldParseNextParameter && Current.Kind != TokenKind.CloseParenthesis && Current.Kind != TokenKind.Eof)
@@ -127,7 +126,7 @@ namespace Delta.Slang.Syntax
                 else shouldParseNextParameter = false;
             }
 
-            return parameters.ToImmutable();
+            return parameters.ToArray();
         }
 
         private NameExpressionNode ParseNameExpression()

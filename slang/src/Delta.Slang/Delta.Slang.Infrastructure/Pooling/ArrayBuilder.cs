@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 
 namespace Delta.Slang.Pooling
 {
@@ -26,8 +25,6 @@ namespace Delta.Slang.Pooling
             collection.Clear();
             return result;
         }
-
-        public ImmutableArray<T> ToImmutable() => ImmutableArray.CreateRange(collection);
 
         public IEnumerator<T> GetEnumerator() => collection.GetEnumerator();
 
