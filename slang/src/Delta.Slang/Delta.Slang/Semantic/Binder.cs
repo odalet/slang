@@ -348,17 +348,17 @@ namespace Delta.Slang.Semantic
             return new BinaryExpression(boundLhs, boundOperator, boundRhs);
         }
 
-        private Expression BindInvokeExpression(InvokeExpressionNode syntax)
+        private Expression BindInvokeExpression(InvokeExpressionNode node)
         {
             // This takes care of explicit conversions
-            var argumentNodes = syntax.Arguments.ToArray();
-            if (argumentNodes.Length == 1 && Scope.TryLookupType(syntax.FunctionName.Text, out var type))
+            var argumentNodes = node.Arguments.ToArray();
+            if (argumentNodes.Length == 1 && Scope.TryLookupType(node.FunctionName.Text, out var type))
                 return BindConversion(argumentNodes[0], type, allowExplicit: true);
 
-            var candidates = Scope.LookupFunctions(syntax.FunctionName.Text).ToArray();
+            var candidates = Scope.LookupFunctions(node.FunctionName.Text).ToArray();
             if (candidates.Length == 0)
             {
-                diagnostics.ReportUndefinedFunction(syntax.FunctionName, syntax.FunctionName.Text);
+                diagnostics.ReportUndefinedFunction(node.FunctionName, node.FunctionName.Text);
                 return new InvalidExpression(null);
             }
 
@@ -384,7 +384,7 @@ namespace Delta.Slang.Semantic
             var findCount = 0;
             foreach (var candidate in candidates)
             {
-                var found = MatchCompatibleOverload(syntax, candidate, arguments, out var convertedArguments);
+                var found = MatchCompatibleOverload(node, candidate, arguments, out var convertedArguments);
                 if (found != null)
                 {
                     invokeExpression = new InvokeExpression(found, convertedArguments);
@@ -392,7 +392,7 @@ namespace Delta.Slang.Semantic
                     if (findCount > 1)
                     {
                         diagnostics.ReportAmbiguousFunction(
-                            syntax.FunctionName, syntax.FunctionName.Text, arguments.Select(a => a.Type.Name).ToArray());
+                            node.FunctionName, node.FunctionName.Text, arguments.Select(a => a.Type.Name).ToArray());
                         return new InvalidExpression(invokeExpression);
                     }
                 }
@@ -402,8 +402,8 @@ namespace Delta.Slang.Semantic
             if (invokeExpression == null)
             {
                 diagnostics.ReportUndefinedFunctionWithArguments(
-                    syntax.FunctionName, syntax.FunctionName.Text, arguments.Select(a => a.Type.Name).ToArray());
-                return new InvalidExpression(null);
+                    node.FunctionName, node.FunctionName.Text, arguments.Select(a => a.Type.Name).ToArray());
+                return new InvalidExpression(new InvokeExpression(candidates.First(), arguments));
             }
 
             // OK, we found one and only one matching overload
