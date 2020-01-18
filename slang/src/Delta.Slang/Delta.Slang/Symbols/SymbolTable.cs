@@ -10,7 +10,7 @@ namespace Delta.Slang.Symbols
         public IEnumerable<Symbol> All => symbols.Values;
 
         public bool Contains(SymbolKey key) => symbols.ContainsKey(key);
-        ////public bool Contains(string name) => symbols.Values.Any(x => x.Name == name);
+
         public void Add(Symbol symbol) => symbols.Add(symbol.Key, symbol);
 
         public bool TryAdd(Symbol symbol)

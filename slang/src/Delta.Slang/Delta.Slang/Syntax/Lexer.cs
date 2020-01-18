@@ -125,8 +125,6 @@ namespace Delta.Slang.Syntax
                     break;
                 case '"':
                     return LexStringLiteral();
-                    ////LexStringLiteral(ref info);
-                    ////break;
                 case '0':
                 case '1':
                 case '2':

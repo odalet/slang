@@ -340,7 +340,5 @@ namespace Delta.Slang.Utils
             expression.WriteTo(writer);
             if (needsParenthesis) writer.WritePunctuation(TokenKind.CloseParenthesis);
         }
-
-        ////private static void WriteInvalidStatement(InvalidStatement node, IndentedTextWriter writer) => writer.Write("<inv>");
     }
 }

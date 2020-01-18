@@ -111,10 +111,10 @@ namespace Delta.Slang
             ReportBinderError(where, $"Type '{name}' could not be found.");
         public void ReportUndefinedFunction(Token where, string name) =>
             ReportBinderError(where, $"Function '{name}' could not be found.");
-        public void ReportWrongArgumentCount(Token where, string name, int expectedCount, int actualCount) =>
-            ReportBinderError(where, $"Function '{name}' requires {expectedCount} arguments but was given {actualCount}.");
-        public void ReportWrongArgumentType(Token where, string name, string functionName,  TypeSymbol expectedType, TypeSymbol actualType) =>
-            ReportBinderError(where, $"Parameter '{name}' in function '{functionName}' requires a value of type '{expectedType}' but was given a value of type '{actualType}'.");
+        public void ReportAmbiguousFunction(Token where, string name, string[] argumentTypes) =>
+            ReportBinderError(where, $"Invocation of Function '{name}' with argument types ({string.Join(", ", argumentTypes)}) is ambiguous.");
+        public void ReportUndefinedFunctionWithArguments(Token where, string name, string[] argumentTypes) =>
+            ReportBinderError(where, $"No Function '{name}' could be found that is compatible with argument types ({string.Join(", ", argumentTypes)}).");
         public void ReportUndefinedVariable(Token where, string name) =>
             ReportBinderError(where, $"Variable '{name}' could not be found.");
         public void ReportUndefinedLabel(Token where, string name) =>

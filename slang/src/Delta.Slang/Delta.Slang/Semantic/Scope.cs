@@ -32,9 +32,6 @@ namespace Delta.Slang.Semantic
 
         public bool TryLookupVariable(string name, out VariableSymbol variable) => TryLookupSymbol(SymbolKey.FromVariable(name), out variable);
 
-        ////public bool TryLookupFunction(string name, out FunctionSymbol function) => TryLookupSymbol(name, out function);
-        public IEnumerable<FunctionSymbol> LookupFunctions(string name) => LookupFunctions(this, name);
-
         public bool TryLookupLabel(string name, out LabelSymbol label)
         {
             label = null;
@@ -59,7 +56,9 @@ namespace Delta.Slang.Semantic
             type = BuiltinTypes.All.SingleOrDefault(x => x.Name == name);
             return type != null;
         }
-        
+
+        public IEnumerable<FunctionSymbol> LookupFunctions(string name) => LookupFunctions(this, name);
+
         public IEnumerable<VariableSymbol> GetDeclaredVariables() => GetDeclaredSymbols<VariableSymbol>();
         public IEnumerable<FunctionSymbol> GetDeclaredFunctions() => GetDeclaredSymbols<FunctionSymbol>();
         public IEnumerable<LabelSymbol> GetDeclaredLabels() => GetDeclaredSymbols<LabelSymbol>();

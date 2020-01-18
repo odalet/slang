@@ -351,22 +351,10 @@ namespace Delta.Slang.Semantic
         private Expression BindInvokeExpression(InvokeExpressionNode syntax)
         {
             // This takes care of explicit conversions
-            var arguments = syntax.Arguments.ToArray();
-            if (arguments.Length == 1 && Scope.TryLookupType(syntax.FunctionName.Text, out var type))
-                return BindConversion(arguments[0], type, allowExplicit: true);
+            var argumentNodes = syntax.Arguments.ToArray();
+            if (argumentNodes.Length == 1 && Scope.TryLookupType(syntax.FunctionName.Text, out var type))
+                return BindConversion(argumentNodes[0], type, allowExplicit: true);
 
-            var boundArguments = new List<Expression>();
-            foreach (var argument in syntax.Arguments)
-            {
-                var boundArgument = BindExpression(argument);
-                boundArguments.Add(boundArgument);
-            }
-
-            ////if (!Scope.TryLookupFunction(syntax.FunctionName.Text, out var function))
-            ////{
-            ////    diagnostics.ReportUndefinedFunction(syntax.FunctionName, syntax.FunctionName.Text);
-            ////    return new InvalidExpression(null);
-            ////}
             var candidates = Scope.LookupFunctions(syntax.FunctionName.Text).ToArray();
             if (candidates.Length == 0)
             {
@@ -374,74 +362,91 @@ namespace Delta.Slang.Semantic
                 return new InvalidExpression(null);
             }
 
+            var boundArguments = new List<Expression>();
+            foreach (var argumentNode in argumentNodes)
+            {
+                var boundArgument = BindExpression(argumentNode);
+                boundArguments.Add(boundArgument);
+            }
+
+            var arguments = boundArguments.ToArray();
+
             // Now let's first look for a definition with the exact same parameters
             foreach (var candidate in candidates)
             {
-                var found = MatchOverload(candidate, boundArguments.ToArray());
+                var found = MatchStrictOverload(candidate, arguments);
                 if (found != null)
-                    return new InvokeExpression(candidate, boundArguments);
+                    return new InvokeExpression(candidate, arguments);
             }
 
-            // No exact parameter match, let's see if we can find functions that would be compatible with implicit conversions
-            // TODO
+            // No exact parameter match, let's see if we can find functions that would be compatible with implicit conversions            
+            InvokeExpression invokeExpression = null;
+            var findCount = 0;
+            foreach (var candidate in candidates)
+            {
+                var found = MatchCompatibleOverload(syntax, candidate, arguments, out var convertedArguments);
+                if (found != null)
+                {
+                    invokeExpression = new InvokeExpression(found, convertedArguments);
+                    findCount++;
+                    if (findCount > 1)
+                    {
+                        diagnostics.ReportAmbiguousFunction(
+                            syntax.FunctionName, syntax.FunctionName.Text, arguments.Select(a => a.Type.Name).ToArray());
+                        return new InvalidExpression(invokeExpression);
+                    }
+                }
+            }
 
-            // No overload found. Report an error
-            diagnostics.ReportUndefinedFunction(syntax.FunctionName, syntax.FunctionName.Text);
-            return new InvalidExpression(null);
+            // No compatible signature was found
+            if (invokeExpression == null)
+            {
+                diagnostics.ReportUndefinedFunctionWithArguments(
+                    syntax.FunctionName, syntax.FunctionName.Text, arguments.Select(a => a.Type.Name).ToArray());
+                return new InvalidExpression(null);
+            }
 
-            ////// We are now able to build the invoke expression
-            ////var invokeExpression = new InvokeExpression(function, boundArguments);
-
-            ////// However, it may be invalid!
-            ////var hasErrors = false;
-
-            ////var parameters = function.Parameters.ToArray();
-            ////if (arguments.Length != parameters.Length)
-            ////{
-            ////    hasErrors = true;
-
-            ////    // OK, let's try to report the error at the best location possible
-            ////    Token where;
-            ////    if (arguments.Length > parameters.Length)
-            ////        where = syntax.CloseParenthesis;
-            ////    else
-            ////        where = parameters.Length == 0 ?
-            ////            arguments[0].MainToken :
-            ////            arguments[parameters.Length - 1].MainToken;
-
-            ////    diagnostics.ReportWrongArgumentCount(where, function.Name, parameters.Length, arguments.Length);
-            ////}
-            ////else
-            ////{
-            ////    for (var i = 0; i < arguments.Length; i++)
-            ////    {
-            ////        var argument = boundArguments[i];
-            ////        var parameter = parameters[i];
-
-            ////        if (argument.Type != parameter.Type)
-            ////        {
-            ////            if (argument.Type != BuiltinTypes.Invalid)
-            ////                diagnostics.ReportWrongArgumentType(arguments[i].MainToken, parameter.Name, function.Name, parameter.Type, argument.Type);
-            ////            hasErrors = true;
-            ////        }
-            ////    }
-            ////}
-
-            ////return hasErrors ? new InvalidExpression(invokeExpression) : (Expression)invokeExpression;
+            // OK, we found one and only one matching overload
+            return invokeExpression;
         }
 
-        private FunctionSymbol MatchOverload(FunctionSymbol candidate, Expression[] boundArguments)
+        private FunctionSymbol MatchStrictOverload(FunctionSymbol candidate, Expression[] arguments)
         {
             var parameters = candidate.Parameters.ToArray();
-            if (boundArguments.Length != parameters.Length) return null;
+            if (arguments.Length != parameters.Length) return null;
 
-            for (var i = 0; i < boundArguments.Length; i++)
+            for (var i = 0; i < arguments.Length; i++)
             {
-                var argument = boundArguments[i];
+                var argument = arguments[i];
                 var parameter = parameters[i];
-
                 if (argument.Type != parameter.Type)
                     return null;
+            }
+
+            return candidate;
+        }
+
+        private FunctionSymbol MatchCompatibleOverload(ExpressionNode node, FunctionSymbol candidate, Expression[] arguments, out Expression[] convertedArguments)
+        {
+            var parameters = candidate.Parameters.ToArray();
+            if (arguments.Length != parameters.Length)
+            {
+                convertedArguments = null;
+                return null;
+            }
+
+            convertedArguments = new Expression[arguments.Length];
+
+            for (var i = 0; i < arguments.Length; i++)
+            {
+                var argument = arguments[i];
+                var parameter = parameters[i];
+
+                var conversionExpression = BindConversion(node, argument, parameter.Type, allowExplicit: false, noDiagnostics: true);
+                if (conversionExpression is InvalidExpression)
+                    return null;
+
+                convertedArguments[i] = conversionExpression;
             }
 
             return candidate;
@@ -453,27 +458,28 @@ namespace Delta.Slang.Semantic
             return BindConversion(node, expression, type, allowExplicit);
         }
 
-        private Expression BindConversion(SyntaxNode sourceNode, Expression expression, TypeSymbol type, bool allowExplicit = false, bool noDiagnostics = false)
+        private Expression BindConversion(SyntaxNode node, Expression fromExpression, TypeSymbol toType, bool allowExplicit = false, bool noDiagnostics = false)
         {
             // We can always build the expression; however, it is not always valid!
-            var conversionExpression = new ConversionExpression(type, expression);
+            var conversionExpression = new ConversionExpression(toType, fromExpression);
 
-            var conversion = Conversions.GetConversionKind(expression.Type, type);
+            var conversion = Conversions.GetConversionKind(fromExpression.Type, toType);
             if (!conversion.Exists)
             {
-                if (!noDiagnostics && expression.Type != BuiltinTypes.Invalid && type != BuiltinTypes.Invalid)
-                    diagnostics.ReportImpossibleConversion(sourceNode.MainToken, expression.Type, type);
+                if (!noDiagnostics && fromExpression.Type != BuiltinTypes.Invalid && toType != BuiltinTypes.Invalid)
+                    diagnostics.ReportImpossibleConversion(node.MainToken, fromExpression.Type, toType);
 
                 return new InvalidExpression(conversionExpression);
             }
 
-            if (!noDiagnostics && !allowExplicit && conversion.IsExplicit)
+            if (!allowExplicit && conversion.IsExplicit)
             {
-                diagnostics.ReportImpossibleImplicitConversion(sourceNode.MainToken, expression.Type, type);
+                if (!noDiagnostics)
+                    diagnostics.ReportImpossibleImplicitConversion(node.MainToken, fromExpression.Type, toType);
                 return new InvalidExpression(conversionExpression);
             }
 
-            return conversion.IsIdentity ? expression : conversionExpression;
+            return conversion.IsIdentity ? fromExpression : conversionExpression;
         }
 
         private Expression BindDefaultInitializer(TypeSymbol type) => new LiteralExpression(type, type.DefaultValue);
