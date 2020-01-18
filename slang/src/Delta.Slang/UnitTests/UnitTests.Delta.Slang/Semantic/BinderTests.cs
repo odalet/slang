@@ -13,7 +13,33 @@ namespace Delta.Slang.Semantic
             var result = Helpers.Bind(program);
             Assert.Empty(result.diagnostics);
         }
-        
+
+        [Fact]
+        public void function_can_be_called_with_parameters_with_exact_type()
+        {
+            const string program = @"
+fun f(i: int): void { }
+fun foo(): void {
+    f(42);
+}
+";
+            var result = Helpers.Bind(program);
+            Assert.Empty(result.diagnostics);
+        }
+
+        [Fact]
+        public void function_can_be_called_with_parameters_with_compatible_type()
+        {
+            const string program = @"
+fun f(d: double): void { }
+fun foo(): void {
+    f(42);
+}
+";
+            var result = Helpers.Bind(program);
+            Assert.Empty(result.diagnostics);
+        }
+
         [Fact]
         public void type_of_double_plus_double_is_double()
         {
