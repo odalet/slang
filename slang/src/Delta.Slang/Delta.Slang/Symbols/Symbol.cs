@@ -1,7 +1,4 @@
-﻿using System.IO;
-using Delta.Slang.Utils;
-
-namespace Delta.Slang.Symbols
+﻿namespace Delta.Slang.Symbols
 {
     public abstract class Symbol
     {
@@ -9,7 +6,7 @@ namespace Delta.Slang.Symbols
 
         public string Name { get; }
         public abstract SymbolKind Kind { get; }
-
+        public abstract SymbolKey Key { get; }
         public override string ToString() => Name ?? "";
     }
 }

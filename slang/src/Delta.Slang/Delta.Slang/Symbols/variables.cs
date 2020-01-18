@@ -6,10 +6,12 @@
         {
             IsReadOnly = isReadOnly;
             Type = type;
+            Key = SymbolKey.FromVariable(name);
         }
 
         public bool IsReadOnly { get; }
         public TypeSymbol Type { get; }
+        public override SymbolKey Key { get; }
     }
 
     public sealed class GlobalVariableSymbol : VariableSymbol

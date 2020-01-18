@@ -362,51 +362,89 @@ namespace Delta.Slang.Semantic
                 boundArguments.Add(boundArgument);
             }
 
-            if (!Scope.TryLookupFunction(syntax.FunctionName.Text, out var function))
+            ////if (!Scope.TryLookupFunction(syntax.FunctionName.Text, out var function))
+            ////{
+            ////    diagnostics.ReportUndefinedFunction(syntax.FunctionName, syntax.FunctionName.Text);
+            ////    return new InvalidExpression(null);
+            ////}
+            var candidates = Scope.LookupFunctions(syntax.FunctionName.Text).ToArray();
+            if (candidates.Length == 0)
             {
                 diagnostics.ReportUndefinedFunction(syntax.FunctionName, syntax.FunctionName.Text);
                 return new InvalidExpression(null);
             }
 
-            // We are now able to build the invoke expression
-            var invokeExpression = new InvokeExpression(function, boundArguments);
-
-            // However, it may be invalid!
-            var hasErrors = false;
-
-            var parameters = function.Parameters.ToArray();
-            if (arguments.Length != parameters.Length)
+            // Now let's first look for a definition with the exact same parameters
+            foreach (var candidate in candidates)
             {
-                hasErrors = true;
-
-                // OK, let's try to report the error at the best location possible
-                Token where;
-                if (arguments.Length > parameters.Length)
-                    where = syntax.CloseParenthesis;
-                else
-                    where = parameters.Length == 0 ?
-                        arguments[0].MainToken :
-                        arguments[parameters.Length - 1].MainToken;
-
-                diagnostics.ReportWrongArgumentCount(where, function.Name, parameters.Length, arguments.Length);
-            }
-            else
-            {
-                for (var i = 0; i < arguments.Length; i++)
-                {
-                    var argument = boundArguments[i];
-                    var parameter = parameters[i];
-
-                    if (argument.Type != parameter.Type)
-                    {
-                        if (argument.Type != BuiltinTypes.Invalid)
-                            diagnostics.ReportWrongArgumentType(arguments[i].MainToken, parameter.Name, function.Name, parameter.Type, argument.Type);
-                        hasErrors = true;
-                    }
-                }
+                var found = MatchOverload(candidate, boundArguments.ToArray());
+                if (found != null)
+                    return new InvokeExpression(candidate, boundArguments);
             }
 
-            return hasErrors ? new InvalidExpression(invokeExpression) : (Expression)invokeExpression;
+            // No exact parameter match, let's see if we can find functions that would be compatible with implicit conversions
+            // TODO
+
+            // No overload found. Report an error
+            diagnostics.ReportUndefinedFunction(syntax.FunctionName, syntax.FunctionName.Text);
+            return new InvalidExpression(null);
+
+            ////// We are now able to build the invoke expression
+            ////var invokeExpression = new InvokeExpression(function, boundArguments);
+
+            ////// However, it may be invalid!
+            ////var hasErrors = false;
+
+            ////var parameters = function.Parameters.ToArray();
+            ////if (arguments.Length != parameters.Length)
+            ////{
+            ////    hasErrors = true;
+
+            ////    // OK, let's try to report the error at the best location possible
+            ////    Token where;
+            ////    if (arguments.Length > parameters.Length)
+            ////        where = syntax.CloseParenthesis;
+            ////    else
+            ////        where = parameters.Length == 0 ?
+            ////            arguments[0].MainToken :
+            ////            arguments[parameters.Length - 1].MainToken;
+
+            ////    diagnostics.ReportWrongArgumentCount(where, function.Name, parameters.Length, arguments.Length);
+            ////}
+            ////else
+            ////{
+            ////    for (var i = 0; i < arguments.Length; i++)
+            ////    {
+            ////        var argument = boundArguments[i];
+            ////        var parameter = parameters[i];
+
+            ////        if (argument.Type != parameter.Type)
+            ////        {
+            ////            if (argument.Type != BuiltinTypes.Invalid)
+            ////                diagnostics.ReportWrongArgumentType(arguments[i].MainToken, parameter.Name, function.Name, parameter.Type, argument.Type);
+            ////            hasErrors = true;
+            ////        }
+            ////    }
+            ////}
+
+            ////return hasErrors ? new InvalidExpression(invokeExpression) : (Expression)invokeExpression;
+        }
+
+        private FunctionSymbol MatchOverload(FunctionSymbol candidate, Expression[] boundArguments)
+        {
+            var parameters = candidate.Parameters.ToArray();
+            if (boundArguments.Length != parameters.Length) return null;
+
+            for (var i = 0; i < boundArguments.Length; i++)
+            {
+                var argument = boundArguments[i];
+                var parameter = parameters[i];
+
+                if (argument.Type != parameter.Type)
+                    return null;
+            }
+
+            return candidate;
         }
 
         private Expression BindConversion(ExpressionNode node, TypeSymbol type, bool allowExplicit = false)
@@ -420,7 +458,7 @@ namespace Delta.Slang.Semantic
             // We can always build the expression; however, it is not always valid!
             var conversionExpression = new ConversionExpression(type, expression);
 
-            var conversion = Conversions.GetConversionKind(expression.Type, type);            
+            var conversion = Conversions.GetConversionKind(expression.Type, type);
             if (!conversion.Exists)
             {
                 if (!noDiagnostics && expression.Type != BuiltinTypes.Invalid && type != BuiltinTypes.Invalid)
