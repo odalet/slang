@@ -1,9 +1,17 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1">
   <Class Name="Delta.Slang.Symbols.FunctionSymbol" Collapsed="true">
-    <Position X="5.25" Y="4.25" Width="1.5" />
+    <Position X="6.75" Y="4.25" Width="1.5" />
+    <AssociationLine Name="Parameters" Type="Delta.Slang.Symbols.ParameterSymbol" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="8.25" Y="4.812" />
+        <Point X="9" Y="4.812" />
+        <Point X="9" Y="7.846" />
+        <Point X="13.25" Y="7.846" />
+      </Path>
+    </AssociationLine>
     <TypeIdentifier>
-      <HashCode>AAAAAAAAQABAAAAAAAAAAAAAAAAAAAAAAYAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAQARAAAQAAAAAAAAAAAAAAAAAAYAAAAAAAAA=</HashCode>
       <FileName>Symbols\FunctionSymbol.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
@@ -15,19 +23,19 @@
     </ShowAsCollectionAssociation>
   </Class>
   <Class Name="Delta.Slang.Symbols.ParameterSymbol" Collapsed="true">
-    <Position X="11.75" Y="7.5" Width="2" />
+    <Position X="13.25" Y="7.5" Width="2" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Symbols\ParameterSymbol.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Delta.Slang.Symbols.Symbol">
-    <Position X="8.5" Y="2" Width="1.5" />
+    <Position X="10" Y="2" Width="1.5" />
     <Compartments>
       <Compartment Name="Methods" Collapsed="true" />
     </Compartments>
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAABAAAAEAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAABAAAQEAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Symbols\Symbol.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
@@ -35,19 +43,19 @@
     </ShowAsAssociation>
   </Class>
   <Class Name="Delta.Slang.Symbols.TypeSymbol" Collapsed="true">
-    <Position X="7.5" Y="4.25" Width="1.5" />
+    <Position X="10" Y="4.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAABAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAABAAAQAAAAAAAAAAABAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Symbols\TypeSymbol.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Delta.Slang.Symbols.VariableSymbol">
-    <Position X="10.75" Y="4.25" Width="1.5" />
+    <Position X="12.25" Y="4.25" Width="1.5" />
     <Compartments>
       <Compartment Name="Methods" Collapsed="true" />
     </Compartments>
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAQAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAQQAAAAAAAAAAAAAAAAAQAAAAAAAAA=</HashCode>
       <FileName>Symbols\variables.cs</FileName>
       <NewMemberFileName>Symbols\VariableSymbol.cs</NewMemberFileName>
     </TypeIdentifier>
@@ -56,7 +64,7 @@
     </ShowAsAssociation>
   </Class>
   <Class Name="Delta.Slang.Symbols.GlobalVariableSymbol" Collapsed="true">
-    <Position X="9.5" Y="6.25" Width="2" />
+    <Position X="11" Y="6.25" Width="2" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Symbols\variables.cs</FileName>
@@ -64,50 +72,70 @@
     </TypeIdentifier>
   </Class>
   <Class Name="Delta.Slang.Symbols.LocalVariableSymbol" Collapsed="true">
-    <Position X="11.75" Y="6.25" Width="2" />
+    <Position X="13.25" Y="6.25" Width="2" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Symbols\variables.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Delta.Slang.Syntax.FunctionDeclarationNode" Collapsed="true">
-    <Position X="2" Y="4.25" Width="2" />
+    <Position X="3.5" Y="4.25" Width="2" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAACBAAEAAAAAHAAAAAAAAAAAAAAAAAAAEAAA=</HashCode>
       <FileName>Syntax\nodes\FunctionDeclarationNode.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Delta.Slang.Symbols.BuiltinTypes">
-    <Position X="2" Y="1" Width="1.5" />
+    <Position X="3.5" Y="1" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAEQAAAAAAQAAAAAAAAAAAAgAAAIAAAAACAAA=</HashCode>
+      <HashCode>AAAAAAAAEAAAAAAgQAAAAAAAAAACAAAAAIAAAAACACA=</HashCode>
       <FileName>Symbols\builtins.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Delta.Slang.Symbols.BuiltinFunctions">
-    <Position X="3.75" Y="1" Width="1.5" />
+    <Position X="0.5" Y="1" Width="2.5" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+      <Compartment Name="Methods" Collapsed="true" />
+    </Compartments>
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAIAAAAAEBAA=</HashCode>
+      <HashCode>AYAIoCAIADCIACAAJAIADBQgEQAQCAAAAYCAQKCEBAA=</HashCode>
       <FileName>Symbols\builtins.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Delta.Slang.Symbols.SymbolTable">
-    <Position X="5.75" Y="1" Width="1.5" />
+    <Position X="7.25" Y="1" Width="1.5" />
     <Compartments>
       <Compartment Name="Fields" Collapsed="true" />
     </Compartments>
     <TypeIdentifier>
-      <HashCode>AAIAAEAAAAAAAAAAAAAAAACAAAAAAAAAAIABAAAQAAA=</HashCode>
+      <HashCode>AAIAAEAAAAAAAAAAAAAAAACAAAAAAAAAAIABAAAQAAg=</HashCode>
       <FileName>Symbols\SymbolTable.cs</FileName>
     </TypeIdentifier>
     <ShowAsCollectionAssociation>
       <Property Name="All" />
     </ShowAsCollectionAssociation>
   </Class>
-  <Enum Name="Delta.Slang.Symbols.SymbolKind">
-    <Position X="14.5" Y="2.5" Width="1.5" />
+  <Class Name="Delta.Slang.Symbols.UnaryOperatorFunctionSymbol" Collapsed="true">
+    <Position X="3.5" Y="5.75" Width="2.5" />
     <TypeIdentifier>
-      <HashCode>IAAQAAAAAAAAAAAAAAAAAAIAAAAQAAAAAQAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAQAAAgAACCAAAAAAAAAAAAAAAgAACAAAAA=</HashCode>
+      <FileName>Symbols\FunctionSymbol.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Delta.Slang.Symbols.BinaryOperatorFunctionSymbol" Collapsed="true">
+    <Position X="6.25" Y="5.75" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>BAAAAAAAAAQAAAAAACCAAEAAAAAAAAQAAAgAAAAAEAA=</HashCode>
+      <FileName>Symbols\FunctionSymbol.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Enum Name="Delta.Slang.Symbols.SymbolKind">
+    <Position X="16" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IAAQAAAAEAAAAAAAAAAAAAIAAAAQAAAAAQAAAAAAAAA=</HashCode>
       <FileName>Symbols\SymbolKind.cs</FileName>
     </TypeIdentifier>
   </Enum>

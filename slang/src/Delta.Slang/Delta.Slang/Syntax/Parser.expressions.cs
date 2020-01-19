@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Delta.Slang.Utils;
+using Delta.Slang.Symbols;
 
 namespace Delta.Slang.Syntax
 {

@@ -1,7 +1,7 @@
-﻿using System;
-using System.CodeDom.Compiler;
+﻿using System.CodeDom.Compiler;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using Delta.Slang.Semantic;
 using Delta.Slang.Symbols;
 using Delta.Slang.Syntax;
@@ -10,6 +10,9 @@ namespace Delta.Slang.Utils
 {
     public static class BoundNodePrinter
     {
+        // TODO: make this a parameter
+        private const bool experimental = true;
+
         public static void WriteTo(this BoundTreeNode node, TextWriter writer)
         {
             if (writer is IndentedTextWriter iw)
@@ -60,12 +63,6 @@ namespace Delta.Slang.Utils
                     break;
                 case LiteralExpression le:
                     WriteLiteralExpression(le, writer);
-                    break;
-                case UnaryExpression ue:
-                    WriteUnaryExpression(ue, writer);
-                    break;
-                case BinaryExpression be:
-                    WriteBinaryExpression(be, writer);
                     break;
                 case InvalidExpression inve:
                     WriteInvalidExpression(inve, writer);
@@ -125,7 +122,7 @@ namespace Delta.Slang.Utils
             finally { writer.Indent = indent; }
             writer.WriteLine();
         }
-        
+
         private static void WriteExpressionStatement(ExpressionStatement node, IndentedTextWriter writer)
         {
             node.Expression.WriteTo(writer);
@@ -245,25 +242,6 @@ namespace Delta.Slang.Utils
             writer.WriteLine();
         }
 
-        private static void WriteUnaryExpression(UnaryExpression node, IndentedTextWriter writer)
-        {
-            var precedence = node.Op.TokenKind.GetUnaryOperatorPrecedence();
-
-            writer.WritePunctuation(node.Op.TokenKind);
-            writer.WriteNestedExpression(precedence, node.Operand);
-        }
-
-        private static void WriteBinaryExpression(BinaryExpression node, IndentedTextWriter writer)
-        {
-            var precedence = node.Op.TokenKind.GetBinaryOperatorPrecedence();
-
-            writer.WriteNestedExpression(precedence, node.Left);
-            writer.WriteSpace();
-            writer.WritePunctuation(node.Op.TokenKind);
-            writer.WriteSpace();
-            writer.WriteNestedExpression(precedence, node.Right);
-        }
-
         private static void WriteLiteralExpression(LiteralExpression node, IndentedTextWriter writer)
         {
             if (node.Value is bool b)
@@ -294,6 +272,60 @@ namespace Delta.Slang.Utils
 
         private static void WriteInvokeExpression(InvokeExpression node, IndentedTextWriter writer)
         {
+            if (node.Function is UnaryOperatorFunctionSymbol)
+                WriteUnaryOperatorFunctionInvocationExpression(node, writer);
+            else if (node.Function is BinaryOperatorFunctionSymbol)
+                WriteBinaryOperatorFunctionInvocationExpression(node, writer);
+            else WriteFunctionInvocationExpression(node, writer);
+        }
+        
+        private static void WriteUnaryOperatorFunctionInvocationExpression(InvokeExpression node, IndentedTextWriter writer)
+        {
+            if (experimental)
+            {
+                var function = (UnaryOperatorFunctionSymbol)node.Function;
+                var precedence = function.OperatorDescriptor.Precedence;
+
+                writer.WritePunctuation(function.OperatorDescriptor.Operator);
+                var childExpression = node.Arguments.ToArray()[0];
+                if (childExpression is InvokeExpression ie && ie.Function is IOperatorFunctionSymbol opfs)
+                    writer.WriteNestedExpression(precedence, opfs.GetOperatorDescriptor().Precedence, childExpression);
+                else
+                    childExpression.WriteTo(writer);
+            }
+            else WriteFunctionInvocationExpression(node, writer);
+        }
+
+        private static void WriteBinaryOperatorFunctionInvocationExpression(InvokeExpression node, IndentedTextWriter writer)
+        {
+            if (experimental)
+            {
+                var function = (BinaryOperatorFunctionSymbol)node.Function;
+                var precedence = function.OperatorDescriptor.Precedence;
+
+                var args = node.Arguments.ToArray();
+
+                var leftExpression = args[0];
+                if (leftExpression is InvokeExpression lie && lie.Function is IOperatorFunctionSymbol lopfs)
+                    writer.WriteNestedExpression(precedence, lopfs.GetOperatorDescriptor().Precedence, leftExpression);
+                else
+                    leftExpression.WriteTo(writer);
+
+                writer.WriteSpace();
+                writer.WritePunctuation(function.OperatorDescriptor.Operator);
+                writer.WriteSpace();
+
+                var rightExpression = args[1];
+                if (rightExpression is InvokeExpression rie && rie.Function is IOperatorFunctionSymbol ropfs)
+                    writer.WriteNestedExpression(precedence, ropfs.GetOperatorDescriptor().Precedence, rightExpression);
+                else
+                    rightExpression.WriteTo(writer);
+            }
+            else WriteFunctionInvocationExpression(node, writer);
+        }
+
+        private static void WriteFunctionInvocationExpression(InvokeExpression node, IndentedTextWriter writer)
+        {
             writer.WriteTypeIdentifier(node.Function.Name);
             writer.WritePunctuation(TokenKind.OpenParenthesis);
             var isFirst = true;
@@ -323,19 +355,9 @@ namespace Delta.Slang.Utils
             node.Expression.WriteTo(writer);
         }
 
-        private static void WriteNestedExpression(this IndentedTextWriter writer, int parentPrecedence, Expression expression)
-        {
-            if (expression is UnaryExpression unary)
-                writer.WriteNestedExpression(parentPrecedence, unary.Op.TokenKind.GetUnaryOperatorPrecedence(), unary);
-            else if (expression is BinaryExpression binary)
-                writer.WriteNestedExpression(parentPrecedence, binary.Op.TokenKind.GetBinaryOperatorPrecedence(), binary);
-            else
-                expression.WriteTo(writer);
-        }
-
         private static void WriteNestedExpression(this IndentedTextWriter writer, int parentPrecedence, int currentPrecedence, Expression expression)
         {
-            var needsParenthesis = parentPrecedence >= currentPrecedence;
+            var needsParenthesis = parentPrecedence > currentPrecedence;
             if (needsParenthesis) writer.WritePunctuation(TokenKind.OpenParenthesis);
             expression.WriteTo(writer);
             if (needsParenthesis) writer.WritePunctuation(TokenKind.CloseParenthesis);

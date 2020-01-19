@@ -78,38 +78,6 @@ namespace Delta.Slang.Semantic
         public override BoundTreeNodeKind Kind => BoundTreeNodeKind.ConversionExpression;
     }
 
-    public sealed class UnaryExpression : Expression
-    {
-        public UnaryExpression(UnaryOperator op, Expression operand)
-        {
-            Op = op ?? throw new ArgumentNullException(nameof(op));
-            Operand = operand ?? throw new ArgumentNullException(nameof(operand));
-        }
-
-        public override TypeSymbol Type => Op.Type;
-        public UnaryOperator Op { get; }
-        public Expression Operand { get; }
-
-        public override BoundTreeNodeKind Kind => BoundTreeNodeKind.UnaryExpression;
-    }
-
-    public sealed class BinaryExpression : Expression
-    {
-        public BinaryExpression(Expression lhs, BinaryOperator op, Expression rhs)
-        {
-            Left = lhs ?? throw new ArgumentNullException(nameof(lhs));
-            Op = op ?? throw new ArgumentNullException(nameof(op));
-            Right = rhs ?? throw new ArgumentNullException(nameof(rhs));
-        }
-
-        public override TypeSymbol Type => Op.Type;
-        public Expression Left { get; }
-        public BinaryOperator Op { get; }
-        public Expression Right { get; }
-
-        public override BoundTreeNodeKind Kind => BoundTreeNodeKind.UnaryExpression;
-    }
-
     public sealed class InvokeExpression : Expression
     {
         public InvokeExpression(FunctionSymbol function, IEnumerable<Expression> arguments)

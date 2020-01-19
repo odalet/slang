@@ -23,7 +23,7 @@
   <Class Name="Delta.Slang.Semantic.Binder" Collapsed="true">
     <Position X="3" Y="0.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAhAAAggAAQDoiYAAACAJAAACQAIgAAQACAEgAAAg=</HashCode>
+      <HashCode>AAAAhAAAhgAAQDpiYAAACAJAAACQAIgAAQACQEwAAAg=</HashCode>
       <FileName>Semantic\Binder.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -76,7 +76,7 @@
     </TypeIdentifier>
   </Class>
   <Class Name="Delta.Slang.Semantic.LiteralExpression">
-    <Position X="19.5" Y="6.25" Width="1.5" />
+    <Position X="16.25" Y="6.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAQQAgAAAAAAA=</HashCode>
       <FileName>Semantic\expressions.cs</FileName>
@@ -103,22 +103,8 @@
       <FileName>Semantic\expressions.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Delta.Slang.Semantic.UnaryExpression">
-    <Position X="16" Y="6.25" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAQAAAAEACAA=</HashCode>
-      <FileName>Semantic\expressions.cs</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="Delta.Slang.Semantic.BinaryExpression">
-    <Position X="17.75" Y="6.25" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAABAAAAAAAAAAAAAAAAAAAAACQCAAAAACAA=</HashCode>
-      <FileName>Semantic\expressions.cs</FileName>
-    </TypeIdentifier>
-  </Class>
   <Class Name="Delta.Slang.Semantic.InvokeExpression">
-    <Position X="21.25" Y="6.25" Width="1.5" />
+    <Position X="18.25" Y="6.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAABAAAAAAAAAAAIAAAAAAAAAIQAAAAAAAAA=</HashCode>
       <FileName>Semantic\expressions.cs</FileName>
@@ -134,7 +120,7 @@
   <Class Name="Delta.Slang.Semantic.InvalidExpression" Collapsed="true">
     <Position X="7.5" Y="6.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAABAAAAAAAAAAAAAAAAAAAAQAQAAAAAAAAA=</HashCode>
       <FileName>Semantic\invalid.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -155,13 +141,13 @@
       </Path>
     </AssociationLine>
     <TypeIdentifier>
-      <HashCode>AgAAQEBAAABAAAAEAAAAUAEAAAAAGAAAAAIAAYAACAA=</HashCode>
+      <HashCode>AgAAQEBAAABAAAAAAAAAUAEAAAAAGAAAAAIAAYAACAE=</HashCode>
       <FileName>Semantic\Scope.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
       <Field Name="symbols" />
-      <Property Name="Parent" />
       <Property Name="Kind" />
+      <Property Name="Parent" />
     </ShowAsAssociation>
   </Class>
   <Class Name="Delta.Slang.Semantic.Statement" Collapsed="true">
@@ -208,7 +194,7 @@
   <Class Name="Delta.Slang.Symbols.SymbolTable" Collapsed="true">
     <Position X="20" Y="9.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAIAAEAAAAAAAAAAAAAAAACAAAAAAAAAAIABAAAQAAA=</HashCode>
+      <HashCode>AAIAAEAAAAAAAAAAAAAAAACAAAAAAAAAAIABAAAQAAg=</HashCode>
       <FileName>Symbols\SymbolTable.cs</FileName>
     </TypeIdentifier>
   </Class>

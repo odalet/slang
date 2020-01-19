@@ -275,7 +275,7 @@ namespace Delta.Slang.Semantic
             }
         }
 
-        private Expression BindParenthesizedExpression(ParenthesizedExpressionNode node) => DoBindExpression(node);
+        private Expression BindParenthesizedExpression(ParenthesizedExpressionNode node) => DoBindExpression(node.Expression);
 
         private Expression BindLiteralExpression(LiteralExpressionNode node) => new LiteralExpression(node.Type, node.Value);
 
@@ -315,50 +315,29 @@ namespace Delta.Slang.Semantic
 
         private Expression BindUnaryExpression(UnaryExpressionNode node)
         {
-            var boundOperand = BindExpression(node.Operand);
-
-            if (boundOperand.Type == BuiltinTypes.Invalid)
-                return new InvalidExpression(null);
-
-            var boundOperator = UnaryOperatorBinder.Bind(node.Operator.Kind, boundOperand.Type);
-            if (boundOperator == null)
-            {
-                diagnostics.ReportUndefinedUnaryOperator(node.Operator, node.Operator.Text, boundOperand.Type);
-                return new InvalidExpression(null);
-            }
-
-            return new UnaryExpression(boundOperator, boundOperand);
+            var functionName = node.Operator.Kind.GetUnaryOperatorDescriptor().FunctionName;
+            return BindFunctionInvocation(node, node.Operator, functionName, new[] { node.Operand });
         }
 
         private Expression BindBinaryExpression(BinaryExpressionNode node)
         {
-            var boundLhs = BindExpression(node.Left);
-            var boundRhs = BindExpression(node.Right);
-
-            if (boundLhs.Type == BuiltinTypes.Invalid || boundRhs.Type == BuiltinTypes.Invalid)
-                return new InvalidExpression(null);
-
-            var boundOperator = BinaryOperatorBinder.Bind(node.Operator.Kind, boundLhs.Type, boundRhs.Type);
-            if (boundOperator == null)
-            {
-                diagnostics.ReportUndefinedBinaryOperator(node.Operator, node.Operator.Text, boundLhs.Type, boundRhs.Type);
-                return new InvalidExpression(null);
-            }
-
-            return new BinaryExpression(boundLhs, boundOperator, boundRhs);
+            var functionName = node.Operator.Kind.GetBinaryOperatorDescriptor().FunctionName;
+            return BindFunctionInvocation(node, node.Operator, functionName, new[] { node.Left, node.Right });
         }
 
-        private Expression BindInvokeExpression(InvokeExpressionNode node)
+        private Expression BindInvokeExpression(InvokeExpressionNode node) =>
+            BindFunctionInvocation(node, node.FunctionName, node.FunctionName.Text, node.Arguments.ToArray());
+
+        private Expression BindFunctionInvocation(ExpressionNode node, Token sourceToken, string functionName, ExpressionNode[] argumentNodes)
         {
             // This takes care of explicit conversions
-            var argumentNodes = node.Arguments.ToArray();
-            if (argumentNodes.Length == 1 && Scope.TryLookupType(node.FunctionName.Text, out var type))
+            if (argumentNodes.Length == 1 && Scope.TryLookupType(functionName, out var type))
                 return BindConversion(argumentNodes[0], type, allowExplicit: true);
 
-            var candidates = Scope.LookupFunctions(node.FunctionName.Text).ToArray();
+            var candidates = Scope.LookupFunctions(functionName).ToArray();
             if (candidates.Length == 0)
             {
-                diagnostics.ReportUndefinedFunction(node.FunctionName, node.FunctionName.Text);
+                diagnostics.ReportUndefinedFunction(sourceToken, functionName);
                 return new InvalidExpression(null);
             }
 
@@ -392,7 +371,7 @@ namespace Delta.Slang.Semantic
                     if (findCount > 1)
                     {
                         diagnostics.ReportAmbiguousFunction(
-                            node.FunctionName, node.FunctionName.Text, arguments.Select(a => a.Type.Name).ToArray());
+                            sourceToken, functionName, arguments.Select(a => a.Type.Name).ToArray());
                         return new InvalidExpression(invokeExpression);
                     }
                 }
@@ -402,7 +381,7 @@ namespace Delta.Slang.Semantic
             if (invokeExpression == null)
             {
                 diagnostics.ReportUndefinedFunctionWithArguments(
-                    node.FunctionName, node.FunctionName.Text, arguments.Select(a => a.Type.Name).ToArray());
+                    sourceToken, functionName, arguments.Select(a => a.Type.Name).ToArray());
                 return new InvalidExpression(new InvokeExpression(candidates.First(), arguments));
             }
 
