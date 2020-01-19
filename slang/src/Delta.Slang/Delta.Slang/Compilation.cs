@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using Delta.Slang.Semantic;
+using Delta.Slang.Semantics;
 using Delta.Slang.Syntax;
 using Delta.Slang.Utils;
 

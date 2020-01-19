@@ -1,6 +1,6 @@
 ﻿using Delta.Slang.Symbols;
 
-namespace Delta.Slang.Semantic
+namespace Delta.Slang.Semantics
 {
 
 #pragma warning disable S1481 // Unused local variables should be removed

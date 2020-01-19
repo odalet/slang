@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using Delta.Slang.Utils;
 
-namespace Delta.Slang.Semantic
+namespace Delta.Slang.Semantics
 {
     public abstract class BoundTreeNode
     {

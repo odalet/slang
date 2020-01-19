@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Delta.Slang.Symbols;
 
-namespace Delta.Slang.Semantic
+namespace Delta.Slang.Semantics
 {
     public enum ScopeKind
     {

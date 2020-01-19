@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using Delta.Slang.Semantic;
+using Delta.Slang.Semantics;
 using Delta.Slang.Syntax;
 
 namespace Delta.Slang

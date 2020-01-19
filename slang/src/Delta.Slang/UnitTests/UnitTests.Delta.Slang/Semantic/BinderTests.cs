@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using Xunit;
 
-namespace Delta.Slang.Semantic
+namespace Delta.Slang.Semantics
 {
     [ExcludeFromCodeCoverage]
     public class BinderTests

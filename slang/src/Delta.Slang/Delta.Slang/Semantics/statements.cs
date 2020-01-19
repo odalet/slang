@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Delta.Slang.Symbols;
 using Delta.Slang.Syntax;
 
-namespace Delta.Slang.Semantic
+namespace Delta.Slang.Semantics
 {
     public abstract class Statement : BoundTreeNode, IHasScope
     {

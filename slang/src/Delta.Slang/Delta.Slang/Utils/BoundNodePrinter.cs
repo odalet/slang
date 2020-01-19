@@ -2,7 +2,7 @@
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using Delta.Slang.Semantic;
+using Delta.Slang.Semantics;
 using Delta.Slang.Symbols;
 using Delta.Slang.Syntax;
 

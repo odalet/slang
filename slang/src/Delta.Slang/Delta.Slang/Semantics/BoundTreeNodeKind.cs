@@ -1,4 +1,4 @@
-﻿namespace Delta.Slang.Semantic
+﻿namespace Delta.Slang.Semantics
 {
     public enum BoundTreeNodeKind
     {

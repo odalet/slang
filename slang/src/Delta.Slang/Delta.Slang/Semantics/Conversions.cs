@@ -1,6 +1,6 @@
 ﻿using Delta.Slang.Symbols;
 
-namespace Delta.Slang.Semantic
+namespace Delta.Slang.Semantics
 {
     internal sealed class ConversionKind
     {

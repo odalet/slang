@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Delta.Slang.Symbols;
 
-namespace Delta.Slang.Semantic
+namespace Delta.Slang.Semantics
 {
     public sealed class BoundTree : BoundTreeNode, IHasChildStatements, IHasScope
     {

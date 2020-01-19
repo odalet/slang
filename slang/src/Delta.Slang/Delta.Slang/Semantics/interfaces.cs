@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Delta.Slang.Semantic
+namespace Delta.Slang.Semantics
 {
     public interface IHasChildStatements
     {

@@ -4,7 +4,7 @@ using System.Linq;
 using Delta.Slang.Symbols;
 using Delta.Slang.Syntax;
 
-namespace Delta.Slang.Semantic
+namespace Delta.Slang.Semantics
 {
     internal sealed class Binder
     {
