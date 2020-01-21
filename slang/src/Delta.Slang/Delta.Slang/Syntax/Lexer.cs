@@ -176,7 +176,7 @@ namespace Delta.Slang.Syntax
 
             // Default is the / operator
             info.Kind = TokenKind.Slash;
-            Consume();
+            // Do not consume: it was already done at the beginning of the method!
         }
 
         private void LexCppComment(ref TokenInfo info)
