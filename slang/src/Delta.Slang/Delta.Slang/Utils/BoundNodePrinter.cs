@@ -357,7 +357,7 @@ namespace Delta.Slang.Utils
 
         private static void WriteNestedExpression(this IndentedTextWriter writer, int parentPrecedence, int currentPrecedence, Expression expression)
         {
-            var needsParenthesis = parentPrecedence > currentPrecedence;
+            var needsParenthesis = parentPrecedence >= currentPrecedence;
             if (needsParenthesis) writer.WritePunctuation(TokenKind.OpenParenthesis);
             expression.WriteTo(writer);
             if (needsParenthesis) writer.WritePunctuation(TokenKind.CloseParenthesis);
