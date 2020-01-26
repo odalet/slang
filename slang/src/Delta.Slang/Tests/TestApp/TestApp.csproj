@@ -6,7 +6,7 @@
     <LangVersion>latest</LangVersion>
     <StartupObject>TestApp.Program</StartupObject>
     <!-- <SignAssembly>True</SignAssembly>
-    <AssemblyOriginatorKeyFile>..\Common\AddUpKeyFile.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile></AssemblyOriginatorKeyFile>
     <DelaySign>False</DelaySign> -->
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
     <!-- See https://stackoverflow.com/questions/36461174/how-do-i-disable-all-roslyn-code-analyzers -->

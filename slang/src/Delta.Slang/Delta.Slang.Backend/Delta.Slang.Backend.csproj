@@ -19,13 +19,10 @@
     <DebugType>full</DebugType>
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
-  
-  <ItemGroup>
-    <None Include="..\.editorconfig" Link=".editorconfig" />
-  </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Delta.Slang.Infrastructure\Delta.Slang.Infrastructure.csproj" />
+    <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="3.1.1" />
+    <PackageReference Include="Mono.Cecil" Version="0.11.1" />
+    <!--<PackageReference Include="System.Reflection.Emit" Version="4.7.0" />-->
   </ItemGroup>
-
 </Project>

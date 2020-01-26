@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Delta.Slang.Backend.IL;
 using Delta.Slang.Semantics;
 using Delta.Slang.Syntax;
 using Delta.Slang.Utils;
@@ -80,6 +81,9 @@ namespace Delta.Slang.Repl
                     case "e":
                         ProcessInteractiveProgram();
                         break;
+                    case "b":
+                        BuildProgram();
+                        break;
                     default:
                         ShowHelp();
                         break;
@@ -93,6 +97,7 @@ namespace Delta.Slang.Repl
         {
             Writer.WriteLine("Q - Quit");
             Writer.WriteLine("E - Enter a program (;; on its own line to end input)");
+            Writer.WriteLine(@"B - Build current program to C:\temp\a.exe");
         }
 
         private void ProcessInteractiveProgram()
@@ -210,6 +215,20 @@ namespace Delta.Slang.Repl
 
             Writer.WriteLine();
         }
+        
+        private void BuildProgram()
+        {
+            try
+            {
+                var builder = new Builder(@"c:\temp\a.exe");
+                builder.Build();
+            }
+            catch (Exception ex)
+            {
+                LogError(ex.Message);
+            }
+        }
+
 
         private static void LogError(object text) => Writer.WriteText($"ERROR - {text ?? "<NULL>"}\r\n", ConsoleColor.Red);
     }
