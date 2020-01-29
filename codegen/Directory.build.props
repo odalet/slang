@@ -1,0 +1,25 @@
+<Project>
+  <!-- Reference: https://docs.microsoft.com/en-us/visualstudio/msbuild/customize-your-build?view=vs-2017 -->
+  <PropertyGroup>
+    <LangVersion>7.3</LangVersion>
+    <BaseVersion>1.0.0</BaseVersion>
+    <RootNamespace>ILGen</RootNamespace>
+    <StartupObject>ILGen.Program</StartupObject>
+    <AssemblyName>ilgen</AssemblyName>
+    <AutoGenerateBindingRedirects>True</AutoGenerateBindingRedirects>
+    <GenerateBindingRedirectsOutputType>True</GenerateBindingRedirectsOutputType>
+    <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)'=='Debug'">
+    <VersionSuffix>$(VersionSuffix)-debug</VersionSuffix>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Version>$(BaseVersion)</Version>
+    <AssemblyVersion>$(BaseVersion).0</AssemblyVersion>
+    <FileVersion>$(BaseVersion).0</FileVersion>
+    <InformationalVersion>$(BaseVersion)$(VersionSuffix)</InformationalVersion>
+  </PropertyGroup>
+
+</Project>
