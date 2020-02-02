@@ -14,6 +14,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "repro", "repro\repro.csproj", "{06D88ADF-2C03-44E6-A8A7-F767F26CAA49}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "cecil", "cecil", "{90A7C68B-6E9A-4898-B2B4-A68CCE7C1DB8}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mono.Cecil", "cecil\Mono.Cecil.csproj", "{19D9561E-7437-4E56-ABC1-0CD5E94F20D3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -32,9 +36,16 @@ Global
 		{06D88ADF-2C03-44E6-A8A7-F767F26CAA49}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{06D88ADF-2C03-44E6-A8A7-F767F26CAA49}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{06D88ADF-2C03-44E6-A8A7-F767F26CAA49}.Release|Any CPU.Build.0 = Release|Any CPU
+		{19D9561E-7437-4E56-ABC1-0CD5E94F20D3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{19D9561E-7437-4E56-ABC1-0CD5E94F20D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{19D9561E-7437-4E56-ABC1-0CD5E94F20D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{19D9561E-7437-4E56-ABC1-0CD5E94F20D3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{19D9561E-7437-4E56-ABC1-0CD5E94F20D3} = {90A7C68B-6E9A-4898-B2B4-A68CCE7C1DB8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {88015E70-FC2F-4B2A-99B8-71AF9DD034FA}
