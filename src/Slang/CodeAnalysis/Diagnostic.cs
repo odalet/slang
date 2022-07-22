@@ -66,7 +66,6 @@ namespace Slang.CodeAnalysis
         public IDiagnostic this[int index] => diagnostics[index];
         public bool HasErrors => diagnostics.Any(d => d.Severity == DiagnosticSeverity.Error);
 
-
         public void Report(IDiagnostic diagnostic) => diagnostics.Add(diagnostic);
 
         public IEnumerator<IDiagnostic> GetEnumerator() => diagnostics.GetEnumerator();

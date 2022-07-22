@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Slang.CodeAnalysis.Text;
 
@@ -7,7 +8,7 @@ namespace Slang.CodeAnalysis.Syntax
     using static SyntaxKind;
     using static TokenCategory;
 
-    internal sealed partial class Lexer
+    public sealed partial class Lexer
     {
         private struct TokenInfo
         {
@@ -37,6 +38,19 @@ namespace Slang.CodeAnalysis.Syntax
         }
 
         public IEnumerable<Token> Lex()
+        {
+            try
+            {
+                return LexSource();
+            }
+            catch (Exception ex)
+            {
+                diagnostics.ReportLexerException(ex);
+                return Array.Empty<Token>();
+            }
+        }
+
+        private IEnumerable<Token> LexSource()
         {
             var end = false;
             do
@@ -77,7 +91,7 @@ namespace Slang.CodeAnalysis.Syntax
                 case '\0' or SlidingTextWindow.InvalidCharacter: setAndConsume(EofToken); break;
                 case '+': setAndConsume(PlusToken); break;
                 case '-': setAndConsume(MinusToken); break;
-                case '*': LexPotentialEndOfComment(ref info); break; //// setAndConsume(StarToken); break;
+                case '*': LexPotentialEndOfComment(ref info); break;
                 case '/': LexPotentialComment(ref info); break;
                 case '(': setAndConsume(LeftParenToken); break;
                 case ')': setAndConsume(RightParenToken); break;
@@ -90,8 +104,6 @@ namespace Slang.CodeAnalysis.Syntax
                 case '<' or '>' or '=' or '!': LexOperatorEndingWithOptionalEqual(current, ref info); break;
                 case '"':
                     return LexStringLiteral();
-                ////case '0' or '1' or '2' or '3' or '4' or '5' or '6' or '7' or '8' or '9':
-                ////    LexNumberLiteral(ref info); break;
                 default:
                     if (IsDigit(current))
                         LexNumberLiteral(ref info);
@@ -142,7 +154,8 @@ namespace Slang.CodeAnalysis.Syntax
         // We only accept ' ' and \t as whitespaces and '\r', '\n' as line breaks.
         private static bool IsWhitespaceOrLineBreak(char c) => c is ' ' or '\t' or '\r' or '\n';
 
-        // NB: in the 2 methods below, we allow all characters in the corresponding unicode categories, not only the basic English/Latin ones.
+        // NB: in the 2 methods below, we allow all characters in the corresponding unicode
+        // categories, not only the basic English/Latin ones.
         private static bool IsIdentifierFirstCharacter(char c) => c == '_' || char.IsLetter(c);
         private static bool IsIdentifierCharacter(char c) => IsIdentifierFirstCharacter(c) || char.IsDigit(c);
 

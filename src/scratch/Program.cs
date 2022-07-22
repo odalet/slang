@@ -34,6 +34,11 @@ namespace Scratch
         {
             File.WriteAllText(@"c:\temp\crlf.txt", "A\rB\r\nC\nD\r\rE\r\r\n");
         }
+
+        private static void Test4()
+        {
+            var i = +-+-+-+-+-+-+-+-1; // Yeah, this works!
+        }
     }
 
     static class Ext

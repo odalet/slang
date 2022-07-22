@@ -5,7 +5,7 @@ namespace Slang.CodeAnalysis.Syntax
 {
     using static LexerDiagnostic.ErrorCode;
 
-    internal class LexerDiagnostic : Diagnostic
+    internal sealed class LexerDiagnostic : Diagnostic
     {
         public enum ErrorCode
         {
@@ -29,8 +29,6 @@ namespace Slang.CodeAnalysis.Syntax
             ReportLexerError(sink, InvalidCharacter, position, span, $"Encountered invalid character: '{character}'.");
         public static void ReportInvalidInteger(this IDiagnosticSink sink, LinePosition position, TextSpan span, string text) =>
             ReportLexerError(sink, InvalidInteger, position, span, $"'{text}' is not a valid integer.");
-        public static void ReportInvalidFloat(this IDiagnosticSink sink, LinePosition position, TextSpan span, string text) =>
-            ReportLexerError(sink, InvalidFloat, position, span, $"'{text}' is not a valid floating-point number.");
         public static void ReportUnterminatedString(this IDiagnosticSink sink, LinePosition position, TextSpan span) =>
             ReportLexerError(sink, UnterminatedString, position, span, $"Unterminated string; Probably missing an end quote.");
         public static void ReportUnterminatedComment(this IDiagnosticSink sink, LinePosition position, TextSpan span) =>
@@ -44,7 +42,7 @@ namespace Slang.CodeAnalysis.Syntax
         private static void ReportLexerDiagnostic(this IDiagnosticSink sink, string id, DiagnosticSeverity severity, string message, SourceBoundDiagnosticInfo info) =>
              sink.Report(new LexerDiagnostic(id, severity, message, info));
 
-        public static string ToId(this LexerDiagnostic.ErrorCode code) => $"L{code.ToString().PadLeft(4, '0')}";
+        public static string ToId(this LexerDiagnostic.ErrorCode code) => $"L{((int)code).ToString().PadLeft(4, '0')}";
         private static SourceBoundDiagnosticInfo MakeInfo(string filename, LinePosition position, TextSpan span) => new(filename, position, span);
     }
 }

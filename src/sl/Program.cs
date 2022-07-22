@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
-using Slang.CodeAnalysis.Text;
 using System.Text;
+using Slang.CodeAnalysis;
+using Slang.CodeAnalysis.Syntax;
+using Slang.CodeAnalysis.Text;
 
 namespace Slang.Cli
 {
@@ -65,7 +67,8 @@ namespace Slang.Cli
             using var reader = new StreamReader(File.OpenRead(filename));
             watch.Reset();
             watch.Start();
-            ProcessInput(reader);
+            var diagnostics = new DiagnosticCollection();
+            ProcessInput(reader, diagnostics);
             watch.Stop();
 
             Writer.WriteLine($"> Processing time: {TimeSpan.FromTicks(watch.ElapsedTicks)}");
@@ -85,17 +88,86 @@ namespace Slang.Cli
                 if (line.Trim() == ";;")
                     break;
 
-                ProcessInput(line);
+                // One new collection per read line
+                var diagnostics = new DiagnosticCollection();
+                ProcessInput(line, diagnostics);
             }
 
             return ExitCode.OK;
         }
 
-        private void ProcessInput(TextReader reader) => ProcessInput(SourceText.From(reader, Encoding.UTF8));
-        private void ProcessInput(string source) => ProcessInput(SourceText.From(source, Encoding.UTF8));
-        private void ProcessInput(SourceText sourceText)
+        private void ProcessInput(TextReader reader, DiagnosticCollection diagnostics) => ProcessInput(SourceText.From(reader, Encoding.UTF8), diagnostics);
+        private void ProcessInput(string source, DiagnosticCollection diagnostics) => ProcessInput(SourceText.From(source, Encoding.UTF8), diagnostics);
+        private void ProcessInput(SourceText sourceText, DiagnosticCollection diagnostics)
         {
-            Writer.WriteLine($"Processing '{sourceText}'");
+            Writer.WriteLine($"> Processing '{sourceText}'");
+
+            var lexer = new Lexer(sourceText, diagnostics);
+            //foreach (var token in lexer.Lex())
+            //    Writer.WriteLine($"-> {token} - {token.Position}");
+
+            var tokens = lexer.Lex();
+
+            var parser = new Parser(tokens, diagnostics);
+            var tree = parser.Parse();
+
+            Writer.WriteLine($"-> Tree:\r\n\r\n{PrettyPrint(tree.Root.ToString())}");
+
+            foreach (var diagnostic in diagnostics)
+                Writer.WriteLine(diagnostic);
+
+            Writer.WriteLine($"< Done Processing '{sourceText}'");
+        }
+
+        private static string PrettyPrint(string text)
+        {
+            const int tabSize = 4;
+            var tabs = 0;
+            var output = new StringBuilder();
+            var index = 0;
+
+            void outputTabs() => output.Append(new string(' ', tabSize * tabs));
+            void eatWhitespaces()
+            {
+                while (char.IsWhiteSpace(text[index + 1]) && index < text.Length - 1)
+                    index++;
+            }
+
+            while (true)
+            {
+                var c = text[index];
+                switch (c)
+                {
+                    case '{':
+                        _ = output.Append('{');
+                        _ = output.Append(Environment.NewLine);
+                        tabs++;
+                        outputTabs();
+                        eatWhitespaces();
+                        break;
+                    case '}':
+                        _ = output.Append(Environment.NewLine);
+                        tabs = tabs-- < 0 ? 0 : tabs;
+                        outputTabs();
+                        _ = output.Append('}');
+                        break;
+                    case ',':
+                        _ = output.Append(',');
+                        _ = output.Append(Environment.NewLine);
+                        outputTabs();
+                        eatWhitespaces();
+                        break;
+                    default:
+                        _ = output.Append(c);
+                        break;
+                }
+
+                index++;
+                if (index >= text.Length)
+                    break;
+            }
+
+            return output.ToString();
         }
     }
 }
