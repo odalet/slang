@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "sl (interactive)": {
+      "commandName": "Project"
+    },
+    "sl hello.sl": {
+      "commandName": "Project",
+      "commandLineArgs": "../../../../examples/hello.sl"
+    }
+  }
+}
