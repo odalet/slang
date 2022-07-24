@@ -24,7 +24,7 @@ namespace Slang.CodeAnalysis.Syntax
     internal static class LexerDiagnosticExtensions
     {
         public static void ReportLexerException(this IDiagnosticSink sink, Exception ex) =>
-            ReportLexerError(sink, UnexpectedError, LinePosition.Zero, TextSpan.Zero, $"Unexpected Error: {ex.Message}.\r\n{ex}");
+            ReportLexerError(sink, UnexpectedError, LinePosition.Zero, TextSpan.Zero, $"Unexpected Error: {ex.Message}.{Environment.NewLine}{ex}");
         public static void ReportInvalidCharacter(this IDiagnosticSink sink, LinePosition position, TextSpan span, char character) =>
             ReportLexerError(sink, InvalidCharacter, position, span, $"Encountered invalid character: '{character}'.");
         public static void ReportInvalidInteger(this IDiagnosticSink sink, LinePosition position, TextSpan span, string text) =>

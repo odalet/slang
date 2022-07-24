@@ -23,6 +23,6 @@ namespace Slang.CodeAnalysis.Syntax
 
         // Beware: Eof is not a trivial token: it is used in the parser as a stop condition!
         public static Token MakeEof(int position, LinePosition line) => new(EofToken, Terminal, new TextSpan(position, 1), line, "\0");
-        public override string ToString() => $"{Kind} @{Span.Start}: {SanitizedText}";
+        public override string ToString() => $"{Kind} @{Span.Start}: '{SanitizedText}'";
     }
 }

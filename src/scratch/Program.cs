@@ -9,9 +9,13 @@ namespace Scratch
     {
         static void Main(string[] args)
         {
+            new TestFormatter().Test();
+            Console.WriteLine("---------------------------");
+
             Test1();
             Test2();
             Test3();
+            Test4();
             Console.WriteLine("DONE");
         }
 
@@ -38,6 +42,8 @@ namespace Scratch
         private static void Test4()
         {
             var i = +-+-+-+-+-+-+-+-1; // Yeah, this works!
+            var j = 09;
+            Console.WriteLine($"i = {i}, j = {j}");
         }
     }
 

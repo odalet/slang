@@ -1,15 +1,22 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text;
 using Slang.CodeAnalysis;
 using Slang.CodeAnalysis.Syntax;
 using Slang.CodeAnalysis.Text;
+using Slang.Utilities;
 
 namespace Slang.Cli
 {
     internal sealed class Program
     {
+        private static readonly string nl = Environment.NewLine;
+
+        private static bool shouldDumpTokens = false;
+        private static bool shouldDumpParseTree = true;
+
         private enum ExitCode
         {
             // See https://www.freebsd.org/cgi/man.cgi?query=sysexits&apropos=0&sektion=0&manpath=FreeBSD+4.3-RELEASE&format=html
@@ -103,71 +110,27 @@ namespace Slang.Cli
             Writer.WriteLine($"> Processing '{sourceText}'");
 
             var lexer = new Lexer(sourceText, diagnostics);
-            //foreach (var token in lexer.Lex())
-            //    Writer.WriteLine($"-> {token} - {token.Position}");
-
-            var tokens = lexer.Lex();
+            var tokens = lexer.Lex().ToArray();
+            if (shouldDumpTokens)
+            {
+                foreach (var token in tokens)
+                    Writer.WriteLine($"-> {token} - {token.Position}");
+            }
 
             var parser = new Parser(tokens, diagnostics);
             var tree = parser.Parse();
-
-            Writer.WriteLine($"-> Tree:\r\n\r\n{PrettyPrint(tree.Root.ToString())}");
+            if (shouldDumpParseTree)
+                Writer.WriteLine($"-> Tree:{nl}{nl}{Dump(tree)}");
 
             foreach (var diagnostic in diagnostics)
                 Writer.WriteLine(diagnostic);
 
+            var dumper = new MarkdownDumper(tokens, tree, diagnostics);
+            dumper.DumpTo(@"c:\temp\dump.md");
+
             Writer.WriteLine($"< Done Processing '{sourceText}'");
         }
 
-        private static string PrettyPrint(string text)
-        {
-            const int tabSize = 4;
-            var tabs = 0;
-            var output = new StringBuilder();
-            var index = 0;
-
-            void outputTabs() => output.Append(new string(' ', tabSize * tabs));
-            void eatWhitespaces()
-            {
-                while (char.IsWhiteSpace(text[index + 1]) && index < text.Length - 1)
-                    index++;
-            }
-
-            while (true)
-            {
-                var c = text[index];
-                switch (c)
-                {
-                    case '{':
-                        _ = output.Append('{');
-                        _ = output.Append(Environment.NewLine);
-                        tabs++;
-                        outputTabs();
-                        eatWhitespaces();
-                        break;
-                    case '}':
-                        _ = output.Append(Environment.NewLine);
-                        tabs = tabs-- < 0 ? 0 : tabs;
-                        outputTabs();
-                        _ = output.Append('}');
-                        break;
-                    case ',':
-                        _ = output.Append(',');
-                        _ = output.Append(Environment.NewLine);
-                        outputTabs();
-                        eatWhitespaces();
-                        break;
-                    default:
-                        _ = output.Append(c);
-                        break;
-                }
-
-                index++;
-                if (index >= text.Length)
-                    break;
-            }
-
-            return output.ToString();
-        }
+        private static string Dump(ParseTree tree) => new ParseTreePrettyPrinter(tree).Dump();
     }
 }

@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Slang.CodeAnalysis.Syntax;
 using Slang.CodeAnalysis.Text;
 
 namespace Slang.CodeAnalysis.Syntax
@@ -97,26 +94,28 @@ namespace Slang.CodeAnalysis.Syntax
 
         private ExpressionNode ParsePrimaryExpression() => Current.Kind switch
         {
+            LeftParenToken => ParseGroupingExpression(),
             TrueToken or FalseToken => ParseBooleanLiteral(),
             IntegerLiteralToken => ParseIntegerLiteral(),
             FloatLiteralToken => ParseFloatLiteral(),
             StringLiteralToken => ParseStringLiteral(),
-            _ => ParseInvalidExpression()
+            _ => throw MakeUnexpectedTokenException(Consume())
         };
+
+        private GroupingExpressionNode ParseGroupingExpression()
+        {
+            _ = ConsumeIfMatches(LeftParenToken); // Discard the opening paren
+            var expression = new GroupingExpressionNode(ParseExpression());
+            _ = ConsumeIfMatches(RightParenToken); // Discard the closing paren
+            return expression;
+        }
 
         private LiteralExpressionNode ParseBooleanLiteral() => new(ConsumeIfMatchesAny(TrueToken, FalseToken));
         private LiteralExpressionNode ParseIntegerLiteral() => new(ConsumeIfMatches(IntegerLiteralToken));
         private LiteralExpressionNode ParseFloatLiteral() => new(ConsumeIfMatches(FloatLiteralToken));
         private LiteralExpressionNode ParseStringLiteral() => new(ConsumeIfMatches(StringLiteralToken));
-        private InvalidExpressionNode ParseInvalidExpression() => MakeInvalidExpression(Consume());
 
         // Helpers --------------------------------------
-
-        private InvalidExpressionNode MakeInvalidExpression(Token token)
-        {
-            diagnostics.ReportUnexpectedToken(Current.Position, Current.Span, token);
-            return new(token);
-        }
 
         private Token ConsumeIfMatches(SyntaxKind kind) =>
             ConsumeIf(t => t.Kind == kind, $"{kind} token");
@@ -127,11 +126,7 @@ namespace Slang.CodeAnalysis.Syntax
         private Token ConsumeIf(Func<Token, bool> condition, string expectation)
         {
             var token = Current;
-            if (condition(token))
-                return Consume();
-
-            diagnostics.ReportUnexpectedToken(Current.Position, Current.Span, token, expectation);
-            return Consume(); // consume it anyway...
+            return condition(token) ? Consume() : throw MakeUnexpectedTokenException(token, expectation);
         }
 
         private Token Consume()
@@ -150,5 +145,8 @@ namespace Slang.CodeAnalysis.Syntax
         }
 
         private bool IsAtEnd() => Current.Kind == EofToken;
+
+        private ParserException MakeUnexpectedTokenException(Token actual, string? expectation = null) =>
+            ParserException.MakeUnexpectedToken(Current.Position, Current.Span, actual, expectation);
     }
 }

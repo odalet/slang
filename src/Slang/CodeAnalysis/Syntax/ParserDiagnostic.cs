@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using Slang.CodeAnalysis.Text;
 
 namespace Slang.CodeAnalysis.Syntax
@@ -22,38 +23,44 @@ namespace Slang.CodeAnalysis.Syntax
         public ParserDiagnostic(string id, DiagnosticSeverity severity, string message, SourceBoundDiagnosticInfo info) : base(id, severity, message, info) { }
     }
 
-    internal static class ParserDiagnosticExtensions
+    [SuppressMessage("Major Code Smell", "S3925:\"ISerializable\" should be implemented correctly", Justification = "<Pending>")]
+    public sealed class ParserException : ApplicationException
     {
-        public static void ReportParserException(this IDiagnosticSink sink, Exception ex) =>
-            ReportParserError(sink, UnexpectedError, LinePosition.Zero, TextSpan.Zero, $"Unexpected Error: {ex.Message}.\r\n{ex}");
+        internal ParserException(ParserDiagnostic diagnostic) : base(diagnostic.Message) =>
+            Diagnostic = diagnostic;
 
-        ////public static void ReportInvalidCharacter(this IDiagnosticSink sink, LinePosition position, TextSpan span, char character) =>
-        ////    ReportParserError(sink, InvalidCharacter, position, span, $"Encountered invalid character: '{character}'.");
-        ////public static void ReportInvalidInteger(this IDiagnosticSink sink, LinePosition position, TextSpan span, string text) =>
-        ////    ReportParserError(sink, InvalidInteger, position, span, $"'{text}' is not a valid integer.");
-        ////public static void ReportUnterminatedString(this IDiagnosticSink sink, LinePosition position, TextSpan span) =>
-        ////    ReportParserError(sink, UnterminatedString, position, span, $"Unterminated string; Probably missing an end quote.");
-        ////public static void ReportUnterminatedComment(this IDiagnosticSink sink, LinePosition position, TextSpan span) =>
-        ////    ReportParserError(sink, UnterminatedComment, position, span, $"Unterminated comment; probably missing '*/'.");
-        ////public static void ReportUnexpectedEndOfComment(this IDiagnosticSink sink, LinePosition position, TextSpan span) =>
-        ////    ReportParserError(sink, UnexpectedEndOfComment, position, span, $"Unexpected end of C comment: nested C comments are not supported.");
+        public IDiagnostic Diagnostic { get; }
 
-        public static void ReportUnexpectedToken(this IDiagnosticSink sink, LinePosition position, TextSpan span, Token actual, string? expectation = null)
+        public static ParserException MakeUnexpectedToken(LinePosition position, TextSpan span, Token actual, string? expectation = null)
         {
             var message = $"Unexpected token '{actual.SanitizedText}' ({actual.Kind})";
             if (!string.IsNullOrEmpty(expectation))
                 message += $"; expected: {expectation}";
 
-            ReportParserError(sink, UnexpectedToken, position, span, message);
+            var diagnostic = ParserDiagnosticExtensions.MakeParserDiagnostic(UnexpectedToken, position, span, message);
+            return new ParserException(diagnostic);
+        }
+    }
+
+    internal static class ParserDiagnosticExtensions
+    {
+        public static ParserDiagnostic MakeParserDiagnostic(ParserDiagnostic.ErrorCode code, LinePosition position, TextSpan span, string message) =>
+            new(code.ToId(), DiagnosticSeverity.Error, message, MakeInfo("TODO", position, span));
+
+        public static void ReportParserException(this IDiagnosticSink sink, Exception exception)
+        {
+            var diagnostic = exception is ParserException pex
+                ? pex.Diagnostic
+                : new ParserDiagnostic(
+                    UnexpectedError.ToId(),
+                    DiagnosticSeverity.Error,
+                    $"Unexpected Error: {exception.Message}.{Environment.NewLine}{exception}",
+                    MakeInfo("TODO", LinePosition.Zero, TextSpan.Zero));
+
+            sink.Report(diagnostic);
         }
 
-        private static void ReportParserError(this IDiagnosticSink sink, ParserDiagnostic.ErrorCode code, LinePosition position, TextSpan span, string message) =>
-            ReportLexerDiagnostic(sink, code.ToId(), DiagnosticSeverity.Error, message, MakeInfo("TODO", position, span));
-
-        private static void ReportLexerDiagnostic(this IDiagnosticSink sink, string id, DiagnosticSeverity severity, string message, SourceBoundDiagnosticInfo info) =>
-             sink.Report(new LexerDiagnostic(id, severity, message, info));
-
-        public static string ToId(this ParserDiagnostic.ErrorCode code) => $"P{((int)code).ToString().PadLeft(4, '0')}";
+        private static string ToId(this ParserDiagnostic.ErrorCode code) => $"P{((int)code).ToString().PadLeft(4, '0')}";
         private static SourceBoundDiagnosticInfo MakeInfo(string filename, LinePosition position, TextSpan span) => new(filename, position, span);
     }
 }

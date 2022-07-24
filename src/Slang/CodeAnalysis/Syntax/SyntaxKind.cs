@@ -56,6 +56,7 @@
         // Expressions
         UnaryExpression,
         BinaryExpression,
+        GroupingExpression,
         LiteralExpression
     }
 }

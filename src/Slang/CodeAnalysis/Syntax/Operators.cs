@@ -47,6 +47,7 @@ namespace Slang.CodeAnalysis.Syntax
             regb(MinusToken, 30);
             regb(StarToken, 40);
             regb(SlashToken, 40);
+
             regu(PlusToken, 50);
             regu(MinusToken, 50);
             regu(BangToken, 50);
