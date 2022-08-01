@@ -27,8 +27,10 @@ namespace Slang.Utilities
                 return nodeName;
             }
 
-            public void Wire(string left, string right) =>
-                graph.AppendLine($"{left} --- {right}");
+            public void Wire(string left, string right, string? linkLabel = null) =>
+                _ = linkLabel == null
+                ? graph.AppendLine($"{left} --- {right}")
+                : graph.AppendLine($"{left} -- {linkLabel} --- {right}");
 
             public override string ToString() => new StringBuilder()
                 .AppendLine("flowchart TD")
@@ -75,6 +77,25 @@ namespace Slang.Utilities
         public override string Visit(EmptyNode node, Context context) =>
             context.Declare("Empty");
 
+        public override string Visit(IfNode node, Context context)
+        {
+            var me = context.Declare("if", NodeShape.RoundedRectangle);
+            
+            var condition = node.Condition.Accept(this, context);
+            context.Wire(me, condition, "if");
+
+            var then = node.Then.Accept(this, context);
+            context.Wire(me, then, "then");
+
+            if (node.Else != null)
+            {
+                var @else = node.Else.Accept(this, context);
+                context.Wire(me, @else, "else");
+            }
+
+            return me;
+        }
+
         public override string Visit(BlockNode node, Context context)
         {
             var me = context.Declare("{}", NodeShape.RoundedRectangle);
@@ -115,9 +136,9 @@ namespace Slang.Utilities
 
         public override string Visit(AssignmentNode node, Context context)
         {
-            var me = context.Declare($"{node.LValue.Text} =");
+            var me = context.Declare(node.LValue.Text);
             var child = node.Expression.Accept(this, context);
-            context.Wire(me, child);
+            context.Wire(me, child, "=");
             return me;
         }
 

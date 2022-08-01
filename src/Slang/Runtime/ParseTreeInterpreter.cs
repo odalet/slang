@@ -46,6 +46,20 @@ namespace Slang.Runtime
 
         public override RuntimeValue Visit(EmptyNode node, Context context) => RuntimeValue.Null;
 
+        public override RuntimeValue Visit(IfNode node, Context context)
+        {
+            var condition = Evaluate(node.Condition, context);
+            if (!condition.IsBool(out var ok))
+                throw new RuntimeException("An 'if' condition must evaluate to a boolean value");
+
+            if (ok.Value) return node.Then.Accept(this, context);
+
+            if (node.Else != null)
+                return node.Else.Accept(this, context);
+
+            return RuntimeValue.Null;
+        }
+
         public override RuntimeValue Visit(BlockNode node, Context context)
         {
             var savedEnv = env;
@@ -160,7 +174,7 @@ namespace Slang.Runtime
         public override RuntimeValue Visit(LiteralNode node, Context context) => new(node.Literal.Value);
 
         protected override RuntimeValue VisitFallback(SyntaxNode node, Context context) =>
-            throw new RuntimeException($"Unexpected Instruction: {node.Kind}");
+            throw new RuntimeException($"Unexpected Instruction: {node.GetType().Name}");
 
         private RuntimeValue Evaluate(ExpressionNode node, Context context) => node.Accept(this, context);
     }

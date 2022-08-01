@@ -42,10 +42,28 @@ namespace Slang.CodeAnalysis.Syntax
         {
             var statements = new List<StatementNode>();
             while (!IsAtEnd())
-                statements.Add(ParseStatement());
+                statements.Add(ParseDeclarationOrStatement());
 
             var compilationUnit = new CompilationUnitNode(statements.ToArray());
             return new ParseTree(compilationUnit);
+        }
+
+        private StatementNode ParseDeclarationOrStatement()
+        {
+            // NB: we separate declarations from other statements
+            // Because we don't want to allow a variable declaration inside an if unless it is in a block
+            try
+            {
+                if (Current.Kind is VarToken or ValToken)
+                    return ParseDeclaration();
+
+                // Otherwise, let's parse other statements
+                return ParseStatement();
+            }
+            catch (ParserException pex)
+            {
+                return Sync(pex);
+            }
         }
 
         private StatementNode ParseStatement()
@@ -55,11 +73,11 @@ namespace Slang.CodeAnalysis.Syntax
                 if (Current.Kind == SemicolonToken) // Empty Statement
                     return ParseEmptyStatement();
 
+                if (Current.Kind == IfToken)
+                    return ParseIf();
+
                 if (Current.Kind == LeftBraceToken)
                     return ParseBlock();
-
-                if (Current.Kind is VarToken or ValToken)
-                    return ParseDeclaration();
 
                 if (Current.Kind is PrintToken or PrintlnToken)
                     return ParsePrintStatement();
@@ -81,13 +99,31 @@ namespace Slang.CodeAnalysis.Syntax
             return new EmptyNode();
         }
 
+        private StatementNode ParseIf()
+        {
+            _ = Consume();
+            _ = ConsumeIfMatches(LeftParenToken);
+            var condition = ParseExpression();
+            _ = ConsumeIfMatches(RightParenToken);
+
+            var then = ParseStatement();
+            StatementNode? @else = null;
+            if (Current.Kind == ElseToken)
+            {
+                _ = Consume();
+                @else = ParseStatement();
+            }
+
+            return new IfNode(condition, then, @else);
+        }
+
         private StatementNode ParseBlock()
         {
             _ = Consume();
 
             var statements = new List<StatementNode>();
             while (Current.Kind != RightBraceToken && !IsAtEnd())
-                statements.Add(ParseStatement());
+                statements.Add(ParseDeclarationOrStatement());
 
             _ = ConsumeIfMatches(RightBraceToken);
 

@@ -37,6 +37,12 @@
         public override R Accept<R, C>(ISyntaxVisitor<R, C> visitor, C context) => visitor.Visit(this, context);
     }
 
+    public sealed record class IfNode(ExpressionNode Condition, StatementNode Then, StatementNode? Else) : StatementNode(EmptyStatement)
+    {
+        public override SyntaxNode[] Children => Else == null ? new[] { Condition, Then } : new[] { Condition, Then, Else };
+        public override R Accept<R, C>(ISyntaxVisitor<R, C> visitor, C context) => visitor.Visit(this, context);
+    }
+
     public sealed record BlockNode(StatementNode[] Statements) : StatementNode(BlockStatement)
     {
         public override SyntaxNode[] Children => Statements;

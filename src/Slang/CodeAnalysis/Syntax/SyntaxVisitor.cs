@@ -6,6 +6,7 @@
 
         // Statements
         R Visit(EmptyNode node, C context);
+        R Visit(IfNode node, C context);
         R Visit(BlockNode node, C context);
         R Visit(VariableDeclarationNode node, C context);
         R Visit(PrintNode node, C context);
@@ -28,6 +29,7 @@
 
         public virtual R Visit(CompilationUnitNode node, C context) => VisitFallback(node, context);
         public virtual R Visit(EmptyNode node, C context) => VisitFallback(node, context);
+        public virtual R Visit(IfNode node, C context) => VisitFallback(node, context);
         public virtual R Visit(BlockNode node, C context) => VisitFallback(node, context);
         public virtual R Visit(VariableDeclarationNode node, C context) => VisitFallback(node, context);
         public virtual R Visit(PrintNode node, C context) => VisitFallback(node, context);

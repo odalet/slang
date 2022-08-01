@@ -16,13 +16,18 @@ compilationUnit = declaration* EOF;
 
 declaration = variableDeclaration | statement;
 
-variableDeclaration = "var" IDENTIFIER ("=" expression )?;
+variableDeclaration = "var" IDENTIFIER ( "=" expression )?;
 
-statement = printStatement | block | expression;
+statement = printStatement 
+          | block
+          | ifStatement
+          | expression;
 
 printStatement = "print" "(" expresion ")" ";";
 
 block = "{" declaration* "}";
+
+ifStatement = "if" "(" expression ")" statement ( "else" statement )?;
 
 (* Precedence is handled through metadata *)
 expression = primary | unary | binary | assignment;
