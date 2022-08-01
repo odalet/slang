@@ -1,4 +1,5 @@
-﻿using Slang.CodeAnalysis.Syntax;
+﻿using System;
+using Slang.CodeAnalysis.Syntax;
 
 namespace Slang.Utilities
 {
@@ -9,7 +10,7 @@ namespace Slang.Utilities
         public static ParseTreePrettyPrinterOptions CSharp { get; } = new ParseTreePrettyPrinterOptions(false, false);
     }
 
-    public sealed class ParseTreePrettyPrinter : ISyntaxVisitor<Unit, ParseTreePrettyPrinter.Context>
+    public sealed class ParseTreePrettyPrinter : BaseSyntaxVisitor<Unit, ParseTreePrettyPrinter.Context>
     {
         public sealed class Context
         {
@@ -22,84 +23,178 @@ namespace Slang.Utilities
             public override string ToString() => builder.ToString();
         }
 
-        private readonly SyntaxNode root;
+        private sealed record Block : IDisposable
+        {
+            private readonly ParseTreePrettyPrinter owner;
+
+            public Block(ParseTreePrettyPrinter parent, Context context, string header, bool useSquareBrackets)
+            {
+                owner = parent;
+                Context = context;
+                Header = header;
+                SquareBrackets = useSquareBrackets;
+
+                OpenBlock();
+                Context.Indent();
+            }
+
+            private Context Context { get; }
+            private string Header { get; }
+            private bool SquareBrackets { get; }
+
+            public void Dispose()
+            {
+                Context.Dedent();
+                CloseBlock();
+            }
+
+            private void OpenBlock()
+            {
+                var brackets = SquareBrackets ? "[" : "{";
+
+                if (owner.options.JavaStyleBraces)
+                    Context.AppendLine($"{Header} {brackets}");
+                else
+                {
+                    Context.AppendLine(Header);
+                    Context.AppendLine(brackets);
+                }
+            }
+
+            private void CloseBlock()
+            {
+                var brackets = SquareBrackets ? "]" : "}";
+                var comment = owner.options.CommentOnClosingBrace && !SquareBrackets;
+                Context.AppendLine(comment ? $"{brackets} // {Header}" : brackets);
+            }
+        }
+
         private readonly ParseTreePrettyPrinterOptions options;
 
         public ParseTreePrettyPrinter(ParseTree tree) : this(tree, ParseTreePrettyPrinterOptions.Default) { }
-        public ParseTreePrettyPrinter(ParseTree tree, ParseTreePrettyPrinterOptions parseTreePrettyPrinterOptions)
-        {
-            root = tree.Root;
+        public ParseTreePrettyPrinter(ParseTree tree, ParseTreePrettyPrinterOptions parseTreePrettyPrinterOptions) : base(tree) =>
             options = parseTreePrettyPrinterOptions;
-        }
 
         public string Dump()
         {
             var context = new Context();
-            _ = root.Accept(this, context);
+            _ = ParseTree.Root.Accept(this, context);
             return context.ToString();
         }
 
-        public Unit Visit(UnaryExpressionNode node, Context context)
+        public override Unit Visit(CompilationUnitNode node, Context context)
         {
-            var header = $"Unary({node.Operator.Text})";
-            OpenBlock(context, header);
-            context.Indent();
-            context.Append("Operand: ");
-            _ = node.Operand.Accept(this, context);
-            context.Dedent();
-            CloseBlock(context, header);
+            using (EnterBlock(context, "CU"))
+            using (EnterBlock(context, "Statements:", true))
+            {
+                foreach (var statement in node.Statements)
+                    _ = statement.Accept(this, context);
+            }
+
             return Unit.Value;
         }
 
-        public Unit Visit(BinaryExpressionNode node, Context context)
+        public override Unit Visit(EmptyNode node, Context context)
         {
-            var header = $"Binary({node.Operator.Text})";
-            OpenBlock(context, header);
-            context.Indent();
-            context.Append("Left : ");
-            _ = node.Left.Accept(this, context);
-            context.Append("Right: ");
-            _ = node.Right.Accept(this, context);
-            context.Dedent();
-            CloseBlock(context, header);
+            context.AppendLine("Empty");
             return Unit.Value;
         }
 
-        public Unit Visit(GroupingExpressionNode node, Context context)
+        public override Unit Visit(VariableDeclarationNode node, Context context)
         {
-            var header = "()";
-            OpenBlock(context, header);
-            context.Indent();
-            context.Append("Content: ");
-            _ = node.Content.Accept(this, context);
-            context.Dedent();
-            CloseBlock(context, header);
+            var header = $"Declare ({(node.IsReadOnly ? "RO" : "RW")}): {node.Name}";
+            if (node.Initializer == null)
+                context.AppendLine(header);
+            else using (EnterBlock(context, header))
+                {
+                    context.Append("Initializer: ");
+                    _ = node.Initializer.Accept(this, context);
+                }
+
             return Unit.Value;
         }
 
-        public Unit Visit(LiteralExpressionNode node, Context context)
+        public override Unit Visit(PrintNode node, Context context)
+        {
+            using (EnterBlock(context, "Print()"))
+            {
+                context.Append("Argument: ");
+                _ = node.Argument.Accept(this, context);
+            }
+
+            return Unit.Value;
+        }
+
+        public override Unit Visit(UnaryNode node, Context context)
+        {
+            using (EnterBlock(context, $"Unary({node.Operator.Text})"))
+            {
+                context.Append("Operand: ");
+                _ = node.Operand.Accept(this, context);
+            }
+
+            return Unit.Value;
+        }
+
+        public override Unit Visit(BinaryNode node, Context context)
+        {
+            using (EnterBlock(context, $"Binary({node.Operator.Text})"))
+            {
+
+                context.Append("Left : ");
+                _ = node.Left.Accept(this, context);
+                context.Append("Right: ");
+                _ = node.Right.Accept(this, context);
+            }
+
+            return Unit.Value;
+        }
+
+        public override Unit Visit(GroupingNode node, Context context)
+        {
+            using (EnterBlock(context, "()"))
+            {
+                context.Append("Content: ");
+                _ = node.Content.Accept(this, context);
+            }
+
+            return Unit.Value;
+        }
+
+        public override Unit Visit(VariableNode node, Context context)
+        {
+            context.AppendLine($"Variable({node.Name.Text})");
+            return Unit.Value;
+        }
+
+        public override Unit Visit(LiteralNode node, Context context)
         {
             context.AppendLine($"Literal({node.Literal.Text})");
             return Unit.Value;
         }
 
-        public Unit Visit(InvalidExpressionNode node, Context context)
+        public override Unit Visit(InvalidNode node, Context context)
         {
             context.AppendLine($"!!Invalid!!({node.Token.Text})");
             return Unit.Value;
         }
 
-        private void OpenBlock(Context context, string header)
+        protected override Unit VisitFallback(SyntaxNode node, Context context)
         {
-            if (options.JavaStyleBraces)
-                context.AppendLine($"{header} {{");
-            else
+            using (EnterBlock(context, $"<{node.GetType().Name}>"))
             {
-                context.AppendLine(header);
-                context.AppendLine("{");
+                if (node.Children.Length > 0)
+                    using (EnterBlock(context, "Children:", true))
+                    {
+                        foreach (var child in node.Children)
+                            _ = child.Accept(this, context);
+                    }
             }
+
+            return Unit.Value;
         }
 
-        private void CloseBlock(Context context, string header) => context.AppendLine(options.CommentOnClosingBrace ? $"}} // {header}" : "}");
+        private IDisposable EnterBlock(Context context, string header, bool useSquareBrackets = false) => 
+            new Block(this, context, header, useSquareBrackets);
     }
 }

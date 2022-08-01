@@ -3,8 +3,15 @@ using Slang.CodeAnalysis.Syntax;
 
 namespace Slang.Utilities
 {
-    public sealed class ParseTreeToMermaid : ISyntaxVisitor<string, ParseTreeToMermaid.Context>
+    public sealed class ParseTreeToMermaid : BaseSyntaxVisitor<string, ParseTreeToMermaid.Context>
     {
+        public enum NodeShape
+        {
+            Circle,
+            Rectangle,
+            RoundedRectangle
+        }
+
         public sealed class Context
         {
             private int nodeIndex;
@@ -12,16 +19,16 @@ namespace Slang.Utilities
             private readonly StringBuilder declarations = new();
             private readonly StringBuilder graph = new();
 
-            public string Declare(string text)
+            public string Declare(string text, NodeShape shape = NodeShape.Circle)
             {
                 nodeIndex++;
                 var nodeName = $"node{nodeIndex}";
-                _ = declarations.AppendLine($"{nodeName}((\"{text}\"))");
+                _ = declarations.AppendLine($"{nodeName}{OpenNode(shape)}\"{text}\"{CloseNode(shape)}");
                 return nodeName;
             }
 
             public void Wire(string left, string right) =>
-                graph.AppendLine($"{left} --> {right}");
+                graph.AppendLine($"{left} --- {right}");
 
             public override string ToString() => new StringBuilder()
                 .AppendLine("flowchart TD")
@@ -31,38 +38,108 @@ namespace Slang.Utilities
                 .AppendLine(graph.ToString())
                 .ToString()
                 ;
+
+            private static (string open, string close) GetNodeShape(NodeShape shape) => shape switch
+            {
+                NodeShape.Circle => ("((", "))"),
+                NodeShape.Rectangle => ("[", "]"),
+                NodeShape.RoundedRectangle => ("(", ")"),
+                _ => ("{", "}")
+            };
+
+            private static string OpenNode(NodeShape shape) => GetNodeShape(shape).open;
+            private static string CloseNode(NodeShape shape) => GetNodeShape(shape).close;
         }
 
-        private readonly SyntaxNode root;
+        public ParseTreeToMermaid(ParseTree tree) : base(tree) { }
 
-        public ParseTreeToMermaid(ParseTree parseTree) => root = parseTree.Root;
-
-        public string Dump()
+        public string Execute()
         {
             var context = new Context();
-            _ = root.Accept(this, context);
+            _ = ParseTree.Root.Accept(this, context);
             return context.ToString();
         }
 
-        public string Visit(UnaryExpressionNode node, Context context)
+        public override string Visit(CompilationUnitNode node, Context context)
         {
-            var me = context.Declare(node.Operator.Text);
-            var operand = node.Operand.Accept(this, context);
-            context.Wire(me, operand);
+            var me = context.Declare("Compilation Unit", NodeShape.RoundedRectangle);
+            foreach (var statement in node.Statements)
+            {
+                var child = statement.Accept(this, context);
+                context.Wire(me, child);
+            }
+
             return me;
         }
 
-        public string Visit(BinaryExpressionNode node, Context context)
+        public override string Visit(EmptyNode node, Context context) =>
+            context.Declare("Empty");
+
+        public override string Visit(BlockNode node, Context context)
+        {
+            var me = context.Declare("{}", NodeShape.RoundedRectangle);
+            foreach (var statement in node.Statements)
+            {
+                var child = statement.Accept(this, context);
+                context.Wire(me, child);
+            }
+
+            return me;
+        }
+
+        public override string Visit(VariableDeclarationNode node, Context context)
+        {
+            var hasInitializer = node.Initializer != null;
+            var decl = node.IsReadOnly ? "val" : "var";
+            var text = $"{decl} {node.Name.Text}";
+            if (hasInitializer)
+                text += " =";
+
+            var me = context.Declare(text, NodeShape.RoundedRectangle);
+            if (node.Initializer != null)
+            {
+                var child = node.Initializer.Accept(this, context);
+                context.Wire(me, child);
+            }
+
+            return me;
+        }
+
+        public override string Visit(PrintNode node, Context context)
+        {
+            var me = context.Declare("print", NodeShape.RoundedRectangle);
+            var child = node.Argument.Accept(this, context);
+            context.Wire(me, child);
+            return me;
+        }
+
+        public override string Visit(AssignmentNode node, Context context)
+        {
+            var me = context.Declare($"{node.LValue.Text} =");
+            var child = node.Expression.Accept(this, context);
+            context.Wire(me, child);
+            return me;
+        }
+
+        public override string Visit(UnaryNode node, Context context)
+        {
+            var me = context.Declare(node.Operator.Text);
+            var child = node.Operand.Accept(this, context);
+            context.Wire(me, child);
+            return me;
+        }
+
+        public override string Visit(BinaryNode node, Context context)
         {
             var me = context.Declare(node.Operator.Text);
             var left = node.Left.Accept(this, context);
-            var right = node.Right.Accept(this, context);
             context.Wire(me, left);
+            var right = node.Right.Accept(this, context);
             context.Wire(me, right);
             return me;
         }
 
-        public string Visit(GroupingExpressionNode node, Context context)
+        public override string Visit(GroupingNode node, Context context)
         {
             var me = context.Declare("()");
             var content = node.Content.Accept(this, context);
@@ -70,10 +147,24 @@ namespace Slang.Utilities
             return me;
         }
 
-        public string Visit(LiteralExpressionNode node, Context context) => 
+        public override string Visit(VariableNode node, Context context) => context.Declare(node.Name.Text);
+
+        public override string Visit(LiteralNode node, Context context) =>
             context.Declare(node.Literal.Text);
 
-        public string Visit(InvalidExpressionNode node, Context context) =>
+        public override string Visit(InvalidNode node, Context context) =>
             context.Declare($"Invalid: {node.Token.Text}");
+
+        protected override string VisitFallback(SyntaxNode node, Context context)
+        {
+            var me = context.Declare(node.GetType().Name, NodeShape.Rectangle);
+            foreach (var childNode in node.Children)
+            {
+                var child = childNode.Accept(this, context);
+                context.Wire(me, child);
+            }
+
+            return me;
+        }
     }
 }

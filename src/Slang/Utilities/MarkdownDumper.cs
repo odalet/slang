@@ -79,7 +79,7 @@ namespace Slang.Utilities
 
             _ = builder
                 .AppendLine("```mermaid")
-                .Append(mermaid.Dump())
+                .Append(mermaid.Execute())
                 .AppendLine("```")
                 ;
         }

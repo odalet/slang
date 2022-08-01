@@ -42,21 +42,33 @@
         // Reserved Words
         GotoToken,
         FunToken,
+        ValToken,
         VarToken,
         IfToken,
         ElseToken,
         ReturnToken,
         TrueToken,
         FalseToken,
+        PrintToken,     // Temporary: as long as we do not have functions nor a real runtime lib
+        PrintlnToken,     // Temporary: as long as we do not have functions nor a real runtime lib
 
         // -- Non-terminals --
 
         Invalid,
+        CompilationUnit,
+
+        // Statements
+        EmptyStatement,
+        BlockStatement,
+        PrintStatement,
+        VariableDeclaration,
 
         // Expressions
+        AssignmentExpression,
         UnaryExpression,
         BinaryExpression,
         GroupingExpression,
+        VariableExpression,
         LiteralExpression
     }
 }

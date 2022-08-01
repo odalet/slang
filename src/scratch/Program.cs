@@ -16,6 +16,8 @@ namespace Scratch
             Test2();
             Test3();
             Test4();
+            Test5();
+            Test6();
             Console.WriteLine("DONE");
         }
 
@@ -44,6 +46,25 @@ namespace Scratch
             var i = +-+-+-+-+-+-+-+-1; // Yeah, this works!
             var j = 09;
             Console.WriteLine($"i = {i}, j = {j}");
+        }
+
+        private static void Test5()
+        {
+            var s = "Hello";
+            var a = s + 1;
+            var b = 1 + s;
+
+            Console.WriteLine(a);
+            Console.WriteLine(b);
+        }
+
+        private static void Test6()
+        {
+            var i = 42;
+            Console.WriteLine((double)i);
+
+            object j = i;
+            Console.WriteLine((double)(int)j);
         }
     }
 

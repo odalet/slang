@@ -24,42 +24,52 @@ namespace Slang.CodeAnalysis.Syntax
 
         static Operators()
         {
-            static void regb(SyntaxKind op, int precedence) => bdescriptors.Add(op, new BinaryOperatorDescriptor(op, precedence));
-            static void regu(SyntaxKind op, int precedence) => udescriptors.Add(op, new UnaryOperatorDescriptor(op, precedence));
-
             // NB: here is the precedence table from lower to higher:
             //
-            //| Name           | Operators | Associativity | Precedence (in code) |
-            //| -------------- | --------- | ------------- | -------------------- |
-            //| Equality       | == !=     | Left          | 10                   |
-            //| Comparison     | < > <= >= | Left          | 20                   |
-            //| Addition       | + -       | Left          | 30                   |
-            //| Multiplication | * /       | Left          | 40                   |
-            //| Unary          | + - !     | **Right**     | 50                   |
+            //| Name           | Operators | Associativity | Precedence |
+            //| -------------- | --------- | ------------- | ---------- |
+            //| Assignment     | =         | Left          | 10         |
+            //| Equality       | == !=     | Left          | 20         |
+            //| Comparison     | < > <= >= | Left          | 30         |
+            //| Addition       | + -       | Left          | 40         |
+            //| Multiplication | * /       | Left          | 50         |
+            //| Unary          | + - !     | **Right**     | 60         |
 
-            regb(EqualEqualToken, 10);
-            regb(BangEqualToken, 10);
-            regb(LessToken, 20);
-            regb(GreaterToken, 20);
-            regb(LessEqualToken, 20);
-            regb(GreaterEqualToken, 20);
-            regb(PlusToken, 30);
-            regb(MinusToken, 30);
-            regb(StarToken, 40);
-            regb(SlashToken, 40);
+            var precedence = 0;
 
-            regu(PlusToken, 50);
-            regu(MinusToken, 50);
-            regu(BangToken, 50);
+            void regb(SyntaxKind op) => bdescriptors.Add(op, new BinaryOperatorDescriptor(op, precedence));
+            void regu(SyntaxKind op) => udescriptors.Add(op, new UnaryOperatorDescriptor(op, precedence));
+
+            precedence += 10;
+            regb(EqualToken);
+            
+            precedence += 10;
+            regb(EqualEqualToken);
+            regb(BangEqualToken);
+            
+            precedence += 10;
+            regb(LessToken);
+            regb(GreaterToken);
+            regb(LessEqualToken);
+            regb(GreaterEqualToken);
+            
+            precedence += 10;
+            regb(PlusToken);
+            regb(MinusToken);
+            
+            precedence += 10;
+            regb(StarToken);
+            regb(SlashToken);
+            
+            precedence += 10;
+            regu(PlusToken);
+            regu(MinusToken);
+            regu(BangToken);
         }
 
-        ////public static bool IsBinary(this Token token) => IsBinary(token.Kind);
-        ////public static bool IsUnary(this Token token) => IsUnary(token.Kind);
         public static int GetBinaryOperatorPrecedence(this Token token) => GetBinaryOperatorPrecedence(token.Kind);
         public static int GetUnaryOperatorPrecedence(this Token token) => GetUnaryOperatorPrecedence(token.Kind);
 
-        ////private static bool IsBinary(SyntaxKind kind) => bdescriptors.ContainsKey(kind);
-        ////private static bool IsUnary(SyntaxKind kind) => udescriptors.ContainsKey(kind);
         private static int GetBinaryOperatorPrecedence(SyntaxKind kind) => bdescriptors.ContainsKey(kind) ? bdescriptors[kind].Precedence : InvalidPrecedence;
         private static int GetUnaryOperatorPrecedence(SyntaxKind kind) => udescriptors.ContainsKey(kind) ? udescriptors[kind].Precedence : InvalidPrecedence;
     }

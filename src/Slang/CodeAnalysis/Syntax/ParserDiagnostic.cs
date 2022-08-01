@@ -12,12 +12,8 @@ namespace Slang.CodeAnalysis.Syntax
         {
             UnexpectedError = 1,
             UnexpectedToken = 2,
-            ////InvalidCharacter = 2,
-            ////InvalidInteger = 3,
-            ////InvalidFloat = 4,
-            ////UnterminatedString = 5,
-            ////UnterminatedComment = 6,
-            ////UnexpectedEndOfComment = 7
+            MissingVariableInitialization = 3,
+            NotAnLValue = 4
         }
 
         public ParserDiagnostic(string id, DiagnosticSeverity severity, string message, SourceBoundDiagnosticInfo info) : base(id, severity, message, info) { }
@@ -26,26 +22,44 @@ namespace Slang.CodeAnalysis.Syntax
     [SuppressMessage("Major Code Smell", "S3925:\"ISerializable\" should be implemented correctly", Justification = "<Pending>")]
     public sealed class ParserException : ApplicationException
     {
-        internal ParserException(ParserDiagnostic diagnostic) : base(diagnostic.Message) =>
+        internal ParserException(ParserDiagnostic diagnostic, Token token) : base(diagnostic.Message)
+        {
             Diagnostic = diagnostic;
+            Token = token;
+        }
 
         public IDiagnostic Diagnostic { get; }
+        public Token Token { get; }
 
-        public static ParserException MakeUnexpectedToken(LinePosition position, TextSpan span, Token actual, string? expectation = null)
+        public static ParserException MakeUnexpectedToken(Token token, string? expectation = null)
         {
-            var message = $"Unexpected token '{actual.SanitizedText}' ({actual.Kind})";
+            var message = $"Unexpected token '{token.SanitizedText}' ({token.Kind})";
             if (!string.IsNullOrEmpty(expectation))
                 message += $"; expected: {expectation}";
 
-            var diagnostic = ParserDiagnosticExtensions.MakeParserDiagnostic(UnexpectedToken, position, span, message);
-            return new ParserException(diagnostic);
+            var diagnostic = ParserDiagnosticExtensions.MakeParserDiagnostic(UnexpectedToken, token, message);
+            return new ParserException(diagnostic, token);
+        }
+
+        public static ParserException MakeMissingVariableInitialization(Token token)
+        {
+            var message = "A read-only variable declared with 'val' must be initialized";
+            var diagnostic = ParserDiagnosticExtensions.MakeParserDiagnostic(MissingVariableInitialization, token, message);
+            return new ParserException(diagnostic, token);
+        }
+
+        public static ParserException MakeNotAnLValue(Token token)
+        {
+            var message = "Invalid assignment target: not an lvalue";
+            var diagnostic = ParserDiagnosticExtensions.MakeParserDiagnostic(NotAnLValue, token, message);
+            return new ParserException(diagnostic, token);
         }
     }
 
     internal static class ParserDiagnosticExtensions
     {
-        public static ParserDiagnostic MakeParserDiagnostic(ParserDiagnostic.ErrorCode code, LinePosition position, TextSpan span, string message) =>
-            new(code.ToId(), DiagnosticSeverity.Error, message, MakeInfo("TODO", position, span));
+        public static ParserDiagnostic MakeParserDiagnostic(ParserDiagnostic.ErrorCode code, Token token, string message) =>
+            new(code.ToId(), DiagnosticSeverity.Error, message, MakeInfo("TODO", token.Position, token.Span));
 
         public static void ReportParserException(this IDiagnosticSink sink, Exception exception)
         {

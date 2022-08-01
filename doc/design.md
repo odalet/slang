@@ -12,6 +12,13 @@
 * Syntax highlighting:
   * <https://marketplace.visualstudio.com/items?itemName=dberezin.lox-language>
 
+### CLR Internals
+
+* [Managed Objects Internals series](https://devblogs.microsoft.com/premier-developer/managed-object-internals-part-4-fields-layout/)
+* <https://stackoverflow.com/questions/8951828/clr-class-memory-layout/8951857?noredirect=1#comment129133194_8951857>
+  * [CLR 1.1](https://web.archive.org/web/20080919091745/http://msdn.microsoft.com:80/en-us/magazine/cc163791.aspx)
+  * [Update for CLR 4](https://web.archive.org/web/20200108021433/http://blogs.microsoft.co.il/sasha/2012/03/15/virtual-method-dispatch-and-object-layout-changes-in-clr-40/)
+
 ## Grammar
 
 [Here](slang.ebnf)
@@ -66,11 +73,12 @@ Ordered by ascending precedence: operators with *higher* precedence bind tighter
 
 | Name           | Operators | Associativity | Precedence |
 | -------------- | --------- | ------------- | ---------- |
-| Equality       | == !=     | Left          | 10         |
-| Comparison     | < > <= >= | Left          | 20         |
-| Addition       | + -       | Left          | 30         |
-| Multiplication | * /       | Left          | 40         |
-| Unary          | + - !     | **Right**     | 50         |
+| Assignment     | =         | Left          | 10         |
+| Equality       | == !=     | Left          | 20         |
+| Comparison     | < > <= >= | Left          | 30         |
+| Addition       | + -       | Left          | 40         |
+| Multiplication | * /       | Left          | 50         |
+| Unary          | + - !     | **Right**     | 60         |
 
 For comparison: [C Operators](https://en.cppreference.com/w/c/language/operator_precedence)
 

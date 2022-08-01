@@ -11,12 +11,15 @@ namespace Slang.CodeAnalysis.Syntax
         {
             ["goto"] = GotoToken,
             ["fun"] = FunToken,
+            ["val"] = ValToken,
             ["var"] = VarToken,
             ["if"] = IfToken,
             ["else"] = ElseToken,
             ["return"] = ReturnToken,
             ["true"] = TrueToken,
             ["false"] = FalseToken,
+            ["print"] = PrintToken,
+            ["println"] = PrintlnToken,
         };
 
         // Useful for unit tests
@@ -34,6 +37,10 @@ namespace Slang.CodeAnalysis.Syntax
 
             var text = source.ToString(GetCurrentSpan());
             info.Kind = reservedWords.ContainsKey(text) ? reservedWords[text] : IdentifierToken;
+
+            // Special cases: boolean literals
+            if (info.Kind == TrueToken) info.Value = true;
+            if (info.Kind == FalseToken) info.Value = false;
         }
     }
 }

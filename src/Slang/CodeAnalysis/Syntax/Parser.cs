@@ -33,14 +33,98 @@ namespace Slang.CodeAnalysis.Syntax
             catch (Exception ex)
             {
                 diagnostics.ReportParserException(ex);
-                return new(new InvalidExpressionNode(new Token(InvalidToken, TokenCategory.Terminal, new TextSpan(0, 1), new LinePosition(0, 0), "")));
+                return new(new InvalidNode(
+                    new Token(InvalidToken, TokenCategory.Terminal, new TextSpan(0, 1), new LinePosition(0, 0), "")));
             }
         }
 
         private ParseTree ParseTokens()
         {
-            var expression = ParseExpression();
-            return new ParseTree(expression);
+            var statements = new List<StatementNode>();
+            while (!IsAtEnd())
+                statements.Add(ParseStatement());
+
+            var compilationUnit = new CompilationUnitNode(statements.ToArray());
+            return new ParseTree(compilationUnit);
+        }
+
+        private StatementNode ParseStatement()
+        {
+            try
+            {
+                if (Current.Kind == SemicolonToken) // Empty Statement
+                    return ParseEmptyStatement();
+
+                if (Current.Kind == LeftBraceToken)
+                    return ParseBlock();
+
+                if (Current.Kind is VarToken or ValToken)
+                    return ParseDeclaration();
+
+                if (Current.Kind is PrintToken or PrintlnToken)
+                    return ParsePrintStatement();
+
+                // Otherwise, let's go to expressions
+                var expression = ParseExpression();
+                _ = ConsumeIfMatches(SemicolonToken);
+                return expression;
+            }
+            catch (ParserException pex)
+            {
+                return Sync(pex);
+            }
+        }
+
+        private StatementNode ParseEmptyStatement()
+        {
+            _ = Consume();
+            return new EmptyNode();
+        }
+
+        private StatementNode ParseBlock()
+        {
+            _ = Consume();
+
+            var statements = new List<StatementNode>();
+            while (Current.Kind != RightBraceToken && !IsAtEnd())
+                statements.Add(ParseStatement());
+
+            _ = ConsumeIfMatches(RightBraceToken);
+
+            return new BlockNode(statements.ToArray());
+        }
+
+        private StatementNode ParseDeclaration()
+        {
+            var token = Consume(); // var or val
+            var name = ConsumeIfMatches(IdentifierToken);
+
+            var isReadOnly = token.Kind == ValToken;
+
+            ExpressionNode? initializer = null;
+            if (Current.Kind == EqualToken)
+            {
+                _ = Consume(); // =
+                initializer = ParseExpression();
+            }
+
+            if (isReadOnly && initializer == null)
+                throw ParserException.MakeMissingVariableInitialization(Current);
+
+            _ = ConsumeIfMatches(SemicolonToken);
+            return new VariableDeclarationNode(name, isReadOnly, initializer);
+        }
+
+        private StatementNode ParsePrintStatement()
+        {
+            // Because we want this to look like a function call, we expect '(' expr ')' and a final ';'
+            var token = Consume(); // Consumes 'print'
+            _ = ConsumeIfMatches(LeftParenToken);
+            var argument = ParseExpression();
+            _ = ConsumeIfMatches(RightParenToken);
+            _ = ConsumeIfMatches(SemicolonToken);
+
+            return new PrintNode(argument, token.Kind == PrintlnToken);
         }
 
         private ExpressionNode ParseExpression(int parentPrecedence = 0)
@@ -51,11 +135,11 @@ namespace Slang.CodeAnalysis.Syntax
 
             // For now, all unary ops have the same precedence; hence this test
             // is meant to distinguish unary ops from other tokens
-            if (uprecedence >= parentPrecedence) 
+            if (uprecedence >= parentPrecedence)
             {
                 var op = Consume();
                 var operand = ParseExpression(uprecedence);
-                lhs = new UnaryExpressionNode(op, operand);
+                lhs = new UnaryNode(op, operand);
             }
             else lhs = ParsePrimaryExpression();
 
@@ -63,8 +147,8 @@ namespace Slang.CodeAnalysis.Syntax
             {
                 var bprecedence = Current.GetBinaryOperatorPrecedence();
 
-                // If we use <, the resulting expression tree leans on the left
-                // If we use <=, it leans on the right
+                // If we use <, the resulting expression tree leans on the right
+                // If we use <=, it leans on the left
                 // For example, with the 1+2+3 expression, in the first case, we obtain:
                 //
                 //     +
@@ -80,13 +164,41 @@ namespace Slang.CodeAnalysis.Syntax
                 //  1 2 
                 //
                 // Or: 1+2+3 <=> (1+2)+3
+                //
+                // In order to evaluate first what's leftmost, we prefer the second case.
+                //
+                // NB: assignment is a special case, we want to be able to chain them in a right-associative way:
+                //
+                // a=b=42 <=> a=(b=42) 
 
-                if (bprecedence < parentPrecedence)
-                    break;
+                var op = Current;
 
-                var op = Consume();
+                if (op.Kind == EqualToken)
+                {
+                    // Assignment is right-associative!
+                    if (bprecedence < parentPrecedence)
+                        break;
+                }
+                else
+                {
+                    // Other binary operators are left-associative
+                    if (bprecedence <= parentPrecedence)
+                        break;
+                }
+
+                _ = Consume(); // Consume the operator
                 var rhs = ParseExpression(bprecedence);
-                lhs = new BinaryExpressionNode(lhs, op, rhs);
+
+                // Special case: assignment
+                if (op.Kind == EqualToken)
+                {
+                    // lhs must be an lvalue!
+                    if (lhs is not VariableNode variableNode)
+                        throw ParserException.MakeNotAnLValue(Current);
+
+                    lhs = new AssignmentNode(variableNode.Name, rhs);
+                }
+                else lhs = new BinaryNode(lhs, op, rhs);
             }
 
             return lhs;
@@ -99,21 +211,23 @@ namespace Slang.CodeAnalysis.Syntax
             IntegerLiteralToken => ParseIntegerLiteral(),
             FloatLiteralToken => ParseFloatLiteral(),
             StringLiteralToken => ParseStringLiteral(),
-            _ => throw MakeUnexpectedTokenException(Consume())
+            IdentifierToken => ParseIdentifier(),
+            _ => throw ParserException.MakeUnexpectedToken(Current)
         };
 
-        private GroupingExpressionNode ParseGroupingExpression()
+        private GroupingNode ParseGroupingExpression()
         {
             _ = ConsumeIfMatches(LeftParenToken); // Discard the opening paren
-            var expression = new GroupingExpressionNode(ParseExpression());
+            var expression = new GroupingNode(ParseExpression());
             _ = ConsumeIfMatches(RightParenToken); // Discard the closing paren
             return expression;
         }
 
-        private LiteralExpressionNode ParseBooleanLiteral() => new(ConsumeIfMatchesAny(TrueToken, FalseToken));
-        private LiteralExpressionNode ParseIntegerLiteral() => new(ConsumeIfMatches(IntegerLiteralToken));
-        private LiteralExpressionNode ParseFloatLiteral() => new(ConsumeIfMatches(FloatLiteralToken));
-        private LiteralExpressionNode ParseStringLiteral() => new(ConsumeIfMatches(StringLiteralToken));
+        private LiteralNode ParseBooleanLiteral() => new(ConsumeIfMatchesAny(TrueToken, FalseToken));
+        private LiteralNode ParseIntegerLiteral() => new(ConsumeIfMatches(IntegerLiteralToken));
+        private LiteralNode ParseFloatLiteral() => new(ConsumeIfMatches(FloatLiteralToken));
+        private LiteralNode ParseStringLiteral() => new(ConsumeIfMatches(StringLiteralToken));
+        private VariableNode ParseIdentifier() => new(ConsumeIfMatches(IdentifierToken));
 
         // Helpers --------------------------------------
 
@@ -126,7 +240,7 @@ namespace Slang.CodeAnalysis.Syntax
         private Token ConsumeIf(Func<Token, bool> condition, string expectation)
         {
             var token = Current;
-            return condition(token) ? Consume() : throw MakeUnexpectedTokenException(token, expectation);
+            return condition(token) ? Consume() : throw ParserException.MakeUnexpectedToken(token, expectation);
         }
 
         private Token Consume()
@@ -146,7 +260,20 @@ namespace Slang.CodeAnalysis.Syntax
 
         private bool IsAtEnd() => Current.Kind == EofToken;
 
-        private ParserException MakeUnexpectedTokenException(Token actual, string? expectation = null) =>
-            ParserException.MakeUnexpectedToken(Current.Position, Current.Span, actual, expectation);
+        // Advance the parser up to the next ';' so that we can continue parsing in a 
+        // more 'stable' state
+        private StatementNode Sync(ParserException cause)
+        {
+            diagnostics.ReportParserException(cause);
+
+            while (!IsAtEnd())
+            {
+                var token = Consume();
+                if (token.Kind == SemicolonToken)
+                    break;
+            }
+
+            return new InvalidNode(cause.Token);
+        }
     }
 }

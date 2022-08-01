@@ -9,23 +9,22 @@ namespace Slang.Utilities;
 public sealed class IndentedStringBuilder
 {
     private const byte indentSize = 4;
-    private byte indent;
     private bool indentPending = true;
 
     private readonly StringBuilder builder = new();
 
-    public byte CurrentIndent => indent;
+    public byte CurrentIndent { get; private set; }
     public int Length => builder.Length;
 
     public IndentedStringBuilder Indent()
     {
-        indent++;
+        CurrentIndent++;
         return this;
     }
 
     public IndentedStringBuilder Dedent()
     {
-        if (indent > 0) indent--;
+        if (CurrentIndent > 0) CurrentIndent--;
         return this;
     }
 
@@ -51,8 +50,8 @@ public sealed class IndentedStringBuilder
 
     private void DoIndent()
     {
-        if (indentPending && indent > 0)
-            _ = builder.Append(' ', indent * indentSize);
+        if (indentPending && CurrentIndent > 0)
+            _ = builder.Append(' ', CurrentIndent * indentSize);
         indentPending = false;
     }
 }
