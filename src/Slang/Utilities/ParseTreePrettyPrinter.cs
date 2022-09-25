@@ -143,6 +143,19 @@ namespace Slang.Utilities
             return Unit.Value;
         }
 
+        public override Unit Visit(WhileNode node, Context context)
+        {
+            using (EnterBlock(context, "while"))
+            {
+                context.Append("Condition: ");
+                _ = node.Condition.Accept(this, context);
+                context.Append("Statement:");
+                _ = node.Statement.Accept(this, context);
+            }
+
+            return Unit.Value;
+        }
+
         public override Unit Visit(UnaryNode node, Context context)
         {
             using (EnterBlock(context, $"Unary({node.Operator.Text})"))

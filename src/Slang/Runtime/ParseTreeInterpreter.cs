@@ -87,6 +87,20 @@ namespace Slang.Runtime
             return RuntimeValue.Null;
         }
 
+        public override RuntimeValue Visit(WhileNode node, Context context)
+        {
+            bool evaluateCondition()
+            {
+                var condition = Evaluate(node.Condition, context);
+                return condition.IsBool(out var isTrue) ? isTrue.Value : throw new RuntimeException("Condition must be a boolean", node.Token);
+            }
+
+            while (evaluateCondition())
+                _ = node.Statement.Accept(this, context);
+
+            return RuntimeValue.Null;
+        }
+
         public override RuntimeValue Visit(AssignmentNode node, Context context)
         {
             var rhs = Evaluate(node.Expression, context);

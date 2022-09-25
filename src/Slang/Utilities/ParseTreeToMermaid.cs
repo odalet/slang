@@ -129,6 +129,16 @@ namespace Slang.Utilities
             return me;
         }
 
+        public override string Visit(WhileNode node, Context context)
+        {
+            var me = context.Declare("while", NodeShape.RoundedRectangle);
+            var condition = node.Condition.Accept(this, context);
+            context.Wire(me, condition, "?");
+            var statement = node.Statement.Accept(this, context);
+            context.Wire(me, statement);
+            return me;
+        }
+
         public override string Visit(AssignmentNode node, Context context)
         {
             var me = context.Declare($"{node.LValue.Text} =");

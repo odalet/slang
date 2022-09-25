@@ -55,6 +55,12 @@
         public override R Accept<R, C>(ISyntaxVisitor<R, C> visitor, C context) => visitor.Visit(this, context);
     }
 
+    public sealed record WhileNode(Token Token, ExpressionNode Condition, StatementNode Statement) : StatementNode(IfStatement)
+    {
+        public override SyntaxNode[] Children => new[] { Condition, Statement };
+        public override R Accept<R, C>(ISyntaxVisitor<R, C> visitor, C context) => visitor.Visit(this, context);
+    }
+
     public sealed record VariableDeclarationNode(Token Name, bool IsReadOnly, ExpressionNode? Initializer = null) : StatementNode(VariableDeclaration)
     {
         public override SyntaxNode[] Children => Initializer == null ? Array.Empty<SyntaxNode>() : new[] { Initializer };

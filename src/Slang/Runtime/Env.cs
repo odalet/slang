@@ -33,8 +33,10 @@ namespace Slang.Runtime
         {
             if (!values.ContainsKey(name))
             {
-                if (Parent != null) Parent.Set(name, value);
-                else throw new RuntimeException($"Variable {name} is not declared");
+                if (Parent == null) throw new RuntimeException($"Variable {name} is not declared");
+
+                Parent.Set(name, value);
+                return;
             }
 
             if (values[name].IsReadOnly) throw new RuntimeException($"Read-only variable {name} can only be initialized once");

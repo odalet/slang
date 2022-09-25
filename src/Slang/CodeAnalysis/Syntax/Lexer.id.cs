@@ -15,6 +15,7 @@ namespace Slang.CodeAnalysis.Syntax
             ["var"] = VarToken,
             ["if"] = IfToken,
             ["else"] = ElseToken,
+            ["while"] = WhileToken,
             ["return"] = ReturnToken,
             ["true"] = TrueToken,
             ["false"] = FalseToken,

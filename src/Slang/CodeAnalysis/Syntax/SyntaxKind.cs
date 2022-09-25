@@ -28,7 +28,7 @@
         LessToken,          // <
         LessEqualToken,     // <=
         LogicalAndToken,    // &&
-        LogicalOrToken,      // ||
+        LogicalOrToken,     // ||
 
         // Literals
         IdentifierToken,
@@ -48,11 +48,12 @@
         VarToken,
         IfToken,
         ElseToken,
+        WhileToken,
         ReturnToken,
         TrueToken,
         FalseToken,
         PrintToken,     // Temporary: as long as we do not have functions nor a real runtime lib
-        PrintlnToken,     // Temporary: as long as we do not have functions nor a real runtime lib
+        PrintlnToken,   // Temporary: as long as we do not have functions nor a real runtime lib
 
         // -- Non-terminals --
 

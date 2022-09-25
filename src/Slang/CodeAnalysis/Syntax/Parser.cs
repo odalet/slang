@@ -67,6 +67,9 @@ namespace Slang.CodeAnalysis.Syntax
                 if (Current.Kind is IfToken)
                     return ParseIfStatement();
 
+                if (Current.Kind is WhileToken)
+                    return ParseWhileStatement();
+
                 // Otherwise, let's go to expressions
                 var expression = ParseExpression();
                 _ = ConsumeIfMatches(SemicolonToken);
@@ -146,6 +149,17 @@ namespace Slang.CodeAnalysis.Syntax
             }
 
             return new IfNode(ifToken, condition, thenBranch, elseBranch);
+        }
+
+        private StatementNode ParseWhileStatement()
+        {
+            var whileToken = Consume(); // Consumes 'while'
+            _ = ConsumeIfMatches(LeftParenToken);
+            var condition = ParseExpression();
+            _ = ConsumeIfMatches(RightParenToken);
+            var statement = ParseStatement();
+
+            return new WhileNode(whileToken, condition, statement);
         }
 
         private ExpressionNode ParseExpression(int parentPrecedence = 0)
