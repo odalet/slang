@@ -63,6 +63,7 @@
         EmptyStatement,
         BlockStatement,
         PrintStatement,
+        IfStatement,
         VariableDeclaration,
 
         // Expressions

@@ -125,6 +125,24 @@ namespace Slang.Utilities
             return Unit.Value;
         }
 
+        public override Unit Visit(IfNode node, Context context)
+        {
+            using (EnterBlock(context, "if"))
+            {
+                context.Append("Condition: ");
+                _ = node.Condition.Accept(this, context);
+                context.Append("Then:");
+                _ = node.Then.Accept(this, context);
+                if (node.Else != null)
+                {
+                    context.Append("Else:");
+                    _ = node.Else.Accept(this, context);
+                }
+            }
+
+            return Unit.Value;
+        }
+
         public override Unit Visit(UnaryNode node, Context context)
         {
             using (EnterBlock(context, $"Unary({node.Operator.Text})"))

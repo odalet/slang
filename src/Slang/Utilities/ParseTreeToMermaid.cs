@@ -27,8 +27,8 @@ namespace Slang.Utilities
                 return nodeName;
             }
 
-            public void Wire(string left, string right) =>
-                graph.AppendLine($"{left} --- {right}");
+            public void Wire(string left, string right, string label = "") =>
+                graph.AppendLine($"{left} {(string.IsNullOrEmpty(label) ? "---" : $"-- {label} ---")} {right}");
 
             public override string ToString() => new StringBuilder()
                 .AppendLine("flowchart TD")
@@ -110,6 +110,22 @@ namespace Slang.Utilities
             var me = context.Declare("print", NodeShape.RoundedRectangle);
             var child = node.Argument.Accept(this, context);
             context.Wire(me, child);
+            return me;
+        }
+
+        public override string Visit(IfNode node, Context context)
+        {
+            var me = context.Declare("if", NodeShape.RoundedRectangle);
+            var condition = node.Condition.Accept(this, context);
+            context.Wire(me, condition, "?");
+            var then = node.Then.Accept(this, context);
+            context.Wire(me, then, "then");
+            if (node.Else != null)
+            {
+                var @else = node.Else.Accept(this, context);
+                context.Wire(me, @else, "else");
+            }
+
             return me;
         }
 

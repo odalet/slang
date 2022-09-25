@@ -18,16 +18,18 @@ declaration = variableDeclaration | statement;
 
 variableDeclaration = "var" IDENTIFIER ("=" expression )?;
 
-statement = printStatement | block | expression;
+statement = printStatement | ifStatement | block | expression;
 
 printStatement = "print" "(" expresion ")" ";";
+
+ifStatement = "if" "(" expression ")" statement ("else" statement)?;
 
 block = "{" declaration* "}";
 
 (* Precedence is handled through metadata *)
 expression = primary | unary | binary | assignment;
 unary = ("!" | "+" | "-") primary;
-binary = primary ("==" | "!=" | "<" | "<=" | ">" | ">=" | "+" | "-" | "*" | "/") primary;
+binary = primary ("||" | "&&" | "==" | "!=" | "<" | "<=" | ">" | ">=" | "+" | "-" | "*" | "/") primary;
 assignment = lvalue "=" expression;
 primary = grouping | LITERAL;
 grouping = "(" expression ")";

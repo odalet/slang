@@ -60,11 +60,13 @@ grouping = "(", expression, ")";
 However, in **slang**, we go with the *precedence-metadata* principle and the actual grammar looks more like this:
 
 ```ebnf
-expression = primary | unary | binary;
-unary = ("!" | "+" | "-"), primary;
-binary = primary, ("==" | "!=" | "<" | "<=" | ">" | ">=" | "+" | "-" | "*" | "/"), primary;
+expression = primary | unary | binary | assignment;
+unary = ("!" | "+" | "-") primary;
+binary = primary ("||" | "&&" | "==" | "!=" | "<" | "<=" | ">" | ">=" | "+" | "-" | "*" | "/") primary;
+assignment = lvalue "=" expression;
 primary = grouping | LITERAL;
-grouping = "(", expression, ")";
+grouping = "(" expression ")";
+lvalue = IDENTIFIER;
 ```
 
 ## Operator Precedences
@@ -73,12 +75,14 @@ Ordered by ascending precedence: operators with *higher* precedence bind tighter
 
 | Name           | Operators | Associativity | Precedence |
 | -------------- | --------- | ------------- | ---------- |
-| Assignment     | =         | Left          | 10         |
-| Equality       | == !=     | Left          | 20         |
-| Comparison     | < > <= >= | Left          | 30         |
-| Addition       | + -       | Left          | 40         |
-| Multiplication | * /       | Left          | 50         |
-| Unary          | + - !     | **Right**     | 60         |
+| Assignment     | =         | Right to Left | 10         |
+| Logical OR     | \|\|      | Left to Right | 20         |
+| Logical AND    | &&        | Left to Right | 30         |
+| Equality       | == !=     | Left to Right | 40         |
+| Comparison     | < > <= >= | Left to Right | 50         |
+| Addition       | + -       | Left to Right | 60         |
+| Multiplication | * /       | Left to Right | 70         |
+| Unary          | + - !     | Right to Left | 80         |
 
 For comparison: [C Operators](https://en.cppreference.com/w/c/language/operator_precedence)
 

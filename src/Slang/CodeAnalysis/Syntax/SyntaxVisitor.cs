@@ -9,6 +9,7 @@
         R Visit(BlockNode node, C context);
         R Visit(VariableDeclarationNode node, C context);
         R Visit(PrintNode node, C context);
+        R Visit(IfNode node, C context);
 
         // Expressions
         R Visit(AssignmentNode node, C context);
@@ -31,6 +32,7 @@
         public virtual R Visit(BlockNode node, C context) => VisitFallback(node, context);
         public virtual R Visit(VariableDeclarationNode node, C context) => VisitFallback(node, context);
         public virtual R Visit(PrintNode node, C context) => VisitFallback(node, context);
+        public virtual R Visit(IfNode node, C context) => VisitFallback(node, context);
         public virtual R Visit(AssignmentNode node, C context) => VisitFallback(node, context);
         public virtual R Visit(UnaryNode node, C context) => VisitFallback(node, context);
         public virtual R Visit(BinaryNode node, C context) => VisitFallback(node, context);

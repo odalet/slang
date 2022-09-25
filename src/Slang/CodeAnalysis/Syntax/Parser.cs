@@ -64,6 +64,9 @@ namespace Slang.CodeAnalysis.Syntax
                 if (Current.Kind is PrintToken or PrintlnToken)
                     return ParsePrintStatement();
 
+                if (Current.Kind is IfToken)
+                    return ParseIfStatement();
+
                 // Otherwise, let's go to expressions
                 var expression = ParseExpression();
                 _ = ConsumeIfMatches(SemicolonToken);
@@ -125,6 +128,24 @@ namespace Slang.CodeAnalysis.Syntax
             _ = ConsumeIfMatches(SemicolonToken);
 
             return new PrintNode(argument, token.Kind == PrintlnToken);
+        }
+
+        private StatementNode ParseIfStatement()
+        {
+            var ifToken = Consume(); // Consumes 'if'
+            _ = ConsumeIfMatches(LeftParenToken);
+            var condition = ParseExpression();
+            _ = ConsumeIfMatches(RightParenToken);
+            var thenBranch = ParseStatement();
+
+            StatementNode? elseBranch = null;
+            if (Current.Kind == ElseToken)
+            {
+                _ = Consume();
+                elseBranch = ParseStatement();
+            }
+
+            return new IfNode(ifToken, condition, thenBranch, elseBranch);
         }
 
         private ExpressionNode ParseExpression(int parentPrecedence = 0)
