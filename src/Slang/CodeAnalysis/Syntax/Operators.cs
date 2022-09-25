@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Xml.Linq;
 
 namespace Slang.CodeAnalysis.Syntax
 {
@@ -28,12 +30,14 @@ namespace Slang.CodeAnalysis.Syntax
             //
             //| Name           | Operators | Associativity | Precedence |
             //| -------------- | --------- | ------------- | ---------- |
-            //| Assignment     | =         | Left          | 10         |
-            //| Equality       | == !=     | Left          | 20         |
-            //| Comparison     | < > <= >= | Left          | 30         |
-            //| Addition       | + -       | Left          | 40         |
-            //| Multiplication | * /       | Left          | 50         |
-            //| Unary          | + - !     | **Right**     | 60         |
+            //| Assignment     | =         | Right to Left | 10         |
+            //| Logical OR     | \|\|      | Left to Right | 20         |
+            //| Logical AND    | &&        | Left to Right | 30         |
+            //| Equality       | == !=     | Left to Right | 40         |
+            //| Comparison     | < > <= >= | Left to Right | 50         |
+            //| Addition       | + -       | Left to Right | 60         |
+            //| Multiplication | * /       | Left to Right | 70         |
+            //| Unary          | + - !     | Right to Left | 80         |
 
             var precedence = 0;
 
@@ -42,25 +46,31 @@ namespace Slang.CodeAnalysis.Syntax
 
             precedence += 10;
             regb(EqualToken);
-            
+
+            precedence += 10;
+            regb(LogicalOrToken);
+
+            precedence += 10;
+            regb(LogicalAndToken);
+
             precedence += 10;
             regb(EqualEqualToken);
             regb(BangEqualToken);
-            
+
             precedence += 10;
             regb(LessToken);
             regb(GreaterToken);
             regb(LessEqualToken);
             regb(GreaterEqualToken);
-            
+
             precedence += 10;
             regb(PlusToken);
             regb(MinusToken);
-            
+
             precedence += 10;
             regb(StarToken);
             regb(SlashToken);
-            
+
             precedence += 10;
             regu(PlusToken);
             regu(MinusToken);

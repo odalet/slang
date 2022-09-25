@@ -11,7 +11,7 @@ namespace Slang.Runtime
 
         public static RuntimeValue Null { get; } = new RuntimeValue();
 
-        public bool IsNull() => content == null;                
+        public bool IsNull() => content == null;
         public bool IsNumber() => content is int or double;
 
         public bool IsBool() => content is bool;

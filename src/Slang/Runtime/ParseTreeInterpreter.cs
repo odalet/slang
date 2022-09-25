@@ -89,7 +89,7 @@ namespace Slang.Runtime
             if (node.Operator.Kind == BangToken)
             {
                 return operand.IsBool(out var boolean)
-                    ? new RuntimeValue(!boolean)
+                    ? new RuntimeValue(!boolean.Value)
                     : throw new RuntimeException("Operand must be a boolean", node.Operator);
             }
 
@@ -97,7 +97,7 @@ namespace Slang.Runtime
                 throw new RuntimeException("Operand must be a number", node.Operator);
 
             if (node.Operator.Kind == PlusToken)
-                return new RuntimeValue(value);
+                return new RuntimeValue(value!);
 
             if (node.Operator.Kind == MinusToken)
                 return new RuntimeValue(-value);
@@ -113,29 +113,50 @@ namespace Slang.Runtime
             var rhs = Evaluate(node.Right, context);
             Check.NotNull(rhs, node.Operator, "Operand must not be null");
 
+            // String concatenation
             if (node.Operator.Kind is PlusToken && (lhs.IsString() || rhs.IsString()))
                 return new RuntimeValue($"{lhs}{rhs}");
 
+            // Equality (and Difference)
             if (node.Operator.Kind is EqualEqualToken)
             {
                 if (lhs.IsBool(out var lb) && rhs.IsBool(out var rb))
-                    return new RuntimeValue(lb == rb);
+                    return new RuntimeValue(lb.Value == rb.Value);
 
                 if (lhs.IsString(out var ls) && rhs.IsString(out var rs))
-                    return new RuntimeValue(ls == rs);
+                    return new RuntimeValue(ls! == rs!);
             }
 
             if (node.Operator.Kind is BangEqualToken)
             {
                 if (lhs.IsBool(out var lb) && rhs.IsBool(out var rb))
-                    return new RuntimeValue(lb != rb);
+                    return new RuntimeValue(lb.Value != rb.Value);
 
                 if (lhs.IsString(out var ls) && rhs.IsString(out var rs))
-                    return new RuntimeValue(ls != rs);
+                    return new RuntimeValue(ls! != rs!);
             }
 
-            if (!lhs.IsDouble(out var l)) throw new RuntimeException("Left Operand must be a number", node.Operator);
-            if (!rhs.IsDouble(out var r)) throw new RuntimeException("Right Operand must be a number", node.Operator);
+            // Logical operators
+            if (node.Operator.Kind.IsLogicalOperator())
+            {
+                if (!lhs.IsBool(out var lb)) throw new RuntimeException("Left Operand must be a boolean", node.Operator);
+                if (!rhs.IsBool(out var rb)) throw new RuntimeException("Right Operand must be a boolean", node.Operator);
+
+                return node.Operator.Kind switch
+                {
+                    LogicalAndToken => new RuntimeValue(lb.Value && rb.Value),
+                    LogicalOrToken => new RuntimeValue(lb.Value || rb.Value),
+                    _ => throw new RuntimeException("Invalid Logical Binary Operator", node.Operator)
+                };
+            }
+
+            // Other operators on double: mathematical operations and comparisons
+
+            if (!lhs.IsDouble(out var ld)) throw new RuntimeException("Left Operand must be a number", node.Operator);
+            var l = ld.Value;
+
+            if (!rhs.IsDouble(out var rd)) throw new RuntimeException("Right Operand must be a number", node.Operator);
+            var r = rd.Value;
 
             return new RuntimeValue(node.Operator.Kind switch
             {

@@ -27,6 +27,8 @@
         GreaterEqualToken,  // >=
         LessToken,          // <
         LessEqualToken,     // <=
+        LogicalAndToken,    // &&
+        LogicalOrToken,      // ||
 
         // Literals
         IdentifierToken,
@@ -70,5 +72,10 @@
         GroupingExpression,
         VariableExpression,
         LiteralExpression
+    }
+
+    public static class SyntaxKindExtensions
+    {
+        public static bool IsLogicalOperator(this SyntaxKind kind) => kind is SyntaxKind.LogicalAndToken or SyntaxKind.LogicalOrToken;
     }
 }

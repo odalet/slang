@@ -101,6 +101,7 @@ namespace Slang.CodeAnalysis.Syntax
                 case ',': setAndConsume(CommaToken); break;
                 case ':': setAndConsume(ColonToken); break;
                 case ';': setAndConsume(SemicolonToken); break;
+                case '&' or '|': LexLogicalOperator(current, ref info); break;
                 case '<' or '>' or '=' or '!': LexOperatorEndingWithOptionalEqual(current, ref info); break;
                 case '"':
                     return LexStringLiteral();
