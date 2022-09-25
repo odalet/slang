@@ -16,7 +16,7 @@ compilationUnit = declaration* EOF;
 
 declaration = variableDeclaration | statement;
 
-variableDeclaration = "var" IDENTIFIER ("=" expression )?;
+variableDeclaration = "var" IDENTIFIER ( "=" expression )?;
 
 statement = printStatement | ifStatement | whileStatement | block | expression;
 
@@ -26,6 +26,8 @@ ifStatement = "if" "(" expression ")" statement ("else" statement)?;
 whileStatement = "while" "(" expression ")" statement;
 
 block = "{" declaration* "}";
+
+ifStatement = "if" "(" expression ")" statement ( "else" statement )?;
 
 (* Precedence is handled through metadata *)
 expression = primary | unary | binary | assignment;

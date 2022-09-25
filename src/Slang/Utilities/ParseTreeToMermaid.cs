@@ -141,9 +141,9 @@ namespace Slang.Utilities
 
         public override string Visit(AssignmentNode node, Context context)
         {
-            var me = context.Declare($"{node.LValue.Text} =");
+            var me = context.Declare(node.LValue.Text);
             var child = node.Expression.Accept(this, context);
-            context.Wire(me, child);
+            context.Wire(me, child, "=");
             return me;
         }
 

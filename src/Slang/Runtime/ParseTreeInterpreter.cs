@@ -208,7 +208,7 @@ namespace Slang.Runtime
         public override RuntimeValue Visit(LiteralNode node, Context context) => new(node.Literal.Value);
 
         protected override RuntimeValue VisitFallback(SyntaxNode node, Context context) =>
-            throw new RuntimeException($"Unexpected Instruction: {node.Kind}");
+            throw new RuntimeException($"Unexpected Instruction: {node.GetType().Name}");
 
         private RuntimeValue Evaluate(ExpressionNode node, Context context) => node.Accept(this, context);
     }
