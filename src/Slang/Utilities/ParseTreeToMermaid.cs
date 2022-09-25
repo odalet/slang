@@ -139,6 +139,12 @@ namespace Slang.Utilities
             return me;
         }
 
+        public override string Visit(BreakNode node, Context context) =>
+            context.Declare("break", NodeShape.RoundedRectangle);
+
+        public override string Visit(ContinueNode node, Context context) =>
+            context.Declare("continue", NodeShape.RoundedRectangle);
+
         public override string Visit(AssignmentNode node, Context context)
         {
             var me = context.Declare(node.LValue.Text);

@@ -85,6 +85,12 @@ namespace Slang.CodeAnalysis.Syntax
                 if (Current.Kind is WhileToken)
                     return ParseWhileStatement();
 
+                if (Current.Kind is BreakToken)
+                    return ParseBreakStatement();
+
+                if (Current.Kind is ContinueToken)
+                    return ParseContinueStatement();
+
                 // Otherwise, let's go to expressions
                 var expression = ParseExpression();
                 _ = ConsumeIfMatches(SemicolonToken);
@@ -175,6 +181,20 @@ namespace Slang.CodeAnalysis.Syntax
             var statement = ParseStatement();
 
             return new WhileNode(whileToken, condition, statement);
+        }
+
+        private StatementNode ParseBreakStatement()
+        {
+            var node = new BreakNode(Consume());
+            _ = ConsumeIfMatches(SemicolonToken);
+            return node;
+        }
+
+        private StatementNode ParseContinueStatement()
+        {
+            var node = new ContinueNode(Consume());
+            _ = ConsumeIfMatches(SemicolonToken);
+            return node;
         }
 
         private ExpressionNode ParseExpression(int parentPrecedence = 0)

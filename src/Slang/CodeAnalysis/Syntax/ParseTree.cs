@@ -55,9 +55,21 @@
         public override R Accept<R, C>(ISyntaxVisitor<R, C> visitor, C context) => visitor.Visit(this, context);
     }
 
-    public sealed record WhileNode(Token Token, ExpressionNode Condition, StatementNode Statement) : StatementNode(IfStatement)
+    public sealed record WhileNode(Token Token, ExpressionNode Condition, StatementNode Statement) : StatementNode(WhileStatement)
     {
         public override SyntaxNode[] Children => new[] { Condition, Statement };
+        public override R Accept<R, C>(ISyntaxVisitor<R, C> visitor, C context) => visitor.Visit(this, context);
+    }
+
+    public sealed record BreakNode(Token Token) : StatementNode(BreakStatement)
+    {
+        public override SyntaxNode[] Children => Array.Empty<SyntaxNode>();
+        public override R Accept<R, C>(ISyntaxVisitor<R, C> visitor, C context) => visitor.Visit(this, context);
+    }
+
+    public sealed record ContinueNode(Token Token) : StatementNode(ContinueStatement)
+    {
+        public override SyntaxNode[] Children => Array.Empty<SyntaxNode>();
         public override R Accept<R, C>(ISyntaxVisitor<R, C> visitor, C context) => visitor.Visit(this, context);
     }
 

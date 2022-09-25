@@ -1,5 +1,6 @@
 ﻿using System;
 using Slang.CodeAnalysis.Syntax;
+using static Slang.Utilities.ParseTreeToMermaid;
 
 namespace Slang.Utilities
 {
@@ -156,6 +157,18 @@ namespace Slang.Utilities
             return Unit.Value;
         }
 
+        public override Unit Visit(BreakNode node, Context context)
+        {
+            context.AppendLine("Break");
+            return Unit.Value;
+        }
+
+        public override Unit Visit(ContinueNode node, Context context)
+        {
+            context.AppendLine("Continue");
+            return Unit.Value;
+        }
+
         public override Unit Visit(UnaryNode node, Context context)
         {
             using (EnterBlock(context, $"Unary({node.Operator.Text})"))
@@ -225,7 +238,7 @@ namespace Slang.Utilities
             return Unit.Value;
         }
 
-        private IDisposable EnterBlock(Context context, string header, bool useSquareBrackets = false) => 
+        private IDisposable EnterBlock(Context context, string header, bool useSquareBrackets = false) =>
             new Block(this, context, header, useSquareBrackets);
     }
 }

@@ -16,6 +16,8 @@ namespace Slang.CodeAnalysis.Syntax
             ["if"] = IfToken,
             ["else"] = ElseToken,
             ["while"] = WhileToken,
+            ["break"] = BreakToken,
+            ["continue"] = ContinueToken,
             ["return"] = ReturnToken,
             ["true"] = TrueToken,
             ["false"] = FalseToken,

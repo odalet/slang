@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using Slang.CodeAnalysis.Syntax;
 
 namespace Slang.Runtime
@@ -7,6 +8,20 @@ namespace Slang.Runtime
 
     public sealed class ParseTreeInterpreter : BaseSyntaxVisitor<RuntimeValue, ParseTreeInterpreter.Context>
     {
+        [SuppressMessage("Critical Code Smell", "S3871:Exception types should be \"public\"", Justification = "By Design")]
+        private sealed class BreakException : Exception 
+        {
+            public BreakException(Token token) => Token = token;
+            public Token Token { get; }
+        }
+
+        [SuppressMessage("Critical Code Smell", "S3871:Exception types should be \"public\"", Justification = "By Design")]
+        private sealed class ContinueException : Exception
+        {
+            public ContinueException(Token token) => Token = token;
+            public Token Token { get; }
+        }
+
         public sealed class Context
         {
             public override string ToString() => "";
@@ -38,8 +53,19 @@ namespace Slang.Runtime
 
         public override RuntimeValue Visit(CompilationUnitNode node, Context context)
         {
-            foreach (var statement in node.Statements)
-                _ = statement.Accept(this, context);
+            try
+            {
+                foreach (var statement in node.Statements)
+                    _ = statement.Accept(this, context);
+            }
+            catch (BreakException bex)
+            {
+                throw new RuntimeException("Encountered unexpected statement", bex.Token);
+            }
+            catch (ContinueException cex)
+            {
+                throw new RuntimeException("Encountered unexpected statement", cex.Token);
+            }
 
             return RuntimeValue.Null;
         }
@@ -96,10 +122,26 @@ namespace Slang.Runtime
             }
 
             while (evaluateCondition())
-                _ = node.Statement.Accept(this, context);
+            {
+                try
+                {
+                    _ = node.Statement.Accept(this, context);
+                }
+                catch (ContinueException)
+                {
+                    //continue;
+                }
+                catch (BreakException)
+                {
+                    break;
+                }
+            }
 
             return RuntimeValue.Null;
         }
+
+        public override RuntimeValue Visit(BreakNode node, Context context) => throw new BreakException(node.Token);
+        public override RuntimeValue Visit(ContinueNode node, Context context) => throw new ContinueException(node.Token);
 
         public override RuntimeValue Visit(AssignmentNode node, Context context)
         {

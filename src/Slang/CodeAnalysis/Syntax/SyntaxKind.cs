@@ -49,6 +49,8 @@
         IfToken,
         ElseToken,
         WhileToken,
+        BreakToken,
+        ContinueToken,
         ReturnToken,
         TrueToken,
         FalseToken,
@@ -65,6 +67,9 @@
         BlockStatement,
         PrintStatement,
         IfStatement,
+        WhileStatement,
+        BreakStatement,
+        ContinueStatement,
         VariableDeclaration,
 
         // Expressions
