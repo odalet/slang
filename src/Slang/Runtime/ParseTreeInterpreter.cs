@@ -1,27 +1,12 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
 using Slang.CodeAnalysis.Syntax;
 
 namespace Slang.Runtime
 {
     using static SyntaxKind;
 
-    public sealed class ParseTreeInterpreter : BaseSyntaxVisitor<RuntimeValue, ParseTreeInterpreter.Context>
+    public sealed class ParseTreeInterpreter : BaseSyntaxVisitor<RuntimeValue, ParseTreeInterpreter.Context>, IDisposable
     {
-        [SuppressMessage("Critical Code Smell", "S3871:Exception types should be \"public\"", Justification = "By Design")]
-        private sealed class BreakException : Exception 
-        {
-            public BreakException(Token token) => Token = token;
-            public Token Token { get; }
-        }
-
-        [SuppressMessage("Critical Code Smell", "S3871:Exception types should be \"public\"", Justification = "By Design")]
-        private sealed class ContinueException : Exception
-        {
-            public ContinueException(Token token) => Token = token;
-            public Token Token { get; }
-        }
-
         public sealed class Context
         {
             public override string ToString() => "";
@@ -44,6 +29,8 @@ namespace Slang.Runtime
             env = environment ?? new();
         }
 
+        public void Dispose() => env.Dispose();
+
         public int Execute()
         {
             var context = new Context();
@@ -58,13 +45,9 @@ namespace Slang.Runtime
                 foreach (var statement in node.Statements)
                     _ = statement.Accept(this, context);
             }
-            catch (BreakException bex)
+            catch (JumpException jex)
             {
-                throw new RuntimeException("Encountered unexpected statement", bex.Token);
-            }
-            catch (ContinueException cex)
-            {
-                throw new RuntimeException("Encountered unexpected statement", cex.Token);
+                throw new RuntimeException("Encountered unexpected statement", jex.Token);
             }
 
             return RuntimeValue.Null;
@@ -81,7 +64,11 @@ namespace Slang.Runtime
                 foreach (var statement in node.Statements)
                     _ = statement.Accept(this, context);
             }
-            finally { env = savedEnv; }
+            finally 
+            {
+                savedEnv.Dispose();
+                env = savedEnv; 
+            }
 
             return RuntimeValue.Null;
         }
@@ -127,21 +114,19 @@ namespace Slang.Runtime
                 {
                     _ = node.Statement.Accept(this, context);
                 }
-                catch (ContinueException)
+                catch (JumpException jex)
                 {
-                    //continue;
-                }
-                catch (BreakException)
-                {
-                    break;
+                    if (jex.Kind == JumpKind.Break)
+                        break;
+                    // NB: nothing to do in the continue case
                 }
             }
 
             return RuntimeValue.Null;
         }
 
-        public override RuntimeValue Visit(BreakNode node, Context context) => throw new BreakException(node.Token);
-        public override RuntimeValue Visit(ContinueNode node, Context context) => throw new ContinueException(node.Token);
+        public override RuntimeValue Visit(BreakNode node, Context context) => throw JumpException.Break(node.Token);
+        public override RuntimeValue Visit(ContinueNode node, Context context) => throw JumpException.Continue(node.Token);
 
         public override RuntimeValue Visit(AssignmentNode node, Context context)
         {

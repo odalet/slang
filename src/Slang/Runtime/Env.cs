@@ -1,17 +1,28 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Slang.Runtime
 {
     public readonly record struct ValueDescriptor(RuntimeValue Content, bool IsReadOnly);
 
     // Stores variables
-    public sealed class Env
+    public sealed class Env : IDisposable
     {
         private readonly Dictionary<string, ValueDescriptor> values = new();
 
-        public Env(Env? parent = null) => Parent = parent;
+        public Env(Env? parent = null)
+        {
+            Parent = parent;
+            NestingLevel = parent == null ? 0 : parent.NestingLevel + 1;
+        }
 
         public Env? Parent { get; }
+        public int NestingLevel { get; } // For debugging purpose
+
+        public void Dispose()
+        {
+            // Nothing to do here for now
+        }
 
         public void Declare(string name, RuntimeValue value, bool isReadOnly)
         {

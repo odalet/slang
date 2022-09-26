@@ -52,7 +52,7 @@ namespace Slang.Interpreter
             var stdout = new StringBuilder();
             var stderr = new StringBuilder();
             using var runtime = MakeForTests(stdout, stderr);
-            var interpreter = new ParseTreeInterpreter(tree, runtime.RuntimeLib);
+            using var interpreter = new ParseTreeInterpreter(tree, runtime.RuntimeLib);
             _ = interpreter.Execute();
 
             err = stderr.ToString();

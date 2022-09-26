@@ -18,12 +18,14 @@ declaration = variableDeclaration | statement;
 
 variableDeclaration = "var" IDENTIFIER ( "=" expression )?;
 
-statement = printStatement | ifStatement | whileStatement | block | expression;
+statement = printStatement | ifStatement | whileStatement | breakStatement | continueStatement | block | expression;
 
 printStatement = "print" "(" expresion ")" ";";
 
 ifStatement = "if" "(" expression ")" statement ("else" statement)?;
 whileStatement = "while" "(" expression ")" statement;
+breakStatement = "break" ";"; (* NB: only valid inside a loop *)
+continueStatement = "continue" ";"; (* NB: only valid inside a loop *)
 
 block = "{" declaration* "}";
 

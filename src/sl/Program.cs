@@ -159,7 +159,7 @@ namespace Slang.Cli
             try
             {
                 var runtime = new RuntimeLib(Reader, Writer, ErrWriter);
-                var interpreter = new ParseTreeInterpreter(tree, runtime);
+                using var interpreter = new ParseTreeInterpreter(tree, runtime);
                 _ = interpreter.Execute();
                 Writer.WriteLine();
             }
