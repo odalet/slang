@@ -23,7 +23,7 @@ namespace Slang.Runtime
         public JumpKind Kind { get; }
         public Token Token { get; }
 
-        public static JumpException Break(Token token) => new JumpException(JumpKind.Break, token);
-        public static JumpException Continue(Token token) => new JumpException(JumpKind.Continue, token);
+        public static JumpException Break(Token token) => new(JumpKind.Break, token);
+        public static JumpException Continue(Token token) => new(JumpKind.Continue, token);
     }
 }
