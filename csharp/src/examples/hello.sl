@@ -11,7 +11,9 @@ val a = 3.14;
 
 {
     var a = 6.28;
+	var b = 2*a;
     println("A' = " + a);
+	println("B' = " + b);
 }
 
 println("A = " + a);

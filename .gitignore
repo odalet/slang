@@ -328,3 +328,10 @@ ASALocalRun/
 
 # MFractors (Xamarin productivity tool) working folder 
 .mfractor/
+
+# Zig temp dirs
+zig-out
+zig-cache
+
+# CMake temp dirs
+out
