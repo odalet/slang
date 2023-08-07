@@ -1,122 +1,114 @@
-﻿namespace Delta.Slang.Syntax
+﻿namespace Delta.Slang.Syntax;
+
+public enum TokenKind
 {
-    public enum TokenKind
+    Eof,
+    Invalid,
+
+    Plus,
+    Minus,
+    Star,
+    Slash,
+    Percent,
+    OpenParenthesis,
+    CloseParenthesis,
+    OpenBrace,
+    CloseBrace,
+    Colon,
+    Comma,
+    Semicolon,
+    Lower,
+    LowerEqual,
+    Greater,
+    GreaterEqual,
+    Exclamation,
+    ExclamationEqual,
+    Equal,
+    EqualEqual,
+    DoubleQuote,
+
+    Whitespace,
+    StringLiteral,
+    IntLiteral,
+    DoubleLiteral,
+
+    Comment,
+
+    GotoKeyword,
+    FunKeyword,
+    VarKeyword,
+    ReturnKeyword,
+    TrueKeyword,
+    FalseKeyword,
+    IfKeyword,
+    ElseKeyword,
+
+    Identifier
+}
+
+internal static class TokenKindConversions
+{
+    public static TokenKind GetIdentifierOrKeyword(string text) => text switch
     {
-        Eof,
-        Invalid,
+        "goto" => TokenKind.GotoKeyword,
+        "fun" => TokenKind.FunKeyword,
+        "var" => TokenKind.VarKeyword,
+        "if" => TokenKind.IfKeyword,
+        "else" => TokenKind.ElseKeyword,
+        "return" => TokenKind.ReturnKeyword,
+        "true" => TokenKind.TrueKeyword,
+        "false" => TokenKind.FalseKeyword,
+        _ => TokenKind.Identifier,
+    };
 
-        Plus,
-        Minus,
-        Star,
-        Slash,
-        Percent,
-        OpenParenthesis,
-        CloseParenthesis,
-        OpenBrace,
-        CloseBrace,
-        Colon,
-        Comma,
-        Semicolon,
-        Lower,
-        LowerEqual,
-        Greater,
-        GreaterEqual,
-        Exclamation,
-        ExclamationEqual,
-        Equal,
-        EqualEqual,
-        DoubleQuote,
-
-        Whitespace,
-        StringLiteral,
-        IntLiteral,
-        DoubleLiteral,
-
-        Comment,
-
-        GotoKeyword,
-        FunKeyword,
-        VarKeyword,
-        ReturnKeyword,
-        TrueKeyword,
-        FalseKeyword,
-        IfKeyword,
-        ElseKeyword,
-
-        Identifier
-    }
-
-    internal static class TokenKindConversions
+    public static string GetText(TokenKind kind) => kind switch
     {
-        public static TokenKind GetIdentifierOrKeyword(string text)
-        {
-            switch (text)
-            {
-                case "goto": return TokenKind.GotoKeyword;
-                case "fun": return TokenKind.FunKeyword;
-                case "var": return TokenKind.VarKeyword;
-                case "if": return TokenKind.IfKeyword;
-                case "else": return TokenKind.ElseKeyword;
-                case "return": return TokenKind.ReturnKeyword;
-                case "true": return TokenKind.TrueKeyword;
-                case "false": return TokenKind.FalseKeyword;
-                default: return TokenKind.Identifier;
-            }
-        }
+        TokenKind.Plus => "+",
+        TokenKind.Minus => "-",
+        TokenKind.Star => "*",
+        TokenKind.Slash => "/",
+        TokenKind.Exclamation => "!",
+        TokenKind.ExclamationEqual => "!=",
+        TokenKind.Equal => "=",
+        TokenKind.EqualEqual => "==",
+        //case TokenKind.Tilde: return "~";
+        TokenKind.Lower => "<",
+        TokenKind.LowerEqual => "<=",
+        TokenKind.Greater => ">",
+        TokenKind.GreaterEqual => ">=",
+        //case TokenKind.Ampersand: return "&";
+        //case TokenKind.AmpersandAmpersand: return "&&";
+        //case TokenKind.Pipe: return "|";
+        //case TokenKind.PipePipe: return "||";
+        //case TokenKind.Hat: return "^";
+        TokenKind.OpenParenthesis => "(",
+        TokenKind.CloseParenthesis => ")",
+        TokenKind.OpenBrace => "{",
+        TokenKind.CloseBrace => "}",
+        TokenKind.Colon => ":",
+        TokenKind.Comma => ",",
+        TokenKind.Semicolon => ";",
+        TokenKind.FalseKeyword => "false",
+        TokenKind.TrueKeyword => "true",
+        TokenKind.VarKeyword => "var",
+        TokenKind.ReturnKeyword => "return",
+        //case TokenKind.BreakKeyword: return "break";
+        //case TokenKind.ContinueKeyword: return "continue";                
+        //case TokenKind.ForKeyword: return "for";
+        TokenKind.GotoKeyword => "goto",
+        TokenKind.FunKeyword => "fun",
+        //case TokenKind.FunctionKeyword: return "function";
+        TokenKind.IfKeyword => "if",
+        TokenKind.ElseKeyword => "else",
+        //case TokenKind.LetKeyword: return "let";
+        //case TokenKind.ToKeyword: return "to";
+        //case TokenKind.WhileKeyword: return "while";
+        //case TokenKind.DoKeyword: return "do";
+        _ => "<?>",
+    };
+}
 
-        public static string GetText(TokenKind kind)
-        {
-            switch (kind)
-            {
-                case TokenKind.Plus: return "+";
-                case TokenKind.Minus: return "-";
-                case TokenKind.Star: return "*";
-                case TokenKind.Slash: return "/";
-                case TokenKind.Exclamation: return "!";
-                case TokenKind.ExclamationEqual: return "!=";
-                case TokenKind.Equal: return "=";
-                case TokenKind.EqualEqual: return "==";
-                //case TokenKind.Tilde: return "~";
-                case TokenKind.Lower: return "<";
-                case TokenKind.LowerEqual: return "<=";
-                case TokenKind.Greater: return ">";
-                case TokenKind.GreaterEqual: return ">=";
-                //case TokenKind.Ampersand: return "&";
-                //case TokenKind.AmpersandAmpersand: return "&&";
-                //case TokenKind.Pipe: return "|";
-                //case TokenKind.PipePipe: return "||";
-                //case TokenKind.Hat: return "^";
-                case TokenKind.OpenParenthesis: return "(";
-                case TokenKind.CloseParenthesis: return ")";
-                case TokenKind.OpenBrace: return "{";
-                case TokenKind.CloseBrace: return "}";
-                case TokenKind.Colon: return ":";
-                case TokenKind.Comma: return ",";
-                case TokenKind.Semicolon: return ";";
-                case TokenKind.FalseKeyword: return "false";
-                case TokenKind.TrueKeyword: return "true";
-                case TokenKind.VarKeyword: return "var";
-                case TokenKind.ReturnKeyword: return "return";
-                //case TokenKind.BreakKeyword: return "break";
-                //case TokenKind.ContinueKeyword: return "continue";                
-                //case TokenKind.ForKeyword: return "for";
-                case TokenKind.GotoKeyword: return "goto";
-                case TokenKind.FunKeyword: return "fun";
-                //case TokenKind.FunctionKeyword: return "function";
-                case TokenKind.IfKeyword: return "if";
-                case TokenKind.ElseKeyword: return "else";
-                //case TokenKind.LetKeyword: return "let";
-                //case TokenKind.ToKeyword: return "to";
-                //case TokenKind.WhileKeyword: return "while";
-                //case TokenKind.DoKeyword: return "do";
-                default:
-                    return "<?>";
-            }
-        }
-    }
-
-    internal static class TokenKindExtensions
-    {
-        public static string GetText(this TokenKind kind) => TokenKindConversions.GetText(kind);
-    }
+internal static class TokenKindExtensions
+{
+    public static string GetText(this TokenKind kind) => TokenKindConversions.GetText(kind);
 }

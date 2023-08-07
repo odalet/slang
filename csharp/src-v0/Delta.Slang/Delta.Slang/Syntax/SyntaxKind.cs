@@ -1,31 +1,30 @@
-﻿namespace Delta.Slang.Syntax
+﻿namespace Delta.Slang.Syntax;
+
+public enum SyntaxKind
 {
-    public enum SyntaxKind
-    {
-        Invalid,
-        CompilationUnit,
+    Invalid,
+    CompilationUnit,
 
-        FunctionDeclaration,
-        ParametersDeclaration,
-        ParameterDeclaration,
-        TypeClause,
+    FunctionDeclaration,
+    ParametersDeclaration,
+    ParameterDeclaration,
+    TypeClause,
 
-        Block,
-        GlobalStatement,
-        IfStatement,
-        ElseClause,
-        ReturnStatement,
-        ExpressionStatement,
+    Block,
+    GlobalStatement,
+    IfStatement,
+    ElseClause,
+    ReturnStatement,
+    ExpressionStatement,
 
-        AssignmentExpression,
-        UnaryExpression,
-        BinaryExpression,
-        ParenthesizedExpression,
-        LiteralExpression,
-        InvokeExpression,
-        NameExpression,
-        GotoStatement,
-        LabelStatement,
-        VariableDeclaration
-    }
+    AssignmentExpression,
+    UnaryExpression,
+    BinaryExpression,
+    ParenthesizedExpression,
+    LiteralExpression,
+    InvokeExpression,
+    NameExpression,
+    GotoStatement,
+    LabelStatement,
+    VariableDeclaration
 }

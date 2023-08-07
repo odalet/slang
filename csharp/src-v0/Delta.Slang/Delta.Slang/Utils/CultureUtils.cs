@@ -1,33 +1,30 @@
 ﻿using System;
 using System.Globalization;
 
-namespace Delta.Slang.Utils
+namespace Delta.Slang.Utils;
+
+public static class CultureUtils
 {
-    public static class CultureUtils
+    private sealed class TemporaryCulture : IDisposable
     {
-        private sealed class TemporaryCulture : IDisposable
+        private readonly CultureInfo previousCulture;
+        private readonly CultureInfo previousUICulture;
+
+        public TemporaryCulture(CultureInfo culture)
         {
-            private readonly CultureInfo previousCulture;
-            private readonly CultureInfo previousUICulture;
+            previousCulture = CultureInfo.CurrentCulture;
+            previousUICulture = CultureInfo.CurrentUICulture;
 
-            public TemporaryCulture(CultureInfo culture)
-            {
-                if (culture == null) throw new ArgumentNullException(nameof(culture));
-
-                previousCulture = CultureInfo.CurrentCulture;
-                previousUICulture = CultureInfo.CurrentUICulture;
-
-                CultureInfo.CurrentCulture = culture;
-                CultureInfo.CurrentUICulture = culture;
-            }
-
-            public void Dispose()
-            {
-                CultureInfo.CurrentCulture = previousCulture;
-                CultureInfo.CurrentUICulture = previousUICulture;
-            }
+            CultureInfo.CurrentCulture = culture ?? throw new ArgumentNullException(nameof(culture));
+            CultureInfo.CurrentUICulture = culture;
         }
 
-        public static IDisposable InvariantCulture() => new TemporaryCulture(CultureInfo.InvariantCulture);
+        public void Dispose()
+        {
+            CultureInfo.CurrentCulture = previousCulture;
+            CultureInfo.CurrentUICulture = previousUICulture;
+        }
     }
+
+    public static IDisposable InvariantCulture() => new TemporaryCulture(CultureInfo.InvariantCulture);
 }

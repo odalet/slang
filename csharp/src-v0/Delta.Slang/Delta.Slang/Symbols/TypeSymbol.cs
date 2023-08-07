@@ -1,16 +1,15 @@
-﻿namespace Delta.Slang.Symbols
+﻿namespace Delta.Slang.Symbols;
+
+public sealed class TypeSymbol : Symbol
 {
-    public sealed class TypeSymbol : Symbol
+    internal TypeSymbol(string name, object defaultValue) : base(name)
     {
-        internal TypeSymbol(string name, object defaultValue) : base(name)
-        {
-            DefaultValue = defaultValue;
-            Key = new SymbolKey(new[] { name });
-        }
-
-        public override SymbolKind Kind => SymbolKind.Type;
-        public override SymbolKey Key { get; }
-
-        public object DefaultValue { get; }
+        DefaultValue = defaultValue;
+        Key = new SymbolKey(new[] { name });
     }
+
+    public override SymbolKind Kind => SymbolKind.Type;
+    public override SymbolKey Key { get; }
+
+    public object DefaultValue { get; }
 }

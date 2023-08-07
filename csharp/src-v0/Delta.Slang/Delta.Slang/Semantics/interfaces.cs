@@ -1,16 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
-namespace Delta.Slang.Semantics
+namespace Delta.Slang.Semantics;
+
+public interface IHasChildStatements
 {
-    public interface IHasChildStatements
-    {
-        IEnumerable<Statement> Statements { get; }
-    }
+    IEnumerable<Statement> Statements { get; }
+}
 
-    public interface IHasScope
-    {
-        Scope Scope { get; }
-    }
+public interface IHasScope
+{
+    Scope Scope { get; }
 }

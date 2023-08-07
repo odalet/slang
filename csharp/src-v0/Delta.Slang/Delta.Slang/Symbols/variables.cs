@@ -1,30 +1,29 @@
-﻿namespace Delta.Slang.Symbols
+﻿namespace Delta.Slang.Symbols;
+
+public abstract class VariableSymbol : Symbol
 {
-    public abstract class VariableSymbol : Symbol
+    protected VariableSymbol(string name, bool isReadOnly, TypeSymbol type) : base(name)
     {
-        protected VariableSymbol(string name, bool isReadOnly, TypeSymbol type) : base(name)
-        {
-            IsReadOnly = isReadOnly;
-            Type = type;
-            Key = SymbolKey.FromVariable(name);
-        }
-
-        public bool IsReadOnly { get; }
-        public TypeSymbol Type { get; }
-        public override SymbolKey Key { get; }
+        IsReadOnly = isReadOnly;
+        Type = type;
+        Key = SymbolKey.FromVariable(name);
     }
 
-    public sealed class GlobalVariableSymbol : VariableSymbol
-    {
-        internal GlobalVariableSymbol(string name, bool isReadOnly, TypeSymbol type) : base(name, isReadOnly, type) { }
+    public bool IsReadOnly { get; }
+    public TypeSymbol Type { get; }
+    public override SymbolKey Key { get; }
+}
 
-        public override SymbolKind Kind => SymbolKind.GlobalVariable;
-    }
+public sealed class GlobalVariableSymbol : VariableSymbol
+{
+    internal GlobalVariableSymbol(string name, bool isReadOnly, TypeSymbol type) : base(name, isReadOnly, type) { }
 
-    public class LocalVariableSymbol : VariableSymbol
-    {
-        internal LocalVariableSymbol(string name, bool isReadOnly, TypeSymbol type) : base(name, isReadOnly, type) { }
+    public override SymbolKind Kind => SymbolKind.GlobalVariable;
+}
 
-        public override SymbolKind Kind => SymbolKind.LocalVariable;
-    }
+public class LocalVariableSymbol : VariableSymbol
+{
+    internal LocalVariableSymbol(string name, bool isReadOnly, TypeSymbol type) : base(name, isReadOnly, type) { }
+
+    public override SymbolKind Kind => SymbolKind.LocalVariable;
 }

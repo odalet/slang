@@ -1,9 +1,8 @@
-﻿namespace Delta.Slang.Symbols
-{
-    public sealed class ParameterSymbol : LocalVariableSymbol
-    {
-        internal ParameterSymbol(string name, TypeSymbol type) : base(name, isReadOnly: true, type) { }
+﻿namespace Delta.Slang.Symbols;
 
-        public override SymbolKind Kind => SymbolKind.Parameter;
-    }
+public sealed class ParameterSymbol : LocalVariableSymbol
+{
+    internal ParameterSymbol(string name, TypeSymbol type) : base(name, isReadOnly: true, type) { }
+
+    public override SymbolKind Kind => SymbolKind.Parameter;
 }

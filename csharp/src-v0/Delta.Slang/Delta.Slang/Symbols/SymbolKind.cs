@@ -1,12 +1,11 @@
-﻿namespace Delta.Slang.Symbols
+﻿namespace Delta.Slang.Symbols;
+
+public enum SymbolKind
 {
-    public enum SymbolKind
-    {
-        Function,
-        GlobalVariable,
-        LocalVariable,
-        Parameter,
-        Type,
-        Label
-    }
+    Function,
+    GlobalVariable,
+    LocalVariable,
+    Parameter,
+    Type,
+    Label
 }
