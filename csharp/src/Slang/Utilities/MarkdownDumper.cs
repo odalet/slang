@@ -5,83 +5,82 @@ using System.Text;
 using Slang.CodeAnalysis;
 using Slang.CodeAnalysis.Syntax;
 
-namespace Slang.Utilities
+namespace Slang.Utilities;
+
+public static class MakdownDumperExtensions
 {
-    public static class MakdownDumperExtensions
+    public static void DumpTo(this MarkdownDumper dumper, string filename) => File.WriteAllText(filename, dumper.Dump());
+}
+
+public sealed class MarkdownDumper
+{
+    private readonly Token[] tokens;
+    private readonly ParseTree tree;
+    private readonly IReadOnlyList<IDiagnostic> diagnostics;
+
+    public MarkdownDumper(IEnumerable<Token> lexedTokens, ParseTree parseTree, IReadOnlyList<IDiagnostic> diagnosticCollection)
     {
-        public static void DumpTo(this MarkdownDumper dumper, string filename) => File.WriteAllText(filename, dumper.Dump());
+        tokens = lexedTokens.ToArray();
+        tree = parseTree;
+        diagnostics = diagnosticCollection;
     }
 
-    public sealed class MarkdownDumper
+    public string Dump()
     {
-        private readonly Token[] tokens;
-        private readonly ParseTree tree;
-        private readonly IReadOnlyList<IDiagnostic> diagnostics;
+        var builder = new StringBuilder()
+            .AppendLine("# Slang Dump")
+            .AppendLine()
+            ;
 
-        public MarkdownDumper(IEnumerable<Token> lexedTokens, ParseTree parseTree, IReadOnlyList<IDiagnostic> diagnosticCollection)
-        {
-            tokens = lexedTokens.ToArray();
-            tree = parseTree;
-            diagnostics = diagnosticCollection;
-        }
+        _ = builder
+            .AppendLine("## Parse Tree")
+            .AppendLine()
+            ;
 
-        public string Dump()
-        {
-            var builder = new StringBuilder()
-                .AppendLine("# Slang Dump")
-                .AppendLine()
-                ;
+        DumpParseTree(builder);
+        _ = builder.AppendLine();
 
-            _ = builder
-                .AppendLine("## Parse Tree")
-                .AppendLine()
-                ;
+        _ = builder.AppendLine("## Diagnostics")
+            .AppendLine()
+            ;
 
-            DumpParseTree(builder);
-            _ = builder.AppendLine();
+        DumpDiagnostics(builder);
+        _ = builder.AppendLine();
 
-            _ = builder.AppendLine("## Diagnostics")
-                .AppendLine()
-                ;
+        _ = builder
+            .AppendLine("## Lexed Tokens")
+            .AppendLine()
+            ;
 
-            DumpDiagnostics(builder);
-            _ = builder.AppendLine();
+        DumpTokens(builder);
 
-            _ = builder
-                .AppendLine("## Lexed Tokens")
-                .AppendLine()
-                ;
+        return builder.ToString();
+    }
 
-            DumpTokens(builder);
+    private void DumpDiagnostics(StringBuilder builder)
+    {
+        if (!diagnostics.Any())
+            _ = builder.AppendLine("*None.*");
+        else foreach (var diagnostic in diagnostics)
+                _ = builder.AppendLine("* " + diagnostic);
+    }
 
-            return builder.ToString();
-        }
+    private void DumpTokens(StringBuilder builder)
+    {
+        if (tokens.Length == 0)
+            _ = builder.AppendLine("*None.*");
+        else foreach (var token in tokens)
+                _ = builder.AppendLine("* " + token);
+    }
 
-        private void DumpDiagnostics(StringBuilder builder)
-        {
-            if (!diagnostics.Any())
-                _ = builder.AppendLine("*None.*");
-            else foreach (var diagnostic in diagnostics)
-                    _ = builder.AppendLine("* " + diagnostic);
-        }
+    private void DumpParseTree(StringBuilder builder)
+    {
+        var mermaid = new ParseTreeToMermaid(tree);
 
-        private void DumpTokens(StringBuilder builder)
-        {
-            if (tokens.Length == 0)
-                _ = builder.AppendLine("*None.*");
-            else foreach (var token in tokens)
-                    _ = builder.AppendLine("* " + token);
-        }
-
-        private void DumpParseTree(StringBuilder builder)
-        {
-            var mermaid = new ParseTreeToMermaid(tree);
-
-            _ = builder
-                .AppendLine("```mermaid")
-                .Append(mermaid.Execute())
-                .AppendLine("```")
-                ;
-        }
+        _ = builder
+            .AppendLine("```mermaid")
+            .Append(mermaid.Execute())
+            .AppendLine("```")
+            ;
     }
 }

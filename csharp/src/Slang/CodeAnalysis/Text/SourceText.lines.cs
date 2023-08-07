@@ -1,159 +1,158 @@
 ﻿using System;
 using Slang.Utilities;
 
-namespace Slang.CodeAnalysis.Text
+namespace Slang.CodeAnalysis.Text;
+
+partial class SourceText
 {
-    partial class SourceText
+    private sealed class LineInfo : TextLineCollection
     {
-        private sealed class LineInfo : TextLineCollection
+        private readonly SourceText text;
+        private readonly int[] starts;
+        private int lastLineNumber;
+
+        public LineInfo(SourceText sourceText, int[] lineStartsArray)
         {
-            private readonly SourceText text;
-            private readonly int[] starts;
-            private int lastLineNumber;
+            text = sourceText;
+            starts = lineStartsArray;
+        }
 
-            public LineInfo(SourceText sourceText, int[] lineStartsArray)
+        public override int Count => starts.Length;
+
+        public override TextLine this[int index]
+        {
+            get
             {
-                text = sourceText;
-                starts = lineStartsArray;
+                if (index < 0 || index >= starts.Length)
+                    throw new ArgumentOutOfRangeException(nameof(index));
+
+                var start = starts[index];
+                if (index == starts.Length - 1)
+                    return TextLine.FromSpan(text, TextSpan.FromBounds(start, text.Length));
+
+                var end = starts[index + 1];
+                return TextLine.FromSpan(text, TextSpan.FromBounds(start, end));
             }
+        }
 
-            public override int Count => starts.Length;
+        public override int IndexOf(int position)
+        {
+            if (position < 0 || position > text.Length)
+                throw new ArgumentOutOfRangeException(nameof(position));
 
-            public override TextLine this[int index]
+            int currentLineNumber;
+
+            // it is common to ask about position on the same line as before or on the next couple lines
+            var last = lastLineNumber;
+            if (position >= starts[last])
             {
-                get
+                var limit = Math.Min(starts.Length, last + 4);
+                for (var i = last; i < limit; i++)
                 {
-                    if (index < 0 || index >= starts.Length)
-                        throw new ArgumentOutOfRangeException(nameof(index));
-
-                    var start = starts[index];
-                    if (index == starts.Length - 1)
-                        return TextLine.FromSpan(text, TextSpan.FromBounds(start, text.Length));
-
-                    var end = starts[index + 1];
-                    return TextLine.FromSpan(text, TextSpan.FromBounds(start, end));
-                }
-            }
-
-            public override int IndexOf(int position)
-            {
-                if (position < 0 || position > text.Length)
-                    throw new ArgumentOutOfRangeException(nameof(position));
-
-                int currentLineNumber;
-
-                // it is common to ask about position on the same line as before or on the next couple lines
-                var last = lastLineNumber;
-                if (position >= starts[last])
-                {
-                    var limit = Math.Min(starts.Length, last + 4);
-                    for (var i = last; i < limit; i++)
+                    if (position < starts[i])
                     {
-                        if (position < starts[i])
-                        {
-                            currentLineNumber = i - 1;
-                            lastLineNumber = currentLineNumber;
-                            return currentLineNumber;
-                        }
+                        currentLineNumber = i - 1;
+                        lastLineNumber = currentLineNumber;
+                        return currentLineNumber;
                     }
                 }
-
-                // Binary search to find the right line. If no lines start exactly at position, 
-                // round to the left. EOF position will map to the last line.
-                currentLineNumber = starts.BinarySearch(position);
-                if (currentLineNumber < 0)
-                    currentLineNumber = ~currentLineNumber - 1;
-
-                lastLineNumber = currentLineNumber;
-                return currentLineNumber;
             }
 
-            public override TextLine GetLineFromPosition(int position) => this[IndexOf(position)];
+            // Binary search to find the right line. If no lines start exactly at position, 
+            // round to the left. EOF position will map to the last line.
+            currentLineNumber = starts.BinarySearch(position);
+            if (currentLineNumber < 0)
+                currentLineNumber = ~currentLineNumber - 1;
+
+            lastLineNumber = currentLineNumber;
+            return currentLineNumber;
         }
 
-        private const int charBufferSize = 32 * 1024;
-        private const int charBufferCount = 5;
+        public override TextLine GetLineFromPosition(int position) => this[IndexOf(position)];
+    }
 
-        private static readonly ObjectPool<char[]> charArrayPool = new(() => new char[charBufferSize], charBufferCount);
+    private const int charBufferSize = 32 * 1024;
+    private const int charBufferCount = 5;
 
-        private LineInfo CreateLineInfo() => new(this, ParseLineStarts());
+    private static readonly ObjectPool<char[]> charArrayPool = new(() => new char[charBufferSize], charBufferCount);
 
-        private void EnumerateChars(Action<int, char[], int> action)
+    private LineInfo CreateLineInfo() => new(this, ParseLineStarts());
+
+    private void EnumerateChars(Action<int, char[], int> action)
+    {
+        var position = 0;
+        var buffer = charArrayPool.Allocate();
+
+        var length = Length;
+        while (position < length)
         {
-            var position = 0;
-            var buffer = charArrayPool.Allocate();
-
-            var length = Length;
-            while (position < length)
-            {
-                var contentLength = Math.Min(length - position, buffer.Length);
-                CopyTo(position, buffer, 0, contentLength);
-                action(position, buffer, contentLength);
-                position += contentLength;
-            }
-
-            // once more with zero length to signal the end
-            action(position, buffer, 0);
-
-            charArrayPool.Free(buffer);
+            var contentLength = Math.Min(length - position, buffer.Length);
+            CopyTo(position, buffer, 0, contentLength);
+            action(position, buffer, contentLength);
+            position += contentLength;
         }
 
-        private int[] ParseLineStarts()
+        // once more with zero length to signal the end
+        action(position, buffer, 0);
+
+        charArrayPool.Free(buffer);
+    }
+
+    private int[] ParseLineStarts()
+    {
+        // Corner case check
+        if (0 == Length) return new[] { 0 };
+
+        var lineStarts = ArrayBuilder<int>.GetInstance();
+        lineStarts.Add(0); // there is always the first line
+
+        var lastWasCR = false;
+
+        // The following loop goes through every character in the text. It is highly
+        // performance critical, and thus inlines knowledge about common line breaks
+        // and non-line breaks.
+        EnumerateChars((int position, char[] buffer, int length) =>
         {
-            // Corner case check
-            if (0 == Length) return new[] { 0 };
-
-            var lineStarts = ArrayBuilder<int>.GetInstance();
-            lineStarts.Add(0); // there is always the first line
-
-            var lastWasCR = false;
-
-            // The following loop goes through every character in the text. It is highly
-            // performance critical, and thus inlines knowledge about common line breaks
-            // and non-line breaks.
-            EnumerateChars((int position, char[] buffer, int length) =>
+            var index = 0;
+            if (lastWasCR)
             {
-                var index = 0;
-                if (lastWasCR)
-                {
-                    if (length > 0 && buffer[0] == '\n')
-                        index++;
-
-                    lineStarts.Add(position + index);
-                    lastWasCR = false;
-                }
-
-                while (index < length)
-                {
-                    var current = buffer[index];
+                if (length > 0 && buffer[0] == '\n')
                     index++;
 
-                    // Common case - ASCII & not a line break:
-                    // c > '\r' && c <= 127 -> c >= ('\r'+1) && c <= 127
-                    const uint bias = '\r' + 1;
-                    if (unchecked(current - bias) <= 127 - bias)
-                        continue;
+                lineStarts.Add(position + index);
+                lastWasCR = false;
+            }
 
-                    // Assumes that the only 2-char line break sequence is CR+LF
-                    if (current == '\r')
+            while (index < length)
+            {
+                var current = buffer[index];
+                index++;
+
+                // Common case - ASCII & not a line break:
+                // c > '\r' && c <= 127 -> c >= ('\r'+1) && c <= 127
+                const uint bias = '\r' + 1;
+                if (unchecked(current - bias) <= 127 - bias)
+                    continue;
+
+                // Assumes that the only 2-char line break sequence is CR+LF
+                if (current == '\r')
+                {
+                    if (index < length && buffer[index] == '\n')
+                        index++;
+                    else if (index >= length)
                     {
-                        if (index < length && buffer[index] == '\n')
-                            index++;
-                        else if (index >= length)
-                        {
-                            lastWasCR = true;
-                            continue;
-                        }
-                    }
-                    else if (!TextUtils.IsAnyLineBreakCharacter(current))
+                        lastWasCR = true;
                         continue;
-
-                    // next line starts at index
-                    lineStarts.Add(position + index);
+                    }
                 }
-            });
+                else if (!TextUtils.IsAnyLineBreakCharacter(current))
+                    continue;
 
-            return lineStarts.ToArrayAndFree();
-        }
+                // next line starts at index
+                lineStarts.Add(position + index);
+            }
+        });
+
+        return lineStarts.ToArrayAndFree();
     }
 }

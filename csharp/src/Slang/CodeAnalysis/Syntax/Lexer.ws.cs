@@ -1,55 +1,54 @@
-﻿namespace Slang.CodeAnalysis.Syntax
+﻿namespace Slang.CodeAnalysis.Syntax;
+
+using static SyntaxKind;
+
+partial class Lexer
 {
-    using static SyntaxKind;
-
-    partial class Lexer
+    private void LexWhiteSpace(ref TokenInfo info)
     {
-        private void LexWhiteSpace(ref TokenInfo info)
+        while (true)
         {
-            while (true)
+            var current = LookAhead();
+            if (ConsumeLineBreakIfAny(current))
+                continue;
+
+            if (current is ' ' or '\t')
             {
-                var current = LookAhead();
-                if (ConsumeLineBreakIfAny(current))
-                    continue;
-
-                if (current is ' ' or '\t')
-                {
-                    Consume();
-                    continue;
-                }
-
-                // All other cases
-                break;
+                Consume();
+                continue;
             }
 
-            info.Kind = WhitespaceToken;
+            // All other cases
+            break;
         }
 
-        private bool ConsumeLineBreakIfAny(char current)
+        info.Kind = WhitespaceToken;
+    }
+
+    private bool ConsumeLineBreakIfAny(char current)
+    {
+        if (current == '\r')
         {
-            if (current == '\r')
-            {
-                currentPosition.line++;
+            currentPosition.line++;
+            Consume();
+
+            var next = LookAhead();
+            if (next == '\n')
                 Consume();
 
-                var next = LookAhead();
-                if (next == '\n')
-                    Consume();
-
-                currentPosition.column = 0;
-                return true;
-            }
-
-            if (current == '\n')
-            {
-                currentPosition.line++;
-                Consume();
-
-                currentPosition.column = 0;
-                return true;
-            }
-
-            return false;
+            currentPosition.column = 0;
+            return true;
         }
+
+        if (current == '\n')
+        {
+            currentPosition.line++;
+            Consume();
+
+            currentPosition.column = 0;
+            return true;
+        }
+
+        return false;
     }
 }

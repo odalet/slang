@@ -1,58 +1,57 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Slang.Runtime
+namespace Slang.Runtime;
+
+public readonly record struct ValueDescriptor(RuntimeValue Content, bool IsReadOnly);
+
+// Stores variables
+public sealed class Env : IDisposable
 {
-    public readonly record struct ValueDescriptor(RuntimeValue Content, bool IsReadOnly);
+    private readonly Dictionary<string, ValueDescriptor> values = new();
 
-    // Stores variables
-    public sealed class Env : IDisposable
+    public Env(Env? parent = null)
     {
-        private readonly Dictionary<string, ValueDescriptor> values = new();
+        Parent = parent;
+        NestingLevel = parent == null ? 0 : parent.NestingLevel + 1;
+    }
 
-        public Env(Env? parent = null)
+    public Env? Parent { get; }
+    public int NestingLevel { get; } // For debugging purpose
+
+    public void Dispose()
+    {
+        // Nothing to do here for now
+    }
+
+    public void Declare(string name, RuntimeValue value, bool isReadOnly)
+    {
+        if (values.ContainsKey(name)) throw new RuntimeException($"Variable {name} is alreay declared");
+        else values.Add(name, new(value, isReadOnly));
+    }
+
+    public RuntimeValue Get(string name)
+    {
+        if (values.ContainsKey(name))
+            return values[name].Content;
+
+        return Parent == null
+            ? throw new RuntimeException($"Variable {name} is not declared")
+            : Parent.Get(name);
+    }
+
+    public void Set(string name, RuntimeValue value)
+    {
+        if (!values.ContainsKey(name))
         {
-            Parent = parent;
-            NestingLevel = parent == null ? 0 : parent.NestingLevel + 1;
+            if (Parent == null) throw new RuntimeException($"Variable {name} is not declared");
+
+            Parent.Set(name, value);
+            return;
         }
 
-        public Env? Parent { get; }
-        public int NestingLevel { get; } // For debugging purpose
+        if (values[name].IsReadOnly) throw new RuntimeException($"Read-only variable {name} can only be initialized once");
 
-        public void Dispose()
-        {
-            // Nothing to do here for now
-        }
-
-        public void Declare(string name, RuntimeValue value, bool isReadOnly)
-        {
-            if (values.ContainsKey(name)) throw new RuntimeException($"Variable {name} is alreay declared");
-            else values.Add(name, new(value, isReadOnly));
-        }
-
-        public RuntimeValue Get(string name)
-        {
-            if (values.ContainsKey(name))
-                return values[name].Content;
-
-            return Parent == null
-                ? throw new RuntimeException($"Variable {name} is not declared")
-                : Parent.Get(name);
-        }
-
-        public void Set(string name, RuntimeValue value)
-        {
-            if (!values.ContainsKey(name))
-            {
-                if (Parent == null) throw new RuntimeException($"Variable {name} is not declared");
-
-                Parent.Set(name, value);
-                return;
-            }
-
-            if (values[name].IsReadOnly) throw new RuntimeException($"Read-only variable {name} can only be initialized once");
-
-            values[name] = new(value, false);
-        }
+        values[name] = new(value, false);
     }
 }
