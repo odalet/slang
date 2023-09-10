@@ -30,7 +30,7 @@ internal sealed class Program
 }";
         var span = sourceCode.AsSpan();
         var tokens = new Lexer(sourceCode).Lex().ToArray();
-        foreach (var token in tokens) 
+        foreach (var token in tokens)
         {
             //var text = span.Slice(token.Location.Start, token.Location.Length);
             var text = span[token.Location.Start..token.Location.End].ToString()
@@ -38,11 +38,13 @@ internal sealed class Program
                 .Replace("\n", "\\n")
                 .Replace("\t", "\\t")
                 .Replace("\v", "\\v")
-                .Replace("\f", "\\f")
-                ;
+                .Replace("\f", "\\f");
 
             Console.WriteLine($"{token.Kind} -> '{text}' [{token.Location.Start} -> {token.Location.End}]/[{token.StartLinePosition.Line}, {token.StartLinePosition.Column} -> {token.EndLinePosition.Line}, {token.EndLinePosition.Column}]");
         }
+
+        Console.WriteLine("Press any key to exit");
+        Console.ReadKey();
 
         return ExitCode.OK;
     }
