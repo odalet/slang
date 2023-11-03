@@ -3,32 +3,65 @@ using System.Collections.Generic;
 using Slang.Diagnostics;
 using Slang.Utils;
 
+// ReSharper disable InvertIf
+
 namespace Slang.Syntax;
 
 using static SyntaxKind;
 using static CharacterUtils;
 
+public readonly ref struct Lexer
+{
+    private readonly ReadOnlySpan<char> sourceText;
+    private readonly Scanner scanner;
+
+    public Lexer(string text) : this(text.AsSpan()) { }
+
+    public Lexer(ReadOnlySpan<char> text)
+    {
+        sourceText = text;
+        scanner = new Scanner(text.Length);
+    }
+
+    public SyntaxToken[] Lex()
+    {
+        var list = new List<SyntaxToken>(); // NB: we cannot yield return when using a span
+        while (true)
+        {
+            var info = scanner.Next(sourceText);
+            list.Add(info.ToToken());
+
+            if (info.Kind == SyntaxKind.EofToken)
+                break;
+        }
+
+        return list.ToArray();
+    }
+}
+
 internal struct TokenInfo
 {
     private readonly List<DiagnosticCode> diagnosticCodes = new();
 
-    public TokenInfo(int start) => Start = start;
+    public TokenInfo(int start) => Location = new(start, 0);
 
-    public SyntaxKind Kind { get; set; }
+    public SyntaxKind Kind { get; private set; }
     public readonly DiagnosticCode[] DiagnosticCodes => diagnosticCodes.ToArray();
-    public int Start { get; }
-    public int Length { get; set; }
-    public (int line, int column) StartLinePosition { get; set; }
-    public (int line, int column) EndLinePosition { get; set; }
 
-    // TODO: Have this in the token
-    //public bool IsValid => DiagnosticCode == DiagnosticCode.None;
+    public TextLocation Location { get; private set; }
 
-    public readonly SyntaxToken ToToken() => new(
-        Kind,
-        new(Start, Length),
-        new(StartLinePosition.line, StartLinePosition.column),
-        new(EndLinePosition.line, EndLinePosition.column));
+    public LinePosition EndLinePosition { get; private set; }
+    public LinePosition StartLinePosition { get; private set; }
+
+    public readonly SyntaxToken ToToken() => new(this);
+
+    public void Update(int endPosition, (int line, int column) startLinePosition, (int line, int column) endLinePosition, SyntaxKind? kind = null)
+    {
+        if (kind.HasValue) Kind = kind.Value;
+        Location = Location.WithEnd(endPosition);
+        StartLinePosition = new(startLinePosition.line, startLinePosition.column);
+        EndLinePosition = new(endLinePosition.line, endLinePosition.column);
+    }
 
     public readonly void AddDiagnostic(DiagnosticCode diagnosticCode) =>
         diagnosticCodes.Add(diagnosticCode);
@@ -38,11 +71,11 @@ internal struct TokenInfo
 internal sealed class Scanner
 {
     private const char invalidCharacter = char.MaxValue;
-    ////private readonly string sourceText;
+
     private readonly int maxLength;
     private (int line, int column) previousLinePosition;
     private (int line, int column) currentLinePosition;
-    private int position = 0;
+    private int position;
     private TokenInfo info;
 
     public Scanner(int length) => maxLength = length;
@@ -55,25 +88,63 @@ internal sealed class Scanner
         var ch = LookAhead(text);
         switch (ch)
         {
-            case '\0' or invalidCharacter: ScanSingleCharacterToken(EofToken); break;
-            case '(': ScanSingleCharacterToken(OpenParenToken); break;
-            case ')': ScanSingleCharacterToken(CloseParenToken); break;
-            case '{': ScanSingleCharacterToken(OpenBraceToken); break;
-            case '}': ScanSingleCharacterToken(CloseBraceToken); break;
-            case ',': ScanSingleCharacterToken(CommaToken); break;
-            case ':': ScanSingleCharacterToken(ColonToken); break;
-            case ';': ScanSingleCharacterToken(SemicolonToken); break;
-            case '.': ScanSingleCharacterToken(DotToken); break;
-            case '+': ScanSingleCharacterToken(PlusToken); break;
-            case '-': ScanSingleCharacterToken(MinusToken); break;
-            case '*': ScanSingleCharacterToken(StarToken); break;
-            case '/': ScanSlash(text); break; //update(SlashToken); break; // TODO: comments
-            case '\'': ScanSingleCharacterToken(SingleQuoteToken); break;
-            case '\"': ScanSingleCharacterToken(DoubleQuoteToken); break;
-            case '=': ScanSingleCharacterToken(EqualsToken); break;
-            case '!': ScanSingleCharacterToken(BangToken); break;
-            case '>': ScanSingleCharacterToken(GreaterThanToken); break;
-            case '<': ScanSingleCharacterToken(LessThanToken); break;
+            case '\0' or invalidCharacter:
+                ScanSingleCharacterToken(EofToken);
+                break;
+            case '(':
+                ScanSingleCharacterToken(OpenParenToken);
+                break;
+            case ')':
+                ScanSingleCharacterToken(CloseParenToken);
+                break;
+            case '{':
+                ScanSingleCharacterToken(OpenBraceToken);
+                break;
+            case '}':
+                ScanSingleCharacterToken(CloseBraceToken);
+                break;
+            case ',':
+                ScanSingleCharacterToken(CommaToken);
+                break;
+            case ':':
+                ScanSingleCharacterToken(ColonToken);
+                break;
+            case ';':
+                ScanSingleCharacterToken(SemicolonToken);
+                break;
+            case '.':
+                ScanSingleCharacterToken(DotToken);
+                break;
+            case '+':
+                ScanSingleCharacterToken(PlusToken);
+                break;
+            case '-':
+                ScanSingleCharacterToken(MinusToken);
+                break;
+            case '*':
+                ScanSingleCharacterToken(StarToken);
+                break;
+            case '/':
+                ScanSlash(text);
+                break;
+            case '\'':
+                ScanSingleCharacterToken(SingleQuoteToken);
+                break;
+            case '\"':
+                ScanSingleCharacterToken(DoubleQuoteToken);
+                break;
+            case '=':
+                ScanEquals(text);
+                break;
+            case '!':
+                ScanBang(text);
+                break;
+            case '>':
+                ScanGreaterThan(text);
+                break;
+            case '<':
+                ScanLessThan(text);
+                break;
             default:
                 if (IsWhitespaceOrNewLine(ch))
                     ScanWhitespace(text);
@@ -114,18 +185,62 @@ internal sealed class Scanner
 
         UpdateInfo(WhitespaceTrivia);
     }
+    
+    private void ScanEquals(ReadOnlySpan<char> text)
+    {
+        Consume(); // This consumes the first =
+        if (LookAhead(text) == '=')
+        {
+            Consume(); // This consumes the second =
+            UpdateInfo(EqualsEqualsToken);
+        }
+        else UpdateInfo(EqualsToken);
+    }
+
+    private void ScanBang(ReadOnlySpan<char> text)
+    {
+        Consume(); // This consumes the !
+        if (LookAhead(text) == '=')
+        {
+            Consume(); // This consumes the =
+            UpdateInfo(BangEqualToken);
+        }
+        else UpdateInfo(BangToken);
+    }
+
+    private void ScanGreaterThan(ReadOnlySpan<char> text)
+    {
+        Consume(); // This consumes the first >
+        if (LookAhead(text) == '=')
+        {
+            Consume(); // This consumes the second =
+            UpdateInfo(GreaterThanEqualsToken);
+        }
+        else UpdateInfo(GreaterThanToken);
+    }
+    
+    private void ScanLessThan(ReadOnlySpan<char> text)
+    {
+        Consume(); // This consumes the first <
+        if (LookAhead(text) == '=')
+        {
+            Consume(); // This consumes the second =
+            UpdateInfo(LessThanEqualsToken);
+        }
+        else UpdateInfo(LessThanToken);
+    }
 
     private void ScanSlash(ReadOnlySpan<char> text)
     {
         Consume(); // This consumes the initial /
-        info.Kind = LookAhead(text) switch
+        var kind = LookAhead(text) switch
         {
             '/' => ScanCppComment(text),
             '*' => ScanCComment(text),
             _ => SlashToken,
         };
 
-        UpdateInfo();
+        UpdateInfo(kind);
     }
 
     private SyntaxKind ScanCppComment(ReadOnlySpan<char> text)
@@ -181,7 +296,7 @@ internal sealed class Scanner
     }
 
     private char LookAhead(ReadOnlySpan<char> text) => position >= maxLength ? invalidCharacter : text[position];
-    private char LookAhead(ReadOnlySpan<char> text, int n) => position + n >= maxLength ? invalidCharacter : text[position + n];
+    ////private char LookAhead(ReadOnlySpan<char> text, int n) => position + n >= maxLength ? invalidCharacter : text[position + n];
 
     private void Consume()
     {
@@ -225,49 +340,19 @@ internal sealed class Scanner
         previousLinePosition = currentLinePosition;
     }
 
-    private void UpdateInfo(SyntaxKind kind)
-    {
-        info.Kind = kind;
-        UpdateInfo();
-    }
+    private void UpdateInfo(SyntaxKind? kind = null) => info.Update(
+        position, previousLinePosition, currentLinePosition, kind);
 
-    private void UpdateInfo()
-    {
-        info.Length = position - info.Start;
-        info.StartLinePosition = previousLinePosition;
-        info.EndLinePosition = currentLinePosition;
-    }
+    // private void ScanToEndOfLine(ReadOnlySpan<char> text)
+    // {
+    //     while (
+    //         !IsNewLine(text[position]) &&
+    //         text[position] != invalidCharacter &&
+    //         position < text.Length)
+    //         Consume();
+    // }
 
-    private void ScanToEndOfLine(ReadOnlySpan<char> text)
-    {
-        while (
-            !IsNewLine(text[position]) &&
-            text[position] != invalidCharacter &&
-            position < text.Length)
-            Consume();
-    }
     private static bool IsWhitespaceOrNewLine(char c) => IsWhitespace(c) || IsNewLine(c);
-
-    ////private void AddDiagnostic(DiagnosticCode code)
-    ////{
-    ////    //var diagnostic = new SyntaxDiagnostic(code, )
-    ////}
-
-
-    ////////// new-line-character:
-    //////////   Carriage return character (U+000D)
-    //////////   Line feed character (U+000A)
-    //////////   Next line character (U+0085)
-    //////////   Line separator character (U+2028)
-    //////////   Paragraph separator character (U+2029)
-    ////////private static bool IsNewLine(in char ch) => ch is '\r' or '\n' or '\u0085' or '\u2028' or '\u2029';
-
-    ////////// whitespace:
-    //////////   Any character with Unicode class Zs
-    //////////   Horizontal tab character (U+0009)
-    //////////   Vertical tab character (U+000B)
-    //////////   Form feed character (U+000C)
-    ////////private static bool IsWhitespace(in char ch)
 
     ////private void InitializeAndConsume(ref TokenInfo info, SyntaxKind kind, int start, int length)
     ////{
@@ -276,32 +361,4 @@ internal sealed class Scanner
     ////    info.Length = length;
     ////    Consume();
     ////}
-}
-
-public sealed class Lexer
-{
-    private readonly string sourceText;
-    private readonly Scanner scanner;
-
-    public Lexer(string text)
-    {
-        sourceText = text;
-        scanner = new Scanner(text.Length);
-    }
-
-    public IEnumerable<SyntaxToken> Lex()
-    {
-        var text = sourceText.AsSpan();
-        var list = new List<SyntaxToken>(); // NB: we cannot yield return when using a span
-        while (true)
-        {
-            var info = scanner.Next(text);
-            list.Add(info.ToToken());
-
-            if (info.Kind == SyntaxKind.EofToken)
-                break;
-        }
-
-        return list;
-    }
 }

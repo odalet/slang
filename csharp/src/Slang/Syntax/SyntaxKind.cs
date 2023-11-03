@@ -5,7 +5,6 @@ public enum SyntaxKind : ushort
     None = 0,
 
     // *************** Terminals ***************
-    FooToken,
     EofToken,
 
     // Operators

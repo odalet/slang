@@ -23,13 +23,17 @@ internal sealed class Program
 
         ////var sourceCode = "Yo!\0";
         ////var sourceCode = "Yo! ++ -- foo+";
-        var sourceCode = @"+ // line comment
-{
-  /* comment */
-  -
-}";
+        const string sourceCode = """
+                                  + // line comment
+                                  {
+                                    /* comment */
+                                    -
+                                  }
+                                  """;
+
         var span = sourceCode.AsSpan();
-        var tokens = new Lexer(sourceCode).Lex().ToArray();
+        // var tokens = new Lexer(sourceCode).Lex().ToArray();
+        var tokens = new Lexer(span).Lex().ToArray();
         foreach (var token in tokens)
         {
             //var text = span.Slice(token.Location.Start, token.Location.Length);
