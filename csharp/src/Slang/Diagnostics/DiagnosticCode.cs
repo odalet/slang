@@ -5,5 +5,6 @@ public enum DiagnosticCode
     None,
     ErrorUnknown,
     ErrorUnterminatedComment,
+    ErrorUnterminatedStringLiteral,
     ErrorInvalidToken,
 }

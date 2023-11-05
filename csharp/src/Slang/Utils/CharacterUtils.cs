@@ -35,5 +35,7 @@ namespace Slang.Utils
         //   Paragraph separator character (U+2029)
         public static bool IsNewLine(in char ch) =>
             ch is '\r' or '\n' or '\u0085' or '\u2028' or '\u2029';
+        
+        public static bool IsDigit(char ch) => ch is >= '0' and <= '9';
     }
 }

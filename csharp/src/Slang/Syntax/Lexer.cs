@@ -15,8 +15,6 @@ public readonly ref struct Lexer
     private readonly ReadOnlySpan<char> sourceText;
     private readonly Scanner scanner;
 
-    public Lexer(string text) : this(text.AsSpan()) { }
-
     public Lexer(ReadOnlySpan<char> text)
     {
         sourceText = text;
@@ -41,30 +39,25 @@ public readonly ref struct Lexer
 
 internal struct TokenInfo
 {
-    private readonly List<DiagnosticCode> diagnosticCodes = new();
-
     public TokenInfo(int start) => Location = new(start, 0);
 
     public SyntaxKind Kind { get; private set; }
-    public readonly DiagnosticCode[] DiagnosticCodes => diagnosticCodes.ToArray();
-
+    public DiagnosticCode DiagnosticCode { get; private set; }
     public TextLocation Location { get; private set; }
-
     public LinePosition EndLinePosition { get; private set; }
     public LinePosition StartLinePosition { get; private set; }
 
     public readonly SyntaxToken ToToken() => new(this);
 
-    public void Update(int endPosition, (int line, int column) startLinePosition, (int line, int column) endLinePosition, SyntaxKind? kind = null)
+    public void Update(SyntaxKind kind, int endPosition, (int line, int column) startLinePosition, (int line, int column) endLinePosition)
     {
-        if (kind.HasValue) Kind = kind.Value;
+        Kind = kind;
         Location = Location.WithEnd(endPosition);
         StartLinePosition = new(startLinePosition.line, startLinePosition.column);
         EndLinePosition = new(endLinePosition.line, endLinePosition.column);
     }
 
-    public readonly void AddDiagnostic(DiagnosticCode diagnosticCode) =>
-        diagnosticCodes.Add(diagnosticCode);
+    public void SetDiagnostic(DiagnosticCode diagnosticCode) => DiagnosticCode = diagnosticCode;
 }
 
 // Only scans the next token
@@ -82,7 +75,7 @@ internal sealed class Scanner
 
     public TokenInfo Next(ReadOnlySpan<char> text)
     {
-        Start();
+        previousLinePosition = currentLinePosition; // Start scanning a new lexeme
         info = new TokenInfo(position);
 
         var ch = LookAhead(text);
@@ -127,11 +120,8 @@ internal sealed class Scanner
             case '/':
                 ScanSlash(text);
                 break;
-            case '\'':
-                ScanSingleCharacterToken(SingleQuoteToken);
-                break;
             case '\"':
-                ScanSingleCharacterToken(DoubleQuoteToken);
+                ScanStringLiteral(text);
                 break;
             case '=':
                 ScanEquals(text);
@@ -148,6 +138,10 @@ internal sealed class Scanner
             default:
                 if (IsWhitespaceOrNewLine(ch))
                     ScanWhitespace(text);
+                else if (IsDigit(ch))
+                    ScanNumberLiteral(ch, text);
+                else if (IsIdentifierFirstCharacter(ch))
+                    ScanIdentifierOrReservedWord(text);
                 else
                     ScanInvalidToken();
                 break;
@@ -165,8 +159,8 @@ internal sealed class Scanner
     private void ScanInvalidToken()
     {
         Consume(); // Consume the character
-        info.AddDiagnostic(DiagnosticCode.ErrorInvalidToken);
-        UpdateInfo(None);
+        info.SetDiagnostic(DiagnosticCode.ErrorInvalidToken);
+        UpdateInfo(Invalid);
     }
 
     private void ScanWhitespace(ReadOnlySpan<char> text)
@@ -185,7 +179,7 @@ internal sealed class Scanner
 
         UpdateInfo(WhitespaceTrivia);
     }
-    
+
     private void ScanEquals(ReadOnlySpan<char> text)
     {
         Consume(); // This consumes the first =
@@ -218,7 +212,7 @@ internal sealed class Scanner
         }
         else UpdateInfo(GreaterThanToken);
     }
-    
+
     private void ScanLessThan(ReadOnlySpan<char> text)
     {
         Consume(); // This consumes the first <
@@ -265,7 +259,7 @@ internal sealed class Scanner
             var ch = LookAhead(text);
             if (ch is invalidCharacter or '\0')
             {
-                info.AddDiagnostic(DiagnosticCode.ErrorUnterminatedComment);
+                info.SetDiagnostic(DiagnosticCode.ErrorUnterminatedComment);
                 break;
             }
 
@@ -284,7 +278,7 @@ internal sealed class Scanner
                 }
                 else if (next is '\0' or invalidCharacter)
                 {
-                    info.AddDiagnostic(DiagnosticCode.ErrorUnterminatedComment);
+                    info.SetDiagnostic(DiagnosticCode.ErrorUnterminatedComment);
                     break;
                 }
             }
@@ -295,8 +289,98 @@ internal sealed class Scanner
         return CommentTrivia;
     }
 
+    private void ScanStringLiteral(ReadOnlySpan<char> text)
+    {
+        Consume(); // This consumes the initial quote (")
+
+        var done = false;
+        var isEscaping = false;
+        while (!done)
+        {
+            var ch = LookAhead(text);
+            switch (ch)
+            {
+                case '\0' or '\r' or '\n' or invalidCharacter: // NB: no newline in string literal (for now)
+                    info.SetDiagnostic(DiagnosticCode.ErrorUnterminatedStringLiteral);
+                    done = true;
+                    break;
+                case '\\':
+                    Consume();
+                    if (!isEscaping) isEscaping = true;
+                    break;
+                case '\"':
+                    Consume();
+                    if (!isEscaping) done = true;
+                    break;
+                default:
+                    Consume();
+                    isEscaping = false; // Not escaping any more...
+                    break;
+            }
+        }
+
+        UpdateInfo(StringLiteralToken);
+    }
+    
+    private void ScanNumberLiteral(char initialCharacter, ReadOnlySpan<char> text)
+    {
+        Consume();
+
+        var hexMode = initialCharacter == '0' && LookAhead(text) is 'x' or 'X';
+        var binMode = initialCharacter == '0' && LookAhead(text) is 'b' or 'B';
+        if (hexMode || binMode) Consume();
+        
+        // NB: we allow _ anywhere after the eventual base specifier
+        bool isDigitOrUnderscore(char c, bool decimalOnlyMode = false)
+        {
+            if (c == '_') return true;
+            
+            if (decimalOnlyMode) return IsDigit(c);
+            
+            if (binMode) return c is '0' or '1';
+            if (IsDigit(c)) return true;
+            if (hexMode) return c 
+                is 'a' or 'b' or 'c' or 'd' or 'e' or 'f'
+                or 'A' or 'B' or 'C' or 'D' or 'E' or 'F';
+            return false;
+        }
+        
+        while (isDigitOrUnderscore(LookAhead(text)))
+            Consume();
+        
+        // TODO: exponent
+        
+        // A digit after a dot means we are looking at a decimal separator
+        // NB: only supported if the number is decimal
+        if (!hexMode && !binMode && LookAhead(text) == '.' && IsDigit(LookAhead(text, 1)))
+        {
+            Consume(); // This consumes the '.' character
+            
+            while (isDigitOrUnderscore(LookAhead(text), decimalOnlyMode: true))
+                Consume();
+            
+            UpdateInfo(FloatLiteralToken);
+            return;
+        }
+
+        // Otherwise, don't consume the dot (it will be consumed by the
+        // general lexing loop) and build an integer
+        UpdateInfo(IntegerLiteralToken);
+    }
+
+    private void ScanIdentifierOrReservedWord(ReadOnlySpan<char> text)
+    {
+        while (IsIdentifierCharacter(LookAhead(text)))
+            Consume();
+
+        // Is it a keyword or an identifier?
+        var value = text[info.Location.Start..position].ToString();
+        var kind = ReservedWords.TryGetToken(value);
+        UpdateInfo(kind ?? IdentifierToken);
+    }
+
     private char LookAhead(ReadOnlySpan<char> text) => position >= maxLength ? invalidCharacter : text[position];
-    ////private char LookAhead(ReadOnlySpan<char> text, int n) => position + n >= maxLength ? invalidCharacter : text[position + n];
+    private char LookAhead(ReadOnlySpan<char> text, int n) => position + n >= maxLength ? invalidCharacter : text[position + n];
 
     private void Consume()
     {
@@ -333,32 +417,11 @@ internal sealed class Scanner
 
         return false;
     }
-
-    // Start scanning a new lexeme
-    private void Start()
-    {
-        previousLinePosition = currentLinePosition;
-    }
-
-    private void UpdateInfo(SyntaxKind? kind = null) => info.Update(
-        position, previousLinePosition, currentLinePosition, kind);
-
-    // private void ScanToEndOfLine(ReadOnlySpan<char> text)
-    // {
-    //     while (
-    //         !IsNewLine(text[position]) &&
-    //         text[position] != invalidCharacter &&
-    //         position < text.Length)
-    //         Consume();
-    // }
+    
+    private void UpdateInfo(SyntaxKind kind) => info.Update(
+        kind, position, previousLinePosition, currentLinePosition);
 
     private static bool IsWhitespaceOrNewLine(char c) => IsWhitespace(c) || IsNewLine(c);
-
-    ////private void InitializeAndConsume(ref TokenInfo info, SyntaxKind kind, int start, int length)
-    ////{
-    ////    info.Kind = kind;
-    ////    info.Start = start;
-    ////    info.Length = length;
-    ////    Consume();
-    ////}
+    private static bool IsIdentifierFirstCharacter(char c) => c == '_' || char.IsLetter(c);
+    private static bool IsIdentifierCharacter(char c) => IsIdentifierFirstCharacter(c) || char.IsDigit(c);
 }

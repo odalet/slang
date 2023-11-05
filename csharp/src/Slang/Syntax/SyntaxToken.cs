@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using Slang.Diagnostics;
 using Slang.Utils;
 
@@ -15,8 +14,9 @@ public readonly struct SyntaxToken
     public TextLocation Location => info.Location;
     public LinePosition StartLinePosition => info.StartLinePosition;
     public LinePosition EndLinePosition => info.EndLinePosition;
-    public DiagnosticCode[] DiagnosticCodes => info.DiagnosticCodes;
+    public DiagnosticCode DiagnosticCode => info.DiagnosticCode;
+    public bool IsValid => DiagnosticCode == DiagnosticCode.None;
 
-    public bool IsValid => DiagnosticCodes.Length == 0 || Array.TrueForAll(
-        DiagnosticCodes, c => c == DiagnosticCode.None);
+    public string GetText(ReadOnlySpan<char> source) => GetSpan(source).ToString();
+    private ReadOnlySpan<char> GetSpan(ReadOnlySpan<char> source) => source[Location.Start..Location.End];
 }

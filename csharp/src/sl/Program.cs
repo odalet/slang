@@ -1,9 +1,11 @@
 ﻿using System;
-using System.Linq;
+using System.Diagnostics.CodeAnalysis;
 using Slang.Syntax;
+// ReSharper disable MemberCanBeMadeStatic.Local
 
 namespace Slang.Cli;
 
+[SuppressMessage("Performance", "CA1822:Mark members as static")]
 internal sealed class Program
 {
     private enum ExitCode
@@ -21,32 +23,39 @@ internal sealed class Program
     {
         Console.WriteLine($"Hello Slang: {string.Join(",", args)}");
 
-        ////var sourceCode = "Yo!\0";
-        ////var sourceCode = "Yo! ++ -- foo+";
         const string sourceCode = """
                                   + // line comment
-                                  {
-                                    /* comment */
+                                  {{
+                                    /* multi-line
+                                    comment */
                                     -
+                                    []
+                                  }}
+                                  
+                                  fun foo(i: int): void {
+                                      val i = 42;
+                                      val j = 0x42;
+                                      val k = 0xDeadBeef;
+                                      val b = 0b11100010101;
+                                      val d = 3.14;
+                                      val e = 0.314e-1;
+                                      val hello = "Hello, World!\r\n";
+                                      while(true) {
+                                          if (1 == 2) 
+                                              return 42.23;
+                                          else
+                                              continue;
+                                      }
+                                      return 0;
                                   }
                                   """;
 
         var span = sourceCode.AsSpan();
-        // var tokens = new Lexer(sourceCode).Lex().ToArray();
-        var tokens = new Lexer(span).Lex().ToArray();
-        foreach (var token in tokens)
-        {
-            //var text = span.Slice(token.Location.Start, token.Location.Length);
-            var text = span[token.Location.Start..token.Location.End].ToString()
-                .Replace("\r", "\\r")
-                .Replace("\n", "\\n")
-                .Replace("\t", "\\t")
-                .Replace("\v", "\\v")
-                .Replace("\f", "\\f");
-
-            Console.WriteLine($"{token.Kind} -> '{text}' [{token.Location.Start} -> {token.Location.End}]/[{token.StartLinePosition.Line}, {token.StartLinePosition.Column} -> {token.EndLinePosition.Line}, {token.EndLinePosition.Column}]");
-        }
-
+        var tokens = new Lexer(span).Lex();
+        
+        var prettifier = new TokensPrettifier(span);
+        prettifier.Dump(tokens);
+        
         Console.WriteLine("Press any key to exit");
         Console.ReadKey();
 
