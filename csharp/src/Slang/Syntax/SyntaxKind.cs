@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace Slang.Syntax;
 
@@ -26,8 +25,8 @@ public enum SyntaxKind : ushort
     StarToken, // *
     SlashToken, // /
 
-    ////SingleQuoteToken,           // '
-    ////DoubleQuoteToken,           // "
+    //SingleQuoteToken,           // '
+    //DoubleQuoteToken,           // "
     EqualsToken, // =
     BangToken, // !
     BangEqualToken, // !=
@@ -36,14 +35,13 @@ public enum SyntaxKind : ushort
     GreaterThanEqualsToken, // >=
     LessThanToken, // <
     LessThanEqualsToken, // <=
-    ////AmpersandAmpersandToken,    // &&
-    ////PipePipeToken,              // ||
+    //AmpersandAmpersandToken,    // &&
+    //PipePipeToken,              // ||
 
     // Literals
     IdentifierToken,
     StringLiteralToken,
-    IntegerLiteralToken,
-    FloatLiteralToken,
+    NumberLiteralToken,
 
     // Reserved Words
     GotoToken,
@@ -69,88 +67,35 @@ public enum SyntaxKind : ushort
     // *************** Non-Terminals ***************
 }
 
-public enum SyntaxCategory
-{
-    Invalid,
-    Eof,
-    Operator,
-    Literal,
-    Reserved,
-    Identifier,
-    Trivia,
-    NonTerminal
-}
-
-public static class SyntaxTokenExtensions
-{
-    public static SyntaxCategory GetCategory(this SyntaxKind kind) => kind switch
-    {
-        Invalid => SyntaxCategory.Invalid,
-        EofToken => SyntaxCategory.Eof,
-        OpenParenToken => SyntaxCategory.Operator,
-        CloseParenToken => SyntaxCategory.Operator,
-        OpenBraceToken => SyntaxCategory.Operator,
-        CloseBraceToken => SyntaxCategory.Operator,
-        CommaToken => SyntaxCategory.Operator,
-        ColonToken => SyntaxCategory.Operator,
-        SemicolonToken => SyntaxCategory.Operator,
-        DotToken => SyntaxCategory.Operator,
-        PlusToken => SyntaxCategory.Operator,
-        MinusToken => SyntaxCategory.Operator,
-        StarToken => SyntaxCategory.Operator,
-        SlashToken => SyntaxCategory.Operator,
-        EqualsToken => SyntaxCategory.Operator,
-        BangToken => SyntaxCategory.Operator,
-        BangEqualToken => SyntaxCategory.Operator,
-        EqualsEqualsToken => SyntaxCategory.Operator,
-        GreaterThanToken => SyntaxCategory.Operator,
-        GreaterThanEqualsToken => SyntaxCategory.Operator,
-        LessThanToken => SyntaxCategory.Operator,
-        LessThanEqualsToken => SyntaxCategory.Operator,
-        IdentifierToken => SyntaxCategory.Identifier,
-        StringLiteralToken => SyntaxCategory.Literal,
-        IntegerLiteralToken => SyntaxCategory.Literal,
-        FloatLiteralToken => SyntaxCategory.Literal,
-        GotoToken => SyntaxCategory.Reserved,
-        FunToken => SyntaxCategory.Reserved,
-        ValToken => SyntaxCategory.Reserved,
-        VarToken => SyntaxCategory.Reserved,
-        IfToken => SyntaxCategory.Reserved,
-        ElseToken => SyntaxCategory.Reserved,
-        WhileToken => SyntaxCategory.Reserved,
-        BreakToken => SyntaxCategory.Reserved,
-        ContinueToken => SyntaxCategory.Reserved,
-        ReturnToken => SyntaxCategory.Reserved,
-        TrueToken => SyntaxCategory.Reserved,
-        FalseToken => SyntaxCategory.Reserved,
-        PrintToken => SyntaxCategory.Reserved,
-        PrintlnToken => SyntaxCategory.Reserved,
-        WhitespaceTrivia => SyntaxCategory.Trivia,
-        CommentTrivia => SyntaxCategory.Trivia,
-        _ => SyntaxCategory.NonTerminal
-    };
-}
-
 internal static class ReservedWords
 {
-    private static readonly Dictionary<string, SyntaxKind> reservedWords = new()
+    private static readonly (string text, SyntaxKind kind)[] reservedWords = new[]
     {
-        ["goto"] = GotoToken,
-        ["fun"] = FunToken,
-        ["val"] = ValToken,
-        ["var"] = VarToken,
-        ["if"] = IfToken,
-        ["else"] = ElseToken,
-        ["while"] = WhileToken,
-        ["break"] = BreakToken,
-        ["continue"] = ContinueToken,
-        ["return"] = ReturnToken,
-        ["true"] = TrueToken,
-        ["false"] = FalseToken,
-        ["print"] = PrintToken,
-        ["println"] = PrintlnToken,
+        ("goto", GotoToken),
+        ("fun", FunToken),
+        ("val", ValToken),
+        ("var", VarToken),
+        ("if", IfToken),
+        ("else", ElseToken),
+        ("while", WhileToken),
+        ("break", BreakToken),
+        ("continue", ContinueToken),
+        ("return", ReturnToken),
+        ("true", TrueToken),
+        ("false", FalseToken),
+        ("print", PrintToken),
+        ("println", PrintlnToken)
     };
 
-    public static SyntaxKind? TryGetToken(string text) =>
-        reservedWords.TryGetValue(text, out var kind) ? kind : null;
+    public static SyntaxKind? TryGetToken(ReadOnlySpan<char> text)
+    {
+        // See https://stackoverflow.com/questions/49289559/spanchar-and-string-equality
+        foreach (var (value, kind) in reservedWords)
+        {
+            if (MemoryExtensions.Equals(text, value, StringComparison.Ordinal))
+                return kind;
+        }
+
+        return null;
+    }
 }

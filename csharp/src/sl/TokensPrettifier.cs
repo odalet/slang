@@ -4,6 +4,69 @@ using Slang.Syntax;
 
 namespace Slang.Cli;
 
+using static SyntaxKind;
+
+internal enum SyntaxCategory
+{
+    Invalid,
+    Eof,
+    Operator,
+    Literal,
+    Reserved,
+    Identifier,
+    Trivia,
+    NonTerminal
+}
+
+internal static class SyntaxTokenExtensions
+{
+    public static SyntaxCategory GetCategory(this SyntaxKind kind) => kind switch
+    {
+        Invalid => SyntaxCategory.Invalid,
+        EofToken => SyntaxCategory.Eof,
+        OpenParenToken => SyntaxCategory.Operator,
+        CloseParenToken => SyntaxCategory.Operator,
+        OpenBraceToken => SyntaxCategory.Operator,
+        CloseBraceToken => SyntaxCategory.Operator,
+        CommaToken => SyntaxCategory.Operator,
+        ColonToken => SyntaxCategory.Operator,
+        SemicolonToken => SyntaxCategory.Operator,
+        DotToken => SyntaxCategory.Operator,
+        PlusToken => SyntaxCategory.Operator,
+        MinusToken => SyntaxCategory.Operator,
+        StarToken => SyntaxCategory.Operator,
+        SlashToken => SyntaxCategory.Operator,
+        EqualsToken => SyntaxCategory.Operator,
+        BangToken => SyntaxCategory.Operator,
+        BangEqualToken => SyntaxCategory.Operator,
+        EqualsEqualsToken => SyntaxCategory.Operator,
+        GreaterThanToken => SyntaxCategory.Operator,
+        GreaterThanEqualsToken => SyntaxCategory.Operator,
+        LessThanToken => SyntaxCategory.Operator,
+        LessThanEqualsToken => SyntaxCategory.Operator,
+        IdentifierToken => SyntaxCategory.Identifier,
+        StringLiteralToken => SyntaxCategory.Literal,
+        NumberLiteralToken => SyntaxCategory.Literal,
+        GotoToken => SyntaxCategory.Reserved,
+        FunToken => SyntaxCategory.Reserved,
+        ValToken => SyntaxCategory.Reserved,
+        VarToken => SyntaxCategory.Reserved,
+        IfToken => SyntaxCategory.Reserved,
+        ElseToken => SyntaxCategory.Reserved,
+        WhileToken => SyntaxCategory.Reserved,
+        BreakToken => SyntaxCategory.Reserved,
+        ContinueToken => SyntaxCategory.Reserved,
+        ReturnToken => SyntaxCategory.Reserved,
+        TrueToken => SyntaxCategory.Reserved,
+        FalseToken => SyntaxCategory.Reserved,
+        PrintToken => SyntaxCategory.Reserved,
+        PrintlnToken => SyntaxCategory.Reserved,
+        WhitespaceTrivia => SyntaxCategory.Trivia,
+        CommentTrivia => SyntaxCategory.Trivia,
+        _ => SyntaxCategory.NonTerminal
+    };
+}
+
 public readonly ref struct TokensPrettifier
 {
     private readonly ReadOnlySpan<char> sourceText;

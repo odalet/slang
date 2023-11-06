@@ -7,7 +7,7 @@ namespace Scratch
 
     internal class Program
     {
-        static void Main(string[] args)
+        static void Main()
         {
             new TestFormatter().Test();
             Console.WriteLine("---------------------------");

@@ -39,6 +39,21 @@ internal sealed class Program
                                       val b = 0b11100010101;
                                       val d = 3.14;
                                       val e = 0.314e-1;
+                                      val a1 = 1e10;
+                                      val a2 = -1e10;
+                                      val a3 = +1e10;
+                                      val b1 = 1.e10;
+                                      val b2 = -1.e10;
+                                      val b3 = +1.e10;
+                                      val c1 = 1.0e10;
+                                      val c2 = -1.0e10;
+                                      val c3 = +1.0e10;
+                                      val d1 = 1.0e-10;
+                                      val d2 = -1.0e-10;
+                                      val d3 = +1.0e-10;
+                                      val e1 = 1.0e+10;
+                                      val e2 = -1.0e+10;
+                                      val e3 = +1.0e+10;
                                       val hello = "Hello, World!\r\n";
                                       while(true) {
                                           if (1 == 2) 
@@ -57,7 +72,7 @@ internal sealed class Program
         prettifier.Dump(tokens);
         
         Console.WriteLine("Press any key to exit");
-        Console.ReadKey();
+        _ = Console.ReadKey();
 
         return ExitCode.OK;
     }
