@@ -12,7 +12,7 @@ public ref struct Lexer
     public Lexer(ReadOnlySpan<char> text)
     {
         var state = new ScannerState(text);
-        scanner = new Scanner(state);
+        scanner = new(state);
     }
 
     public SyntaxToken[] Lex()

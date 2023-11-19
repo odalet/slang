@@ -71,6 +71,9 @@ internal sealed class Program
         var prettifier = new TokensPrettifier(span);
         prettifier.Dump(tokens);
         
+        var parser = new Parser(tokens);
+        var ast = parser.Parse();
+        
         Console.WriteLine("Press any key to exit");
         _ = Console.ReadKey();
 
